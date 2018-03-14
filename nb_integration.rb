@@ -1,7 +1,7 @@
 require "roda"
 require "json"
 
-require_relative "./helpers/helpers.rb"
+require_relative "../nb_integration/helpers/helpers.rb"
 include Helpers
 require_files
 
