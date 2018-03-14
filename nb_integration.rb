@@ -34,16 +34,21 @@ class App < Roda
         r.get do
           # fetch events, show the first one
           response = Client.index(path_provider: @path_provider, resource: :events)
-          event = event(response)
-
-          {
-            id: event["id"],
-            name: event["name"],
-            intro: event["intro"],
-            status: event["status"],
-            start_time: event["start_time"],
-            end_time: event["end_time"]
-          }
+          if response.status != 200
+            {
+              errors: [message: "Unexpected response from NationBuilder"]
+            }
+          else
+            event = event(response)
+            {
+              id: event["id"],
+              name: event["name"],
+              intro: event["intro"],
+              status: event["status"],
+              start_time: event["start_time"],
+              end_time: event["end_time"]
+            }
+          end
         end
 
         # POST /event request
