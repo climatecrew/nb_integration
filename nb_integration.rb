@@ -1,7 +1,8 @@
 require "roda"
 require "json"
 
-require_relative "../nb_integration/helpers/helpers.rb"
+$:.unshift File.expand_path(File.dirname(__FILE__), "helpers/")
+require "helpers/helpers"
 include Helpers
 require_files
 
