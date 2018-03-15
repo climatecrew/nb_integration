@@ -2,9 +2,8 @@ require "roda"
 require "json"
 
 $:.unshift File.expand_path(File.dirname(__FILE__), "helpers/")
-require "helpers/helpers"
-include Helpers
-require_files
+require "helpers/path_provider"
+require "helpers/client"
 
 class App < Roda
   include NBConfiguration
