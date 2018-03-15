@@ -62,5 +62,13 @@ class App < Roda
         end
       end
     end
+
+    r.on "oauth" do
+      r.is "callback" do
+        code = r.params["code"]
+        logger.info("code: #{code}")
+        { code: code }
+      end
+    end
   end
 end
