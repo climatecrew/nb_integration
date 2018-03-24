@@ -59,3 +59,5 @@ rspec
 ## Integration Tests
 
 The integration tests will make HTTP requests to the development server, so it must be running for the tests to work.
+
+If you need to run the development server at a different location than http://localhost:3000 change the `config.integration_test_server` value in  `spec/spec_helper.rb`.
