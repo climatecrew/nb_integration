@@ -1,6 +1,6 @@
 require File.expand_path("../../helpers/client.rb", __FILE__)
 
-describe Client do
+RSpec.describe Client do
   let(:resource) { :test_resource }
   let(:path_provider_klass) do
     Class.new do
@@ -37,7 +37,7 @@ describe Client do
       stub_request(:get, index_path)
 
       path_provider = path_provider_klass.new(index_path)
-      client = Client.index(path_provider: path_provider, resource: resource)
+      Client.index(path_provider: path_provider, resource: resource)
 
       expect(a_request(:get, index_path).with(
         headers: {
@@ -53,7 +53,7 @@ describe Client do
       stub_request(:post, create_path)
 
       path_provider = path_provider_klass.new(create_path)
-      client = Client.create(path_provider: path_provider, resource: resource)
+      Client.create(path_provider: path_provider, resource: resource)
 
       expect(a_request(:post, create_path)).to have_been_made.once
     end
@@ -62,7 +62,7 @@ describe Client do
       stub_request(:post, create_path)
 
       path_provider = path_provider_klass.new(create_path)
-      client = Client.create(path_provider: path_provider, resource: resource)
+      Client.create(path_provider: path_provider, resource: resource)
 
       expect(a_request(:post, create_path).with(body: {})).to have_been_made.once
     end
@@ -74,7 +74,7 @@ describe Client do
         "key" => "value"
       }
       path_provider = path_provider_klass.new(create_path)
-      client = Client.create(path_provider: path_provider,
+      Client.create(path_provider: path_provider,
                              resource: resource,
                              payload: expected_payload)
 
@@ -96,7 +96,7 @@ describe Client do
       stub_request(:delete, delete_path)
 
       path_provider = path_provider_klass.new(delete_path)
-      client = Client.delete(path_provider: path_provider, resource: resource, id: id)
+      Client.delete(path_provider: path_provider, resource: resource, id: id)
 
       expect(a_request(:delete, delete_path).with(
         headers: {
@@ -116,7 +116,7 @@ describe Client do
       payload = {
         key: :value
       }
-      client = Client.update(path_provider: path_provider,
+      Client.update(path_provider: path_provider,
                              resource: resource,
                              id: id,
                              payload: payload)
@@ -138,7 +138,7 @@ describe Client do
       stub_request(:get, match_path)
 
       path_provider = path_provider_klass.new(match_path)
-      client = Client.match(path_provider: path_provider,
+      Client.match(path_provider: path_provider,
                              resource: resource,
                              parameters: parameters)
       expect(a_request(:get, match_path).with(

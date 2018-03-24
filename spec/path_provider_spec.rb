@@ -1,6 +1,6 @@
 require File.expand_path("../../helpers/path_provider.rb", __FILE__)
 
-describe PathProvider do
+RSpec.describe PathProvider do
   let(:slug) { 'test-nation' }
   let(:api_token) { 'test-token' }
   let(:path_provider) { PathProvider.new(slug: slug, api_token: api_token) }

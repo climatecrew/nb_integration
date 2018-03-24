@@ -1,7 +1,7 @@
 require "logger"
 require File.expand_path("../../helpers/nb_configuration.rb", __FILE__)
 
-describe NBConfiguration do
+RSpec.describe NBConfiguration do
   let(:including_class) do
     Class.new do
       include NBConfiguration
@@ -32,6 +32,8 @@ describe NBConfiguration do
 
       ENV['NB_API_TOKEN'] = 'abc'
       ENV['NB_SLUG'] = 'mynation'
+
+      expect(object.nb_configuration_valid?).to be_truthy
     end
 
     it "returns false if API Token missing" do
