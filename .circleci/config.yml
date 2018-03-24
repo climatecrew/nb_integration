@@ -40,6 +40,11 @@ jobs:
       #- run: bundle exec rake db:create
       #- run: bundle exec rake db:schema:load
 
+      # run local server for integration tests
+      - run:
+          name: run server
+          command: bundle exec puma -C config/puma.rb
+
       # run tests!
       - run:
           name: run tests
