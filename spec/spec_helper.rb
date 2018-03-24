@@ -14,6 +14,10 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require 'webmock/rspec'
+WebMock.disable_net_connect!(allow_localhost: true)
+
+require "faraday"
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
@@ -98,4 +102,12 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
+
+  # For integration tests
+  integration_server_url = "http://localhost:3000"
+  begin
+    Faraday.get integration_server_url
+  rescue Faraday::ConnectionFailed => error
+    puts "WARNING: Could not reach #{integration_server_url} for integration testing. Integration tests will raise errors. Details:\n#{error}"
+  end
 end
