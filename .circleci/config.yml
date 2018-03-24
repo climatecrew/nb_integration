@@ -42,13 +42,12 @@ jobs:
 
       # run tests!
       # we exclude integration specs as long as we only have one container
-      # the non-integration tests are all at the top level of the spec/ directory
-      # but ideally we could use "spec/**/*_spec.rb" as the glob pattern
       - run:
           name: run tests
           command: |
             mkdir /tmp/test-results
-            TEST_FILES="$(circleci tests glob "spec/*_spec.rb" | circleci tests split --split-by=timings)"
+            echo "Warning: excluding spec/integration/ directory"
+            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | grep -v integration/ | circleci tests split --split-by=timings)"
             
             bundle exec rspec --format progress \
                             --format RspecJunitFormatter \
