@@ -1,4 +1,8 @@
 require "logger"
+require 'dotenv'
+Dotenv.load('.env')
+# If this file is present we want it to override ENV variables
+Dotenv.overload('.env.local')
 
 $:.unshift File.dirname(__FILE__)
 $:.unshift File.expand_path(File.dirname(__FILE__), "helpers/")

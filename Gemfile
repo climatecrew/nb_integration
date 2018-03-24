@@ -9,6 +9,7 @@ gem 'faraday'
 gem 'roda'
 
 group :test, :development do
+  gem 'dotenv'
   gem 'pry'
   gem 'rerun'
 end
