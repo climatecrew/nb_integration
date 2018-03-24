@@ -19,6 +19,23 @@ The app is deployed on Heroku. To deploy you must have access to the CREW Heroku
 
 You will need the [Heroku CLI](https://devcenter.heroku.com/categories/command-line) for various server administration tasks. See Heroku's docs for more information.
 
+## NationBuilder Setup
+
+[NationBuilder developer docs](https://nationbuilder.com/developers)
+
+We need to do the following as a one-time setup. It is based on the [API Quickstart](https://nationbuilder.com/api_quickstart) guide.
+
+1. Register the app in our NationBuilder nation, crew.nationbuilder.com. An admin of that nation must go to Settings -> Developer -> Register app and enter the required details.
+2. A logged-in admin of crew.nationbuilder.com must install the app.
+
+You will only need to re-do these steps if a CREW admin deletes and/or uninstalls this app.
+
+To repeat, registering and installing are different actions. CREW owns and provides this app so CREW is the only nation that registers it. A nation that wants to use the app's features installs it. In our case the sole intended user is the same nation, crew.nationbuilder.com.
+
+A nation that registers an app can choose to make it available for other nations to install so that they too can use its features. That is not our intent for this particular app, so we do not make it publicly available in the registration step. We intend CREW to be the only nation that installs it.
+
+By virtue of an admin installing it in crew.nationbuilder.com, the app will obtain an API access token. It uses that token to authenticate when making requests to the NationBuilder API on behalf of CREW.
+
 # Development
 
 The web service makes requests to the NationBuilder, and needs credentials for a specific nation. Namely it requires `NB_SLUG` and `NB_API_TOKEN` environment variables.
