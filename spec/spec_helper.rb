@@ -106,9 +106,9 @@ RSpec.configure do |config|
   # For integration tests
   config.add_setting :integration_test_server
   config.integration_test_server = "http://localhost:3000"
-  begin
-    Faraday.get config.integration_test_server
-  rescue Faraday::ConnectionFailed => error
-    puts "WARNING: Could not reach #{config.integration_test_server} for integration testing. Integration tests will raise errors. Details:\n#{error}"
-  end
+  #begin
+  #  Faraday.get config.integration_test_server
+  #rescue Faraday::ConnectionFailed => error
+  #  puts "WARNING: Could not reach #{config.integration_test_server} for integration testing. Integration tests will raise errors. Details:\n#{error}"
+  #end
 end
