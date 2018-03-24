@@ -41,7 +41,9 @@ jobs:
       #- run: bundle exec rake db:schema:load
 
       # run tests!
-      # exclude integration specs as long as we only have one container
+      # we exclude integration specs as long as we only have one container
+      # the non-integration tests are all at the top level of the spec/ directory
+      # but ideally we could use "spec/**/*_spec.rb" as the glob pattern
       - run:
           name: run tests
           command: |
@@ -52,7 +54,6 @@ jobs:
                             --format RspecJunitFormatter \
                             --out /tmp/test-results/rspec.xml \
                             --format progress \
-                            --exclude-pattern spec/{integration}/**/*_spec.rb \
                             $TEST_FILES
 
       # collect reports
