@@ -1,12 +1,7 @@
-require "rack/test"
-require "logger"
-require File.expand_path("../../../nb_integration.rb", __FILE__)
+require "support/rack_test_helper"
 
 RSpec.describe "GET /oauth/callback" do
-  include Rack::Test::Methods
-  def app
-    App.app
-  end
+  include RackTestHelper
 
   let(:authorization_code) { "007" }
   let(:nation_slug) { "test_nation_slug" }
@@ -28,17 +23,12 @@ RSpec.describe "GET /oauth/callback" do
     }
   end
   let(:body_params) { {} }
-  let(:rack_env) do
-    {
-      "rack.logger" => Logger.new("log/test.log")
-    }
-  end
 
   it "returns 200" do
     stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
       with(access_token_request)
 
-    get "/oauth/callback?code=#{authorization_code}", body_params, rack_env
+    get "/oauth/callback?code=#{authorization_code}", body_params, test_rack_env
 
     expect(last_response).to be_ok
   end
@@ -47,7 +37,7 @@ RSpec.describe "GET /oauth/callback" do
     token_request = stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
       with(access_token_request)
 
-    get "/oauth/callback?code=#{authorization_code}", body_params, rack_env
+    get "/oauth/callback?code=#{authorization_code}", body_params, test_rack_env
 
     expect(token_request).to have_been_requested.once
   end
