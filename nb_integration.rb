@@ -80,12 +80,27 @@ class App < Roda
           response.status = 422
           { "errors" => errors }
         else
-          response = RequestOAuthAccessToken.new(
+          token_response = RequestOAuthAccessToken.new(
             slug: r.params["slug"],
             code: r.params["code"]
           ).call
 
-          { code: r.params["code"] }
+          if token_response.status != 200
+            response.status = 500
+            {
+              "errors" => [{"title" => "An error occurred when attempting to obtain an access token from NationBuilder. Please try again."}]
+            }
+          else
+            {
+              "data" => {
+                "id": "1",
+                "type": "oauth_callback",
+                "attributes": {
+                  "message" => "Installation successful"
+                }
+              }
+            }
+          end
         end
       end
     end
