@@ -23,11 +23,9 @@ class RequestOAuthAccessToken
   end
 
   def access_token_request_body
-    client_secret = "app_client_secret"
-    client_id = "app_client_id"
     {
-      client_id: client_id,
-      client_secret: client_secret,
+      client_id: app_client_id,
+      client_secret: app_client_secret,
       redirect_uri: "#{app_base_url}/oauth/callback?slug=#{slug}",
       grant_type: "authorization_code",
       code: code

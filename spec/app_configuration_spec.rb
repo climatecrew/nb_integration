@@ -121,4 +121,24 @@ RSpec.describe AppConfiguration do
       expect(object.app_base_url).to eq('http://api.test.gov')
     end
   end
+
+  describe "app_client_id" do
+    it "returns ENV['NB_CLIENT_ID']" do
+      object = including_class.new
+
+      ENV['NB_CLIENT_ID'] = '29edc'
+
+      expect(object.app_client_id).to eq('29edc')
+    end
+  end
+
+  describe "app_client_secret" do
+    it "returns ENV['NB_CLIENT_SECRET']" do
+      object = including_class.new
+
+      ENV['NB_CLIENT_SECRET'] = 'dd74e'
+
+      expect(object.app_client_secret).to eq('dd74e')
+    end
+  end
 end

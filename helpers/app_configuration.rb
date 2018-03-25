@@ -32,4 +32,12 @@ module AppConfiguration
   def app_base_url
     "#{protocol}://#{domain_name}"
   end
+
+  def app_client_id
+    ENV['NB_CLIENT_ID']
+  end
+
+  def app_client_secret
+    ENV['NB_CLIENT_SECRET']
+  end
 end

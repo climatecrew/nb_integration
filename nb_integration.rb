@@ -55,10 +55,10 @@ class App < Roda
         # POST /event request
         r.post do
           # just for this demo we're trusting the input from the client as-is
-          response = Client.update(path_provider: @path_provider,
-                                   resource: :events,
-                                   id: r.params["event"]["id"],
-                                   payload: r.params)
+          Client.update(path_provider: @path_provider,
+                        resource: :events,
+                        id: r.params["event"]["id"],
+                        payload: r.params)
 
           r.redirect
         end
