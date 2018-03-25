@@ -53,4 +53,4 @@ build-iPhoneSimulator/
 .env.local
 
 # logs
-/log
+/log/*.log
