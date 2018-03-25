@@ -4,6 +4,7 @@ require "json"
 $:.unshift File.expand_path(File.dirname(__FILE__), "helpers/")
 require "helpers/path_provider"
 require "helpers/client"
+require "helpers/nb_configuration"
 
 class App < Roda
   include NBConfiguration
@@ -65,9 +66,29 @@ class App < Roda
 
     r.on "oauth" do
       r.is "callback" do
-        code = r.params["code"]
-        logger.info("code: #{code}")
-        { code: code }
+        authorization_code = r.params["code"]
+        slug = "test_nation_slug"
+        nation_url = "https://#{slug}.nationbuilder.com"
+        client_secret = "app_client_secret"
+        client_id = "app_client_id"
+        access_token_request_path = "/oauth/token"
+        access_token_request_body = {
+          client_id: client_id,
+          client_secret: client_secret,
+          redirect_uri: "http://x.com",
+          grant_type: "authorization_code",
+          code: authorization_code
+        }.to_json
+
+        conn = Faraday.new(url: nation_url)
+        response = conn.post do |req|
+          req.url access_token_request_path
+          req.headers['Content-Type'] = 'application/json'
+          req.body = access_token_request_body
+        end
+
+        logger.info("code: #{authorization_code}")
+        { code: authorization_code }
       end
     end
   end
