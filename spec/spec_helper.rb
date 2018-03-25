@@ -17,6 +17,7 @@ require 'webmock/rspec'
 WebMock.disable_net_connect!(allow_localhost: true)
 
 require "faraday"
+require "pry"
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
@@ -102,17 +103,4 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
-
-  # For integration tests
-  config.add_setting :integration_test_server
-  config.integration_test_server = "http://localhost:3000"
-
-  # TODO: determine how to run a web process for integration tests on CircleCI
-  unless ENV["CIRCLECI"] == "true"
-    begin
-      Faraday.get config.integration_test_server
-    rescue Faraday::ConnectionFailed => error
-      puts "WARNING: Could not reach #{config.integration_test_server} for integration testing. Integration tests will raise errors. Details:\n#{error}"
-    end
-  end
 end
