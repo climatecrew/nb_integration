@@ -1,4 +1,4 @@
-module NBConfiguration
+module AppConfiguration
   def nb_api_token
     ENV['NB_API_TOKEN']
   end

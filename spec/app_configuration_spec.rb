@@ -1,10 +1,10 @@
 require "logger"
-require File.expand_path("../../helpers/nb_configuration.rb", __FILE__)
+require File.expand_path("../../helpers/app_configuration.rb", __FILE__)
 
-RSpec.describe NBConfiguration do
+RSpec.describe AppConfiguration do
   let(:including_class) do
     Class.new do
-      include NBConfiguration
+      include AppConfiguration
     end
   end
 
