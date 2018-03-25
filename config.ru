@@ -4,7 +4,7 @@ begin
   Dotenv.load('.env')
   # If this file is present we want it to override ENV variables
   Dotenv.overload('.env.local')
-rescue
+rescue LoadError
   Logger.new($stderr).info("Could not load dotenv. Will not use Dotenv to set environment variables.")
 end
 
