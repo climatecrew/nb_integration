@@ -84,4 +84,41 @@ RSpec.describe AppConfiguration do
       expect(logger).to have_received(:warn).with("ENV['NB_SLUG'] unset.")
     end
   end
+
+  describe "domain_name" do
+    it "returns ENV['DOMAIN_NAME']" do
+      ENV['DOMAIN_NAME'] = 'www.example.com'
+      object = including_class.new
+
+      expect(object.domain_name).to eq('www.example.com')
+    end
+  end
+
+  describe "protocol" do
+    it "defaults to https" do
+      object = including_class.new
+
+      ENV.delete('HTTP_PROTOCOL')
+
+      expect(object.protocol).to eq('https')
+    end
+
+    it "returns ENV['HTTP_PROTOCOL'] if present" do
+      object = including_class.new
+
+      ENV['HTTP_PROTOCOL'] = 'http'
+
+      expect(object.protocol).to eq('http')
+    end
+  end
+
+  describe "app_base_url" do
+    it "returns a URL configured with protocol and domain" do
+      object = including_class.new
+      ENV['HTTP_PROTOCOL'] = 'http'
+      ENV['DOMAIN_NAME'] = 'api.test.gov'
+
+      expect(object.app_base_url).to eq('http://api.test.gov')
+    end
+  end
 end

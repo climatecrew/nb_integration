@@ -1,7 +1,9 @@
 require "support/rack_test_helper"
+require "helpers/app_configuration"
 
 RSpec.describe "GET /oauth/callback" do
   include RackTestHelper
+  include AppConfiguration
 
   let(:authorization_code) { "007" }
   let(:nation_slug) { "test_nation_slug" }
@@ -11,7 +13,7 @@ RSpec.describe "GET /oauth/callback" do
     {
       client_id: client_id,
       client_secret: client_secret,
-      redirect_uri: "http://x.com",
+      redirect_uri: "#{app_base_url}/oauth/callback?slug=#{nation_slug}",
       grant_type: "authorization_code",
       code: authorization_code
     }

@@ -20,4 +20,16 @@ module AppConfiguration
       logger.warn("ENV['NB_SLUG'] unset.")
     end
   end
+
+  def domain_name
+    ENV['DOMAIN_NAME']
+  end
+
+  def protocol
+    ENV['HTTP_PROTOCOL'] || 'https'
+  end
+
+  def app_base_url
+    "#{protocol}://#{domain_name}"
+  end
 end
