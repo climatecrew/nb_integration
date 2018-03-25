@@ -5,8 +5,9 @@ source 'https://rubygems.org'
 
 gem "puma"
 
-gem 'faraday'
 gem 'roda'
+
+gem 'faraday'
 
 group :test, :development do
   gem 'dotenv'
@@ -15,6 +16,7 @@ group :test, :development do
 end
 
 group :test do
+  gem 'rack-test'
   gem 'rspec'
   gem 'rspec_junit_formatter'
   gem 'webmock'

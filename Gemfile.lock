@@ -24,6 +24,8 @@ GEM
     public_suffix (3.0.2)
     puma (3.11.3)
     rack (2.0.4)
+    rack-test (0.8.3)
+      rack (>= 1.0, < 3)
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
@@ -61,6 +63,7 @@ DEPENDENCIES
   faraday
   pry
   puma
+  rack-test
   rerun
   roda
   rspec
