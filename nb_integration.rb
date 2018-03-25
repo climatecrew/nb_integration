@@ -5,6 +5,7 @@ $:.unshift File.expand_path(File.dirname(__FILE__), "helpers/")
 require "helpers/path_provider"
 require "helpers/client"
 require "helpers/app_configuration"
+require "helpers/request_oauth_access_token"
 
 class App < Roda
   include AppConfiguration
@@ -66,29 +67,26 @@ class App < Roda
 
     r.on "oauth" do
       r.is "callback" do
-        authorization_code = r.params["code"]
-        slug = "test_nation_slug"
-        nation_url = "https://#{slug}.nationbuilder.com"
-        client_secret = "app_client_secret"
-        client_id = "app_client_id"
-        access_token_request_path = "/oauth/token"
-        access_token_request_body = {
-          client_id: client_id,
-          client_secret: client_secret,
-          redirect_uri: "#{app_base_url}/oauth/callback?slug=#{slug}",
-          grant_type: "authorization_code",
-          code: authorization_code
-        }.to_json
-
-        conn = Faraday.new(url: nation_url)
-        response = conn.post do |req|
-          req.url access_token_request_path
-          req.headers['Content-Type'] = 'application/json'
-          req.body = access_token_request_body
+        errors = []
+        if r.params["slug"].nil?
+          errors << { "title" => "slug parameter is missing" }
         end
 
-        logger.info("code: #{authorization_code}")
-        { code: authorization_code }
+        if r.params["code"].nil?
+          errors << { "title" => "code parameter is missing" }
+        end
+
+        if errors.any?
+          response.status = 422
+          { "errors" => errors }
+        else
+          response = RequestOAuthAccessToken.new(
+            slug: r.params["slug"],
+            code: r.params["code"]
+          ).call
+
+          { code: r.params["code"] }
+        end
       end
     end
   end

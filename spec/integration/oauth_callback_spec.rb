@@ -26,11 +26,35 @@ RSpec.describe "GET /oauth/callback" do
   end
   let(:body_params) { {} }
 
+  context "missing parameters" do
+    it "requires slug" do
+      get "/oauth/callback?code=#{authorization_code}", body_params, test_rack_env
+
+      expect(last_response.status).to eq(422)
+      expect(JSON.parse(last_response.body)).to eq(
+        {
+          "errors" => [{"title" => "slug parameter is missing"}]
+        }
+      )
+    end
+
+    it "requires code" do
+      get "/oauth/callback?slug=#{nation_slug}", body_params, test_rack_env
+
+      expect(last_response.status).to eq(422)
+      expect(JSON.parse(last_response.body)).to eq(
+        {
+          "errors" => [{"title" => "code parameter is missing"}]
+        }
+      )
+    end
+  end
+
   it "returns 200" do
     stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
       with(access_token_request)
 
-    get "/oauth/callback?code=#{authorization_code}", body_params, test_rack_env
+    get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", body_params, test_rack_env
 
     expect(last_response).to be_ok
   end
@@ -39,7 +63,7 @@ RSpec.describe "GET /oauth/callback" do
     token_request = stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
       with(access_token_request)
 
-    get "/oauth/callback?code=#{authorization_code}", body_params, test_rack_env
+    get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", body_params, test_rack_env
 
     expect(token_request).to have_been_requested.once
   end
