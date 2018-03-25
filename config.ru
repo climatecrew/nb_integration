@@ -1,8 +1,12 @@
 require "logger"
-require 'dotenv'
-Dotenv.load('.env')
-# If this file is present we want it to override ENV variables
-Dotenv.overload('.env.local')
+begin
+  require 'dotenv'
+  Dotenv.load('.env')
+  # If this file is present we want it to override ENV variables
+  Dotenv.overload('.env.local')
+rescue
+  Logger.new($stderr).info("Could not load dotenv. Will not use Dotenv to set environment variables.")
+end
 
 $:.unshift File.dirname(__FILE__)
 $:.unshift File.expand_path(File.dirname(__FILE__), "helpers/")
