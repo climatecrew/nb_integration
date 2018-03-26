@@ -6,6 +6,7 @@ require "helpers/path_provider"
 require "helpers/client"
 require "helpers/app_configuration"
 require "helpers/request_oauth_access_token"
+require "helpers/nb_app_install"
 
 class App < Roda
   include AppConfiguration
@@ -114,9 +115,10 @@ class App < Roda
 
         r.post do
           errors = []
-          unless r.params["slug"].nil? || r.params["slug"].empty?
-            response.status = 201
-            "success"
+          slug = r.params['slug']
+          unless slug.nil? || slug.empty?
+            nb_install_url = NBAppInstall.new(slug: slug).url
+            r.redirect(nb_install_url)
           else
             response.status = 422
             errors << { "title" => "slug missing" }

@@ -1,4 +1,5 @@
 require "support/rack_test_helper"
+require "helpers/nb_app_install"
 
 RSpec.describe "/install" do
   include RackTestHelper
@@ -12,10 +13,14 @@ RSpec.describe "/install" do
   end
 
   describe "POST /install" do
-    it "returns 201" do
-      post "/install", { "slug" => "test_slug" }
+    it "redirects to the NationBuilder OAuth request URL" do
+      test_slug = "slug"
+      nb_install_url = NBAppInstall.new(slug: test_slug).url
 
-      expect(last_response.status).to eq(201)
+      post "/install", { "slug" => test_slug }
+
+      expect(last_response.status).to eq(302)
+      expect(last_response["Location"]).to eq(nb_install_url)
     end
 
     context "when slug not entered" do
