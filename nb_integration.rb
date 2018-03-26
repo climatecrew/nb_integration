@@ -11,6 +11,7 @@ class App < Roda
   include AppConfiguration
 
   plugin :json
+  plugin :render
 
   def event(event_index_response)
     data = JSON.parse(event_index_response.body)
@@ -27,7 +28,7 @@ class App < Roda
                                       api_token: nb_api_token)
     # GET / request
     r.root do
-      r.redirect "/event"
+      render("home")
     end
 
     r.on "event" do
