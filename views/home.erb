@@ -9,6 +9,17 @@
         font-weight: bold;
     }
 
+    .red {
+        color: #ba2a2a;
+    }
+
+    .green {
+        color: #258e28;
+    }
+
+    .blue {
+        color: #2e80cc;
+
     .container {
         max-width: 680px;
     }
@@ -50,7 +61,10 @@
 
     <div class="error">
         <% if flash["error"] %>
-            Error: <%= flash["error"] %>
+            <span class="bold red">Error:</span> <span><%= flash["error"] %></span>
+        <% end %>
+        <% if flash["notice"] %>
+            <span class="bold blue"><%= flash["notice"] %></span>
         <% end %>
     </div>
 </div>

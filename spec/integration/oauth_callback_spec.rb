@@ -91,7 +91,7 @@ RSpec.describe "GET /oauth/callback" do
     end
 
     context "when NationBuilder provides a successful token response" do
-      it "returns a successful response" do
+      it "redirects to /install with a success message" do
         stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
           with(access_token_request).
           to_return({
@@ -100,18 +100,8 @@ RSpec.describe "GET /oauth/callback" do
 
         get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
 
-        expect(last_response).to be_ok
-        expect(JSON.parse(last_response.body)).to match(
-          a_hash_including(
-            "data" => a_hash_including(
-              "id" => an_instance_of(String),
-              "type" => "oauth_callback",
-              "attributes" => a_hash_including(
-                "message" => "Installation successful"
-              )
-            )
-          )
-        )
+        expect(last_response.status).to eq(302)
+        expect(last_response["Location"]).to eq("/install?flash[notice]=Installation+successful")
       end
     end
   end

@@ -93,15 +93,7 @@ class App < Roda
               "errors" => [{"title" => "An error occurred when attempting to obtain an access token from NationBuilder. Please try again."}]
             }
           else
-            {
-              "data" => {
-                "id": "1",
-                "type": "oauth_callback",
-                "attributes": {
-                  "message" => "Installation successful"
-                }
-              }
-            }
+            r.redirect("/install?flash[notice]=Installation+successful")
           end
         end
       end
