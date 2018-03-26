@@ -28,7 +28,7 @@ class App < Roda
                                       api_token: nb_api_token)
     # GET / request
     r.root do
-      render("home")
+      render("home", locals: { errors: [] })
     end
 
     r.on "event" do
@@ -101,6 +101,26 @@ class App < Roda
                 }
               }
             }
+          end
+        end
+      end
+    end
+
+    r.on "install" do
+      r.is do
+        r.get do
+          render("home", locals: { errors: [] })
+        end
+
+        r.post do
+          errors = []
+          unless r.params["slug"].nil? || r.params["slug"].empty?
+            response.status = 201
+            "success"
+          else
+            response.status = 422
+            errors << { "title" => "slug missing" }
+            render("home", locals: { errors: errors })
           end
         end
       end

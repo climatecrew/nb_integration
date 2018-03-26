@@ -26,15 +26,22 @@
 
 <form action="/install" method="post">
     <div class="flex-container">
-    <div>
-        <label for="slug" class="bold">Nation slug:</label>
-        <input type="text" id="slug">
-    </div>
+        <div>
+            <label for="slug" class="bold">Nation slug:</label>
+            <input type="text" id="slug" name="slug">
+        </div>
 
-    <div>
-        <span>.nationbuilder.com</span>
-    </div>
+        <div>
+            <span>.nationbuilder.com</span>
+        </div>
 
-    <button type="submit">Install</button>
+        <button type="submit">Install</button>
+
     </div>
 </form>
+
+<div class="error">
+    <% if errors.any? %>
+        Error: <%= errors.first["title"] %>
+    <% end %>
+</div>
