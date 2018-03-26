@@ -8,40 +8,49 @@
     .bold {
         font-weight: bold;
     }
+
+    .container {
+        max-width: 680px;
+    }
 </style>
 
-<h1>Welcome</h1>
+<div class="container">
+    <h1>Welcome</h1>
 
-<p>
-    This is the home page of <a href="https://www.climatecrew.org">CREW's</a> NationBuilder integration app.
-</p>
+    <p>
+        This is the home page of <a href="https://www.climatecrew.org">CREW's</a> NationBuilder integration app.
+    </p>
 
-<p>
-    If you are an admin of a <a href="https://nationbuilder.com">NationBuilder</a> nation and you want to install this app, enter the nation slug below and click Install. You will be re-directed to login to that nation if necessary.
-</p>
+    <p>
+        If you are an admin of a <a href="https://nationbuilder.com">NationBuilder</a> nation and you want to install this app, enter the nation slug below and click Install. You will be re-directed to login to that nation if necessary.
+    </p>
 
-<p>
-    Please be aware that by installing this app, you are granting it access to read and write the data of the nation associated with the entered slug. For example this app will be able to create a calendar event in the nation on your behalf. To uninstall go to Settings -> Apps in your nation's control panel.
-</p>
+    <p>
+        Please be aware that by installing this app, you are granting it access to read and write the data of the nation associated with the entered slug. For example it will be able to create a calendar event in the nation on your behalf.
+    </p>
+    <p>
+        If you ever want to uninstall you can go to Settings -> Apps in your nation's control panel.
+    </p>
 
-<form action="/install" method="post">
-    <div class="flex-container">
-        <div>
-            <label for="slug" class="bold">Nation slug:</label>
-            <input type="text" id="slug" name="slug">
+    <form action="/install" method="post">
+        <div class="flex-container">
+            <div>
+                <label for="slug" class="bold">Nation slug:</label>
+                <input type="text" id="slug" name="slug">
+            </div>
+
+            <div>
+                <span>.nationbuilder.com</span>
+            </div>
+
+            <button type="submit">Install</button>
+
         </div>
+    </form>
 
-        <div>
-            <span>.nationbuilder.com</span>
-        </div>
-
-        <button type="submit">Install</button>
-
+    <div class="error">
+        <% if errors.any? %>
+            Error: <%= errors.first["title"] %>
+        <% end %>
     </div>
-</form>
-
-<div class="error">
-    <% if errors.any? %>
-        Error: <%= errors.first["title"] %>
-    <% end %>
 </div>
