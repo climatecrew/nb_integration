@@ -29,7 +29,7 @@ class App < Roda
                                       api_token: nb_api_token)
     # GET / request
     r.root do
-      render("home", locals: { errors: [] })
+      render("home", locals: { flash: {} })
     end
 
     r.on "event" do
@@ -110,7 +110,12 @@ class App < Roda
     r.on "install" do
       r.is do
         r.get do
-          render("home", locals: { errors: [] })
+          flash = if r.params["flash"]
+            r.params["flash"]
+          else
+            {}
+          end
+          render("home", locals: { flash: flash })
         end
 
         r.post do
@@ -120,9 +125,7 @@ class App < Roda
             nb_install_url = NBAppInstall.new(slug: slug).url
             r.redirect(nb_install_url)
           else
-            response.status = 422
-            errors << { "title" => "slug missing" }
-            render("home", locals: { errors: errors })
+            r.redirect("/install?flash[error]=slug+is+missing")
           end
         end
       end

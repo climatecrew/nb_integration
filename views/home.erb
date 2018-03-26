@@ -26,7 +26,7 @@
     </p>
 
     <p>
-        Please be aware that by installing this app, you are granting it access to read and write the data of the nation associated with the entered slug. For example it will be able to create a calendar event in the nation on your behalf.
+        Please be aware that by installing this app, you are granting it access to read and write the data owned by the nation associated with the entered slug. For example it will be able to create a calendar event in the nation on your behalf.
     </p>
     <p>
         If you ever want to uninstall you can go to Settings -> Apps in your nation's control panel.
@@ -49,8 +49,8 @@
     </form>
 
     <div class="error">
-        <% if errors.any? %>
-            Error: <%= errors.first["title"] %>
+        <% if flash["error"] %>
+            Error: <%= flash["error"] %>
         <% end %>
     </div>
 </div>

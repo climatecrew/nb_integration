@@ -24,10 +24,11 @@ RSpec.describe "/install" do
     end
 
     context "when slug not entered" do
-      it "returns 422" do
+      it "redirects to /install with a flash error message" do
         post "/install"
 
-        expect(last_response.status).to eq(422)
+        expect(last_response.status).to eq(302)
+        expect(last_response["Location"]).to eq("/install?flash[error]=slug+is+missing")
       end
     end
   end
