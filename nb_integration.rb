@@ -111,7 +111,6 @@ class App < Roda
         end
 
         r.post do
-          errors = []
           slug = r.params['slug']
           unless slug.nil? || slug.empty?
             nb_install_url = NBAppInstall.new(slug: slug).url
