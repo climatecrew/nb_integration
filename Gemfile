@@ -4,6 +4,7 @@ ruby "2.5.0"
 source 'https://rubygems.org'
 
 gem 'faraday'
+gem 'sequel'
 gem "puma"
 gem 'roda'
 gem 'tilt'
