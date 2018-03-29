@@ -5,7 +5,8 @@ source 'https://rubygems.org'
 
 gem 'faraday'
 gem 'sequel'
-gem "puma"
+gem 'pg'
+gem 'puma'
 gem 'roda'
 gem 'tilt'
 
