@@ -8,6 +8,9 @@ require "helpers/app_configuration"
 require "helpers/request_oauth_access_token"
 require "helpers/nb_app_install"
 
+$:.unshift File.expand_path(File.dirname(__FILE__), "models/")
+require "models/account"
+
 class App < Roda
   include AppConfiguration
 
@@ -93,6 +96,8 @@ class App < Roda
               "errors" => [{"title" => "An error occurred when attempting to obtain an access token from NationBuilder. Please try again."}]
             }
           else
+            token_response_body = JSON.parse(token_response.body)
+            Account.create(nb_slug: r.params["slug"], nb_access_token: token_response_body["access_token"])
             r.redirect("/install?flash[notice]=Installation+successful")
           end
         end

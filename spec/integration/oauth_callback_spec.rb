@@ -60,7 +60,11 @@ RSpec.describe "GET /oauth/callback" do
   context "when required parameters supplied" do
     it "attempts to exchange the authorization code for an access token" do
       token_request = stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
-        with(access_token_request)
+        with(access_token_request).
+        to_return({
+          headers: { "Content-Type" => "application/json" },
+          body: access_token_success_response.to_json
+        })
 
       get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
 
@@ -73,9 +77,10 @@ RSpec.describe "GET /oauth/callback" do
         stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
           with(access_token_request).
           to_return({
-          status: 404,
-          body: access_token_failure_response
-        })
+            status: 404,
+            headers: { "Content-Type" => "text/html" },
+            body: access_token_failure_response
+          })
 
         get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
 
@@ -95,13 +100,28 @@ RSpec.describe "GET /oauth/callback" do
         stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
           with(access_token_request).
           to_return({
-          body: access_token_success_response.to_json
-        })
+            headers: { "Content-Type" => "application/json" },
+            body: access_token_success_response.to_json
+          })
 
         get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
 
         expect(last_response.status).to eq(302)
         expect(last_response["Location"]).to eq("/install?flash[notice]=Installation+successful")
+      end
+
+      it "writes to slug and token to the database" do
+        stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
+          with(access_token_request).
+          to_return({
+            headers: { "Content-Type" => "application/json" },
+            body: access_token_success_response.to_json
+          })
+
+        get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
+
+        account = Account.first
+        expect(account.nb_access_token).to eq(access_token_success_response["access_token"])
       end
     end
   end
