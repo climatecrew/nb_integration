@@ -1,3 +1,4 @@
+require 'sequel'
 require File.expand_path("../../helpers/database_access.rb", __FILE__)
 
 RSpec.describe DatabaseAccess do
@@ -9,6 +10,15 @@ RSpec.describe DatabaseAccess do
 
   it "provides a DB constant" do
     expect(described_class::DB).to be
+  end
+
+  it "sets DB to a connection" do
+    connection = Sequel.connect(ENV['DB_URL'])
+    expect(described_class::DB.opts[:uri]).to eq(connection.opts[:uri])
+  end
+
+  it "makes the DB constant available to including class" do
+    expect(including_class::DB).to eq(described_class::DB)
   end
 
   describe ".connect_options" do
