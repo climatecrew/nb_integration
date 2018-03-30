@@ -19,6 +19,9 @@ WebMock.disable_net_connect!(allow_localhost: true)
 require "faraday"
 require "pry"
 
+require File.expand_path("../../helpers/dotenv_loader.rb", __FILE__)
+DotenvLoader.new(environment: :test).load
+
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
   # assertion/expectation library such as wrong or the stdlib/minitest
