@@ -1,0 +1,9 @@
+test:
+  adapter: 'postgres'
+  host: 'localhost'
+  database: 'nb_integration_test'
+
+development:
+  adapter: 'postgres'
+  host: 'localhost'
+  database: 'nb_integration_development'

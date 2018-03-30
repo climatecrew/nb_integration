@@ -10,21 +10,36 @@ desc "Run test suite"
 task :spec => :test
 
 namespace :db do
-  namespace :test do
-    desc "Create test database"
-    task :create do
-      sh "createdb nb_integration_test"
+  [:development, :test].each do |env|
+    namespace env do
+      desc "Create #{env} database"
+      task :create do
+        sh "createdb nb_integration_#{env}"
+      end
+
+      desc "Drop #{env} database"
+      task :drop do
+        sh "dropdb nb_integration_#{env}"
+      end
+
+      desc "Setup #{env} database"
+      task :setup => :create
+
+      desc "Reset #{env} database"
+      task :reset => [:drop, :create]
     end
-
-    desc "Drop test database"
-    task :drop do
-      sh "dropdb nb_integration_test"
-    end
-
-    desc "Create test database"
-    task :setup => :create
-
-    desc "Drop test database, create test database"
-    task :reset => [:drop, :create]
   end
+
+  # default to development DB
+  desc "Create development database"
+  task :create => 'development:create'
+
+  desc "Drop development database"
+  task :drop => 'development:drop'
+
+  desc "Setup development database"
+  task :setup => 'development:setup'
+
+  desc "Rest development database"
+  task :reset => 'development:reset'
 end
