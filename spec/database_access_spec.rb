@@ -13,7 +13,7 @@ RSpec.describe DatabaseAccess do
   end
 
   it "sets DB to a connection" do
-    connection = Sequel.connect(ENV['DB_URL'])
+    connection = Sequel.connect(ENV['DATABASE_URL'])
     expect(described_class::DB.opts[:uri]).to eq(connection.opts[:uri])
   end
 
@@ -23,16 +23,16 @@ RSpec.describe DatabaseAccess do
 
   describe ".connect_options" do
     before do
-      @old_db_url = ENV['DB_URL']
+      @old_db_url = ENV['DATABASE_URL']
     end
 
     after do
-      ENV['DB_URL'] = @old_db_url
+      ENV['DATABASE_URL'] = @old_db_url
     end
 
     it "reads from the environment" do
       db_url = 'postgres://user:password@localhost/nb_integration_test'
-      ENV['DB_URL'] = db_url
+      ENV['DATABASE_URL'] = db_url
       expect(DatabaseAccess.connect_options).to eq(db_url)
     end
   end
