@@ -91,10 +91,8 @@ class App < Roda
           ).call
 
           if token_response.status != 200
-            response.status = 500
-            {
-              "errors" => [{"title" => "An error occurred when attempting to obtain an access token from NationBuilder. Please try again."}]
-            }
+            message = "An error occurred when attempting to install this app in your nation. Please try again."
+            r.redirect("/install?flash[error]=#{CGI::escape(message)}")
           else
             token_response_body = JSON.parse(token_response.body)
             Account.create(nb_slug: r.params["slug"], nb_access_token: token_response_body["access_token"])

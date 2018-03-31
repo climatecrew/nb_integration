@@ -72,7 +72,7 @@ RSpec.describe "GET /oauth/callback" do
     end
 
     context "when NationBuilder does not provide a successful token response" do
-      it "returns an error message" do
+      it "redirects to /install with a failure message" do
         access_token_failure_response = "<!DOCTYPE html><html><body>An error has occurred</body></html>"
         stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
           with(access_token_request).
@@ -84,14 +84,9 @@ RSpec.describe "GET /oauth/callback" do
 
         get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
 
-        expect(last_response).not_to be_ok
-        expect(last_response.status).to eq(500)
-
-        expect(JSON.parse(last_response.body)).to eq(
-          {
-            "errors" => [{"title" => "An error occurred when attempting to obtain an access token from NationBuilder. Please try again."}]
-          }
-        )
+        expect(last_response.status).to eq(302)
+        message = CGI::escape("An error occurred when attempting to install this app in your nation. Please try again.")
+        expect(last_response["Location"]).to eq("/install?flash[error]=#{message}")
       end
     end
 
