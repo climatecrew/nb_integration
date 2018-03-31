@@ -1,5 +1,3 @@
-require 'dotenv'
-
 class DotenvLoader
   def initialize(environment: :development)
     @environment = environment.to_sym
@@ -9,6 +7,7 @@ class DotenvLoader
 
   def load
     begin
+      require 'dotenv'
       Dotenv.load('.env')
       # If this file is present we want it to override ENV variables
       Dotenv.overload('.env.local')
