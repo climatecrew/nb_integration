@@ -7,6 +7,7 @@ gem 'faraday'
 gem 'sequel'
 gem 'pg'
 gem 'puma'
+gem 'rake'
 gem 'roda'
 gem 'tilt'
 
