@@ -1,6 +1,7 @@
 require "sequel"
 
-Sequel::Model.plugin :timestamps, update_on_create: true
+$:.unshift File.expand_path(File.dirname(__FILE__), "../helpers/")
+require "helpers/database_access"
 
 class Account < Sequel::Model
 end
