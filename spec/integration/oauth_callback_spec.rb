@@ -35,7 +35,7 @@ RSpec.describe "GET /oauth/callback" do
 
   context "missing parameters" do
     it "requires slug" do
-      get "/oauth/callback?code=#{authorization_code}", test_rack_env
+      get "/oauth/callback?code=#{authorization_code}", {}, test_rack_env
 
       expect(last_response.status).to eq(422)
       expect(JSON.parse(last_response.body)).to eq(
@@ -45,19 +45,42 @@ RSpec.describe "GET /oauth/callback" do
       )
     end
 
-    it "requires code" do
-      get "/oauth/callback?slug=#{nation_slug}", test_rack_env
+    it "requires code or error parameter" do
+      get "/oauth/callback?slug=#{nation_slug}", {}, test_rack_env
 
       expect(last_response.status).to eq(422)
       expect(JSON.parse(last_response.body)).to eq(
         {
-          "errors" => [{"title" => "code parameter is missing"}]
+          "errors" => [{"title" => "Either code or error parameter must be given."}]
         }
       )
     end
   end
 
-  context "when required parameters supplied" do
+  context "when slug and error parameters supplied" do
+    context "when error_description supplied" do
+      it "redirects and shows the given error_description, plus 'App not installed.'" do
+        error_description = "The+resource+owner+or+authorization+server+denied+the+request."
+        get "/oauth/callback?slug=#{nation_slug}&error=access_denied&error_description=#{error_description}", {}, test_rack_env
+
+        expect(last_response.status).to eq(302)
+        message = "App+not+installed.+#{error_description}"
+        expect(last_response["Location"]).to eq("/install?flash[notice]=#{message}")
+      end
+    end
+
+    context "when error_description not supplied" do
+      it "redirects and shows 'App not installed.'" do
+        get "/oauth/callback?slug=#{nation_slug}&error=access_denied", {}, test_rack_env
+
+        expect(last_response.status).to eq(302)
+        message = "App+not+installed."
+        expect(last_response["Location"]).to eq("/install?flash[notice]=#{message}")
+      end
+    end
+  end
+
+  context "when slug and code parameters supplied" do
     it "attempts to exchange the authorization code for an access token" do
       token_request = stub_request(:post, "https://#{nation_slug}.nationbuilder.com/oauth/token").
         with(access_token_request).
@@ -66,7 +89,7 @@ RSpec.describe "GET /oauth/callback" do
           body: access_token_success_response.to_json
         })
 
-      get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
+      get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", {}, test_rack_env
 
       expect(token_request).to have_been_requested.once
     end
@@ -82,7 +105,7 @@ RSpec.describe "GET /oauth/callback" do
             body: access_token_failure_response
           })
 
-        get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
+        get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", {}, test_rack_env
 
         expect(last_response.status).to eq(302)
         message = CGI::escape("An error occurred when attempting to install this app in your nation. Please try again.")
@@ -99,7 +122,7 @@ RSpec.describe "GET /oauth/callback" do
             body: access_token_success_response.to_json
           })
 
-        get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
+        get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", {}, test_rack_env
 
         expect(last_response.status).to eq(302)
         expect(last_response["Location"]).to eq("/install?flash[notice]=Installation+successful")
@@ -113,7 +136,7 @@ RSpec.describe "GET /oauth/callback" do
             body: access_token_success_response.to_json
           })
 
-        get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
+        get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", {}, test_rack_env
 
         account = Account.first
         expect(account.nb_access_token).to eq(access_token_success_response[:access_token])

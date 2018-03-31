@@ -77,20 +77,30 @@ class App < Roda
           errors << { "title" => "slug parameter is missing" }
         end
 
-        if r.params["code"].nil?
-          errors << { "title" => "code parameter is missing" }
+        if r.params["code"].nil? && r.params["error"].nil?
+          errors << { "title" => "Either code or error parameter must be given." }
         end
 
         if errors.any?
+          logger.warn("Unexpected request to /oauth/callback: #{r.params}. Errors: #{errors}")
           response.status = 422
           { "errors" => errors }
         else
-          token_response = RequestOAuthAccessToken.new(
-            slug: r.params["slug"],
-            code: r.params["code"]
-          ).call
+          if r.params["error"].nil?
+            token_response = RequestOAuthAccessToken.new(
+              slug: r.params["slug"],
+              code: r.params["code"]
+            ).call
+          else
+            base_message = "#{CGI::escape('App not installed.')}"
+            if r.params["error_description"].nil?
+              message = base_message
+            else
+              message = "#{base_message}+#{CGI::escape(r.params['error_description'])}"
+            end
+            r.redirect("/install?flash[notice]=#{message}")
+          end
 
-          logger.info(token_response.inspect)
 
           if token_response.status != 200
             message = "An error occurred when attempting to install this app in your nation. Please try again."
