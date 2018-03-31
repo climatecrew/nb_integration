@@ -27,17 +27,7 @@ namespace :db do
 
       desc "Migrate #{env} database"
       task :migrate, [:version] do |t, args|
-        DotenvLoader.new(environment: env).load
-        require "sequel"
-        Sequel.extension :migration
-        db = Sequel.connect(ENV.fetch("DATABASE_URL"))
-        if args[:version]
-          puts "Migrating to version #{args[:version]}"
-          Sequel::Migrator.run(db, "db/migrate", target: args[:version].to_i)
-        else
-          puts "Migrating to latest"
-          Sequel::Migrator.run(db, "db/migrate")
-        end
+        Rake::Task["db:migrate"].invoke(env, *args)
       end
 
       desc "Setup #{env} database"
@@ -55,9 +45,20 @@ namespace :db do
   desc "Drop development database"
   task :drop => 'development:drop'
 
-  desc "Migrate development database"
-  task :migrate, [:version] do |t, args|
-    Rake::Task["db:development:migrate"].invoke(*args)
+  desc "Migrate database"
+  task :migrate, [:env, :version] do |t, args|
+    env = args[:env] || "development"
+    DotenvLoader.new(environment: env).load
+    require "sequel"
+    Sequel.extension :migration
+    db = Sequel.connect(ENV.fetch("DATABASE_URL"))
+    if args[:version]
+      puts "Migrating to version #{args[:version]}"
+      Sequel::Migrator.run(db, "db/migrate", target: args[:version].to_i)
+    else
+      puts "Migrating to latest"
+      Sequel::Migrator.run(db, "db/migrate")
+    end
   end
 
   desc "Setup development database"
