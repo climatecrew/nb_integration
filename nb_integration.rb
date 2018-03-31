@@ -74,17 +74,17 @@ class App < Roda
       r.is "callback" do
         errors = []
         if r.params["slug"].nil?
-          errors << { "title" => "slug parameter is missing" }
+          errors << "Missing slug parameter"
         end
 
         if r.params["code"].nil? && r.params["error"].nil?
-          errors << { "title" => "Either code or error parameter must be given." }
+          errors << "Either code or error parameter must be given"
         end
 
         if errors.any?
-          logger.warn("Unexpected request to /oauth/callback: #{r.params}. Errors: #{errors}")
-          response.status = 422
-          { "errors" => errors }
+          message = errors.join(', ')
+          logger.warn("Unexpected request to /oauth/callback: #{r.params}. Errors: #{message}")
+          r.redirect("/install?flash[error]=#{CGI::escape(message)}")
         else
           if r.params["error"].nil?
             token_response = RequestOAuthAccessToken.new(

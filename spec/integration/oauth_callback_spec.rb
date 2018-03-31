@@ -37,23 +37,17 @@ RSpec.describe "GET /oauth/callback" do
     it "requires slug" do
       get "/oauth/callback?code=#{authorization_code}", {}, test_rack_env
 
-      expect(last_response.status).to eq(422)
-      expect(JSON.parse(last_response.body)).to eq(
-        {
-          "errors" => [{"title" => "slug parameter is missing"}]
-        }
-      )
+      expect(last_response.status).to eq(302)
+      message = CGI::escape("Missing slug parameter")
+      expect(last_response["Location"]).to eq("/install?flash[error]=#{message}")
     end
 
     it "requires code or error parameter" do
       get "/oauth/callback?slug=#{nation_slug}", {}, test_rack_env
 
-      expect(last_response.status).to eq(422)
-      expect(JSON.parse(last_response.body)).to eq(
-        {
-          "errors" => [{"title" => "Either code or error parameter must be given."}]
-        }
-      )
+      expect(last_response.status).to eq(302)
+      message = CGI::escape("Either code or error parameter must be given")
+      expect(last_response["Location"]).to eq("/install?flash[error]=#{message}")
     end
   end
 
