@@ -101,7 +101,6 @@ class App < Roda
             r.redirect("/install?flash[notice]=#{message}")
           end
 
-
           if token_response.status != 200
             message = "An error occurred when attempting to install this app in your nation. Please try again."
             r.redirect("/install?flash[error]=#{CGI::escape(message)}")
