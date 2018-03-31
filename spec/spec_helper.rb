@@ -17,14 +17,14 @@ require "database_cleaner"
 require "faraday"
 require "pry"
 require "sequel"
+require "warning"
 require 'webmock/rspec'
 
 # Set environment first for any setup that depends on it
 require File.expand_path("../../helpers/dotenv_loader.rb", __FILE__)
 DotenvLoader.new(environment: :test).load
 
-DatabaseCleaner[:sequel].db = Sequel.connect(ENV.fetch('DATABASE_URL'))
-
+# Prevent outbound network requests
 WebMock.disable_net_connect!(allow_localhost: true)
 
 RSpec.configure do |config|
@@ -85,6 +85,14 @@ RSpec.configure do |config|
   # be too noisy due to issues in dependencies.
   config.warnings = true
 
+  # Silence specific warnings from dependencies
+  Gem.path.each do |gem_path|
+    sequel_path = "#{gem_path}/gems/sequel"
+    database_cleaner_path = "#{gem_path}/gems/database_cleaner"
+    Warning.ignore(/instance variable @\w+ not initialized/, sequel_path)
+    Warning.ignore(/instance variable @\w+ not initialized/, database_cleaner_path)
+  end
+
   # Many RSpec users commonly either run the entire suite or an individual
   # file, and it's useful to allow more verbose output when running an
   # individual spec file.
@@ -112,6 +120,7 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 
+  DatabaseCleaner[:sequel].db = Sequel.connect(ENV.fetch('DATABASE_URL'))
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
