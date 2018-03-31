@@ -13,14 +13,19 @@
 # it.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
-require 'webmock/rspec'
-WebMock.disable_net_connect!(allow_localhost: true)
-
+require "database_cleaner"
 require "faraday"
 require "pry"
+require "sequel"
+require 'webmock/rspec'
 
+# Set environment first for any setup that depends on it
 require File.expand_path("../../helpers/dotenv_loader.rb", __FILE__)
 DotenvLoader.new(environment: :test).load
+
+DatabaseCleaner[:sequel].db = Sequel.connect(ENV.fetch('DATABASE_URL'))
+
+WebMock.disable_net_connect!(allow_localhost: true)
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
@@ -106,4 +111,15 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
+
+  config.before(:suite) do
+    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.around(:each) do |example|
+    DatabaseCleaner.cleaning do
+      example.run
+    end
+  end
 end

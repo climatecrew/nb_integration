@@ -121,7 +121,7 @@ RSpec.describe "GET /oauth/callback" do
         get "/oauth/callback?slug=#{nation_slug}&code=#{authorization_code}", test_rack_env
 
         account = Account.first
-        expect(account.nb_access_token).to eq(access_token_success_response["access_token"])
+        expect(account.nb_access_token).to eq(access_token_success_response[:access_token])
       end
     end
   end

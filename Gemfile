@@ -18,6 +18,7 @@ group :test, :development do
 end
 
 group :test do
+  gem 'database_cleaner'
   gem 'rack-test'
   gem 'rspec'
   gem 'rspec_junit_formatter'
