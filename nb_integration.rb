@@ -16,6 +16,7 @@ class App < Roda
 
   plugin :json
   plugin :render
+  plugin :public, default_mime: "text/html"
 
   def event(event_index_response)
     data = JSON.parse(event_index_response.body)
@@ -31,6 +32,9 @@ class App < Roda
     r.root do
       render("home", locals: { flash: {} })
     end
+
+    # serve the app as an HTML page
+    r.public
 
     r.on "oauth" do
       r.is "callback" do
