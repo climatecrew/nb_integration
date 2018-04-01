@@ -16,7 +16,7 @@ class App < Roda
 
   plugin :json
   plugin :render
-  plugin :public, default_mime: "text/html"
+  plugin :public, gzip: true, default_mime: "text/html"
 
   def event(event_index_response)
     data = JSON.parse(event_index_response.body)
