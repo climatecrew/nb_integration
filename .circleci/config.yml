@@ -83,9 +83,9 @@ jobs:
           fingerprints:
             - "32:72:ca:a8:43:5a:d1:1c:f5:9d:01:5c:ad:0a:e9:ee"
 
-              #- run:
-              #          name: Add Heroku host fingerprint
-              #command: echo '8tF0wX2WquK45aGKs/Bh1dKmBXH08vxUe0VCJJWOA/o' >> ~/.ssh/known_hosts
+      - run:
+          name: Add Heroku to known_hosts
+          command: ssh-keyscan -H heroku.com >> ~/.ssh/known_hosts
 
       - run:
           name: Run Heroku Setup Script
@@ -98,8 +98,6 @@ jobs:
           command: |  # this command is framework-dependent and may vary
             heroku git:remote --ssh-git -a $HEROKU_APP_NAME
             git push --force git@heroku.com:$HEROKU_APP_NAME.git HEAD:refs/heads/master
-            #heroku run python manage.py deploy
-            #heroku restart
 
 workflows:
   version: 2
