@@ -8,5 +8,8 @@
   "license": "MIT",
   "dependencies": {
     "elm": "^0.18.0"
+  },
+  "scripts": {
+    "postinstall": "elm-make assets/nb_integration.elm --output public/nb_integration.js"
   }
 }
