@@ -17,12 +17,12 @@ namespace :db do
     namespace env do
       desc "Create #{env} database"
       task :create do
-        sh "createdb -h localhost -p 5432 nb_integration_#{env}"
+        sh "createdb nb_integration_#{env}"
       end
 
       desc "Drop #{env} database"
       task :drop do
-        sh "dropdb -h localhost -p 5432 nb_integration_#{env}"
+        sh "dropdb nb_integration_#{env}"
       end
 
       desc "Migrate #{env} database"
