@@ -13,6 +13,9 @@ jobs:
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
        - image: circleci/postgres:10.3-alpine-postgis
+         environment:
+            POSTGRES_USER=ubuntu
+            POSTGRES_DB=nb_integration_test
 
     working_directory: ~/repo
 
@@ -33,10 +36,9 @@ jobs:
             bundle install --jobs=4 --retry=3 --path vendor/bundle
 
       - save_cache:
-          working_directory: ~/repo/server
           paths:
             - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+          key: v1-dependencies-{{ checksum "server/Gemfile.lock" }}
         
       # Database setup
       - run: sudo apt install postgresql-client
