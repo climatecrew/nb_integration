@@ -68,3 +68,41 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
+
+  deploy:
+    docker:
+       - image: circleci/ruby:2.5.0-node-browsers
+         environment:
+            HEROKU_APP_NAME: polar-temple-72955
+
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+      - add_ssh_keys:  # add key from CircleCI account based on fingerprint
+          fingerprints:
+            - "32:72:ca:a8:43:5a:d1:1c:f5:9d:01:5c:ad:0a:e9:ee"
+      - run:
+          name: Run Heroku Setup Script
+          command: bash .circleci/setup-heroku.sh
+
+      - run:
+          name: Deploy Master to Heroku
+          command: |  # this command is framework-dependent and may vary
+            heroku git:remote -a $HEROKU_APP_NAME
+            git push --force git@heroku.com:$HEROKU_APP_NAME.git HEAD:refs/heads/master
+            #heroku run python manage.py deploy
+            #heroku restart
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
+      - deploy:  # only deploy when master successfully builds
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
