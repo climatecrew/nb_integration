@@ -15,9 +15,28 @@ Front-end code that interacts with the web service. A NationBuilder web page mus
 
 # Deployment
 
-The app is deployed on Heroku. To deploy you must have access to the CREW Heroku account.
+We host the app on Heroku. To deploy you must have access to the CREW Heroku account.
 
 You will need the [Heroku CLI](https://devcenter.heroku.com/categories/command-line) for various server administration tasks. See Heroku's docs for more information.
+
+## Environment variables
+
+Consult the Heroku settings page with the config variable values and the references to them in the source code for the comprehensive truth. With that said, here is a sampling:
+
+* `HTTP_PROTOCOL` and `DOMAIN_NAME`: used by the web service to compute its own URLs, for example https://api.climatecrew.org/oauth/callback
+* `DATABASE_URL`: managed by Heroku, the URL to connect to the Postgres DB backing the web service
+
+## Buildpacks
+
+The app requires the heroku/nodejs and heroku/ruby buildpacks, in that order. We use node to compile the Elm client app on production. `package.json` includes a post-install script to prep the app JS. We do not keep the compiled app in version control, because it would be a large file that slow down git clones, and would add noise to `git grep` results.
+
+The last Heroku buildpack determines the process type of the deployed application. Therefore we need it to be heroku/ruby in order to run the web service.
+
+## Continuous Deployment
+
+We have a build and deploy workflow defined in [CircleCI](https://circleci.com). You will need access to the [climatecrew](https://circleci.com/gh/climatecrew) team in CircleCI.
+
+When you push the `master` branch, Circle runs the test suite, and if it passes it will deploy to Heroku.
 
 ## NationBuilder Setup
 
@@ -36,22 +55,60 @@ A nation that registers an app can choose to make it available for other nations
 
 By virtue of an admin installing it in crew.nationbuilder.com, the app will obtain an API access token. It uses that token to authenticate when making requests to the NationBuilder API on behalf of CREW.
 
-# Development
 
-The web service makes requests to the NationBuilder, and needs credentials for a specific nation. Namely it requires `NB_SLUG` and `NB_API_TOKEN` environment variables.
+# Development and Testing
 
-We use the [Dotenv](https://github.com/bkeepers/dotenv) gem in order to set environment variables.
+## Web Service
+
+### Prerequisites
+
+* You need Postgres installed locally.
+* You need Ruby installed locally, and the bundler gem.
+
+Install dependencies:
+
+```
+bundle install
+```
+
+Prepare the development database:
+
+```
+rake db:setup # aka rake db:development:setup
+```
+
+Prepare the test database:
+
+```
+rake db:test:setup
+```
+
+### Verify Environment
+
+In production we use Heroku config variables to set the environment variables, but locally we use the [Dotenv](https://github.com/bkeepers/dotenv) gem.
+
+At first you should not need to change what is stored in this repo, but in case you do here are the details:
 
 Default values live in the file `.env`. Please *do not* commit secret credentials to this file.
 
-Sometimes you may need to hit a real nation's API for testing purposes, so you will need to temporarily use real credentials. Place them in a file named `.env.local`. That filename is gitignored in this repository.
+Sometimes you may need to temporarily use real credentials. Place them in a file named `.env.local`. That filename is gitignored in this repository.
 
-Example `.env.local`:
+Finally any environment variables that differ between development and test should be set in `.env.development.local` and `.env.test.local`.
+
+### Run the test suite
 
 ```
-NB_SLUG=crew
-NB_API_TOKEN=<a real API token>
+rake # by default runs the test suite
+
+# OR run the suite directly:
+
+rspec
+
+# OR run a specific test file
+rspec spec/integration/home_page_spec.rb
 ```
+
+### Run the development server
 
 We use the [Rerun](https://github.com/alexch/rerun) gem to automatically restart the app when files change. To run the web server:
 
@@ -65,20 +122,13 @@ Alternatively, if you have the [Heroku CLI](https://devcenter.heroku.com/categor
 heroku local web -p 3000
 ```
 
-# Testing
+### Making changes
 
-To run the test suite locally:
+Overall you should consult the documentation for:
 
-```
-rspec
-```
+* The [Roda](http://roda.jeremyevans.net/) web framework
+    * [Project structure conventions](http://sequel.jeremyevans.net/rdoc/files/doc/migration_rdoc.html)
+* The [Sequel](http://sequel.jeremyevans.net/) database toolkit
+    * Guide to [database migrations](http://sequel.jeremyevans.net/rdoc/files/doc/migration_rdoc.html)
 
-## Integration Tests
-
-The integration tests will make HTTP requests to the development server, so it must be running for the tests to work.
-
-If you need to run the development server at a different location than http://localhost:3000 change the `config.integration_test_server` value in  `spec/spec_helper.rb`.
-
-## Continuous Integration
-
-We run the tests in [CircleCI](https://circleci.com/gh/climatecrew).
+Please update and enhance the RSpec tests when editing the functionality.
