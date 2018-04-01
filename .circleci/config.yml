@@ -10,7 +10,7 @@ jobs:
        - image: circleci/ruby:2.5.0-node-browsers
          environment:
             PGHOST=localhost
-            PGUSER: root
+            PGUSER=root
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
