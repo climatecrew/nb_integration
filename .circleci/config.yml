@@ -19,6 +19,10 @@ jobs:
     steps:
       - checkout
 
+      - run
+          name: server directory
+          command: cd server
+
       # Download and cache dependencies
       - restore_cache:
           keys:

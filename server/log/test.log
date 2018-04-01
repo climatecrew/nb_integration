@@ -1,0 +1,95 @@
+# Logfile created on 2018-03-25 13:34:29 -0400 by logger.rb/61378
+I, [2018-03-25T13:34:29.190256 #6748]  INFO -- : code: 007
+I, [2018-03-25T13:34:43.639365 #6852]  INFO -- : code: 007
+I, [2018-03-25T13:38:03.237606 #7053]  INFO -- : code: 007
+I, [2018-03-25T13:38:11.400983 #7085]  INFO -- : code: 007
+I, [2018-03-25T13:38:37.137303 #7117]  INFO -- : code: 007
+I, [2018-03-25T13:40:26.535560 #7190]  INFO -- : code: 007
+I, [2018-03-25T13:42:27.458872 #7230]  INFO -- : code: 007
+I, [2018-03-25T13:44:10.940396 #7300]  INFO -- : code: 007
+I, [2018-03-25T13:44:45.804252 #7336]  INFO -- : code: 007
+I, [2018-03-25T13:50:05.575312 #7578]  INFO -- : code: 007
+I, [2018-03-25T13:50:11.319530 #7610]  INFO -- : code: 007
+I, [2018-03-25T13:51:37.995036 #7646]  INFO -- : code: 007
+I, [2018-03-25T13:52:06.385544 #7681]  INFO -- : code: 007
+I, [2018-03-25T13:52:31.833686 #7714]  INFO -- : code: 007
+I, [2018-03-25T13:52:31.846588 #7714]  INFO -- : code: 007
+I, [2018-03-25T13:55:51.206623 #7866]  INFO -- : code: 007
+I, [2018-03-25T13:57:57.723968 #8025]  INFO -- : code: 007
+I, [2018-03-25T13:57:57.735885 #8025]  INFO -- : code: 007
+I, [2018-03-25T13:59:51.748478 #8117]  INFO -- : code: 007
+I, [2018-03-25T13:59:51.760794 #8117]  INFO -- : code: 007
+I, [2018-03-25T14:01:27.329697 #8358]  INFO -- : code: 007
+I, [2018-03-25T14:01:27.343249 #8358]  INFO -- : code: 007
+I, [2018-03-25T14:52:07.137474 #8843]  INFO -- : code: 007
+I, [2018-03-25T14:52:10.775954 #8874]  INFO -- : code: 007
+I, [2018-03-25T14:52:10.789341 #8874]  INFO -- : code: 007
+I, [2018-03-25T14:57:06.725600 #9055]  INFO -- : code: 007
+I, [2018-03-25T14:57:06.738342 #9055]  INFO -- : code: 007
+I, [2018-03-25T14:57:10.868126 #9086]  INFO -- : code: 007
+I, [2018-03-25T14:57:10.878168 #9086]  INFO -- : code: 007
+I, [2018-03-25T14:58:11.900883 #9123]  INFO -- : code: 007
+I, [2018-03-25T14:58:11.913378 #9123]  INFO -- : code: 007
+I, [2018-03-25T14:58:18.164255 #9156]  INFO -- : code: 007
+I, [2018-03-25T14:58:18.176670 #9156]  INFO -- : code: 007
+I, [2018-03-25T14:58:24.065141 #9187]  INFO -- : code: 007
+I, [2018-03-25T14:58:24.078625 #9187]  INFO -- : code: 007
+I, [2018-03-25T15:50:30.919313 #9898]  INFO -- : code: 007
+I, [2018-03-25T15:50:30.931031 #9898]  INFO -- : code: 007
+I, [2018-03-25T16:10:39.218687 #10525]  INFO -- : code: 007
+I, [2018-03-25T16:10:39.231506 #10525]  INFO -- : code: 007
+I, [2018-03-25T16:19:15.122083 #10632]  INFO -- : code: 007
+I, [2018-03-25T16:19:15.137371 #10632]  INFO -- : code: 007
+I, [2018-03-25T16:21:03.198177 #10707]  INFO -- : code: 007
+I, [2018-03-25T16:21:03.210726 #10707]  INFO -- : code: 007
+I, [2018-03-25T16:22:49.979173 #10777]  INFO -- : code: 007
+I, [2018-03-25T16:22:49.989712 #10777]  INFO -- : code: 007
+I, [2018-03-25T16:23:01.695114 #10809]  INFO -- : code: 007
+I, [2018-03-25T16:23:01.706091 #10809]  INFO -- : code: 007
+I, [2018-03-25T16:23:29.776939 #10843]  INFO -- : code: 007
+I, [2018-03-25T16:23:29.788227 #10843]  INFO -- : code: 007
+I, [2018-03-25T16:25:41.145869 #10915]  INFO -- : code: 007
+I, [2018-03-25T16:25:41.160627 #10915]  INFO -- : code: 007
+I, [2018-03-25T16:25:51.624058 #10946]  INFO -- : code: 007
+I, [2018-03-25T16:25:51.633856 #10946]  INFO -- : code: 007
+I, [2018-03-25T16:36:30.412386 #11153]  INFO -- : code: 007
+I, [2018-03-25T16:36:30.428220 #11153]  INFO -- : code: 007
+I, [2018-03-25T16:37:41.493619 #11220]  INFO -- : code: 007
+I, [2018-03-25T16:37:41.507986 #11220]  INFO -- : code: 007
+W, [2018-03-31T15:00:26.684213 #64994]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:00:47.420149 #65080]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:00:50.860497 #65125]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:01:02.710261 #65182]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:01:02.712455 #65182]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: [{"title"=>"slug parameter is missing"}]
+W, [2018-03-31T15:01:30.578358 #65289]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:01:30.580059 #65289]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: [{"title"=>"slug parameter is missing"}]
+W, [2018-03-31T15:01:34.216238 #65329]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:01:34.217568 #65329]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: [{"title"=>"slug parameter is missing"}]
+W, [2018-03-31T15:12:18.311849 #67197]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:12:18.314128 #67197]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: [{"title"=>"slug parameter is missing"}]
+W, [2018-03-31T15:13:01.682409 #67335]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:13:01.683375 #67335]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: [{"title"=>"slug parameter is missing"}]
+W, [2018-03-31T15:23:50.472777 #68888]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:23:50.473934 #68888]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: [{"title"=>"slug parameter is missing"}]
+W, [2018-03-31T15:27:41.252408 #69527]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:27:41.253427 #69527]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: [{"title"=>"slug parameter is missing"}]
+W, [2018-03-31T15:40:01.132024 #71139]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:40:01.132889 #71139]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: [{"title"=>"slug parameter is missing"}]
+W, [2018-03-31T15:40:20.461956 #71217]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: [{"title"=>"Either code or error parameter must be given."}]
+W, [2018-03-31T15:40:20.462770 #71217]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: [{"title"=>"slug parameter is missing"}]
+W, [2018-03-31T18:41:50.770084 #83309]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: Either code or error parameter must be given.
+W, [2018-03-31T18:41:50.781820 #83309]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: slug parameter is missing
+W, [2018-03-31T18:43:03.811969 #83519]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: Either code or error parameter must be given.
+W, [2018-03-31T18:43:03.821155 #83519]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: slug parameter is missing
+W, [2018-03-31T18:43:18.124980 #83592]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: Either code or error parameter must be given.
+W, [2018-03-31T18:43:18.133389 #83592]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: slug parameter is missing
+W, [2018-03-31T18:43:48.156918 #83696]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: Either code or error parameter must be given.
+W, [2018-03-31T18:43:48.158702 #83696]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: slug parameter is missing
+W, [2018-03-31T18:46:13.392627 #84105]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: Either code or error parameter must be given.
+W, [2018-03-31T18:46:13.393458 #84105]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: slug parameter is missing
+W, [2018-03-31T18:50:18.182470 #84827]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: Either code or error parameter must be given
+W, [2018-03-31T18:50:18.183324 #84827]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: Missing slug parameter
+W, [2018-03-31T21:23:41.903978 #89822]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: Missing slug parameter
+W, [2018-03-31T21:23:41.904796 #89822]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: Either code or error parameter must be given
+W, [2018-03-31T21:30:57.489204 #90984]  WARN -- : Unexpected request to /oauth/callback: {"slug"=>"test_nation_slug"}. Errors: Either code or error parameter must be given
+W, [2018-03-31T21:30:57.490052 #90984]  WARN -- : Unexpected request to /oauth/callback: {"code"=>"007"}. Errors: Missing slug parameter
