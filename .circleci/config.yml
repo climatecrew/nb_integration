@@ -8,11 +8,17 @@ jobs:
     docker:
       # specify the version you desire here
        - image: circleci/ruby:2.5.0-node-browsers
+         environment:
+            PGHOST: localhost
+            PGUSER: root
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
       # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
+       - image: circleci/postgres:10.3-alpine-postgis
+         environment:
+            POSTGRES_USER: root
+            POSTGRES_DB: nb_integration_test
 
     working_directory: ~/repo
 
@@ -37,8 +43,10 @@ jobs:
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}
         
       # Database setup
-      #- run: bundle exec rake db:create
-      #- run: bundle exec rake db:schema:load
+      - run:
+          command: bundle exec rake db:test:migrate
+          environment:
+            DATABASE_URL: "postgres://localhost:5432/nb_integration_test"
 
       # run tests!
       # we exclude integration specs as long as we only have one container
