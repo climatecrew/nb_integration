@@ -44,9 +44,13 @@ jobs:
       - run:
           working_directory: ~/repo/server
           command: bundle exec rake db:test:create
+          environment:
+            DATABASE_URL: "postgres://ubuntu@localhost:5432/nb_integration_test"
       - run:
           working_directory: ~/repo/server
           command: bundle exec rake db:test:migrate
+          environment:
+            DATABASE_URL: "postgres://ubuntu@localhost:5432/nb_integration_test"
 
       # run tests!
       # we exclude integration specs as long as we only have one container
