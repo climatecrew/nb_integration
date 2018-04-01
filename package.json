@@ -13,6 +13,6 @@
     "elm": "^0.18.0"
   },
   "scripts": {
-    "postinstall": "elm-package install && elm-make assets/nb_integration.elm --output public/nb_integration.js"
+    "postinstall": "elm-package install -y && elm-make assets/nb_integration.elm --output public/nb_integration.js"
   }
 }
