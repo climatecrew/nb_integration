@@ -19,7 +19,7 @@ jobs:
     steps:
       - checkout
 
-      - run
+      - run:
           name: server directory
           command: cd server
 
