@@ -5,5 +5,8 @@
   "main": "index.js",
   "repository": "git@github.com:climatecrew/nb_integration.git",
   "author": "Stephen Karger <stephen.karger@gmail.com>",
-  "license": "BSD3"
+  "license": "MIT",
+  "dependencies": {
+    "elm": "^0.18.0"
+  }
 }
