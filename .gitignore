@@ -65,3 +65,4 @@ node_modules/*
 
 # compiled app
 public/nb_integration.js
+public/nb_integration.js.gz
