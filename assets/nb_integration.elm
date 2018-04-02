@@ -1,11 +1,25 @@
 module Main exposing (..)
 
-import Html exposing (beginnerProgram, div, button, text)
+import Html exposing (programWithFlags, div, button, text)
 import Html.Events exposing (onClick)
 
 
 main =
-    beginnerProgram { model = 0, view = view, update = update }
+    programWithFlags { init = init, update = update, subscriptions = subscriptions, view = view }
+
+
+init : Flags -> ( Model, Cmd msg )
+init flags =
+    ( model, Cmd.none )
+
+
+model =
+    0
+
+
+subscriptions : Model -> Sub msg
+subscriptions model =
+    Sub.none
 
 
 view model =
@@ -21,10 +35,19 @@ type Msg
     | Decrement
 
 
+type alias Model =
+    Int
+
+
+type alias Flags =
+    String
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Increment ->
-            model + 1
+            ( model + 1, Cmd.none )
 
         Decrement ->
-            model - 1
+            ( model - 1, Cmd.none )
