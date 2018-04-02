@@ -153,6 +153,29 @@ Overall you should consult the documentation for:
 
 Please update and enhance the RSpec tests when editing the functionality.
 
+## Frontend Client
+
+### Prerequisites
+
+* You need node and npm installed locally. See the engines section in `package.json` for the current node version.
+* You need [Yarn](https://yarnpkg.com/) installed locally.
+* You need [Elm](http://elm-lang.org/).
+    * `package.json` installs Elm via NPM, because we need it to compile in CircleCI and Heroku. However you can also install Elm with a platform-specific installer.
+
+Install dependencies:
+
+```
+yarn install
+```
+
+# Documentation
+
+If you update this README, update the table of contents by running:
+
+```
+yarn run markdown-toc -i README.md
+```
+
 # Documentation
 
 If you update this README, update the table of contents by running:
