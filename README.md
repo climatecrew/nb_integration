@@ -18,6 +18,9 @@ Integration to enhance CREW's NationBuilder website.
     + [Run the test suite](#run-the-test-suite)
     + [Run the development server](#run-the-development-server)
     + [Making changes](#making-changes)
+  * [Frontend Client](#frontend-client)
+    + [Prerequisites](#prerequisites-1)
+- [Documentation](#documentation)
 
 <!-- tocstop -->
 
@@ -166,14 +169,6 @@ Install dependencies:
 
 ```
 yarn install
-```
-
-# Documentation
-
-If you update this README, update the table of contents by running:
-
-```
-yarn run markdown-toc -i README.md
 ```
 
 # Documentation
