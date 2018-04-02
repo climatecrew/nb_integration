@@ -1,33 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (programWithFlags, div, button, text)
+import Html exposing (Html, programWithFlags, div, button, text)
 import Html.Events exposing (onClick)
-
-
-main =
-    programWithFlags { init = init, update = update, subscriptions = subscriptions, view = view }
-
-
-init : Flags -> ( Model, Cmd msg )
-init flags =
-    ( model, Cmd.none )
-
-
-model =
-    0
-
-
-subscriptions : Model -> Sub msg
-subscriptions model =
-    Sub.none
-
-
-view model =
-    div []
-        [ button [ onClick Decrement ] [ text "-" ]
-        , div [] [ text (toString model) ]
-        , button [ onClick Increment ] [ text "+" ]
-        ]
 
 
 type Msg
@@ -36,18 +10,50 @@ type Msg
 
 
 type alias Model =
-    Int
+    { counter : Int
+    , email : String
+    }
 
 
 type alias Flags =
-    String
+    { email : String, access_token : String }
+
+
+main : Program Flags Model Msg
+main =
+    programWithFlags
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    ( { counter = 0, email = flags.email }, Cmd.none )
+
+
+subscriptions : Model -> Sub msg
+subscriptions model =
+    Sub.none
+
+
+view : Model -> Html Msg
+view model =
+    div []
+        [ button [ onClick Decrement ] [ text "-" ]
+        , div [] [ text (toString model.counter) ]
+        , button [ onClick Increment ] [ text "+" ]
+        , div [] [ text model.email ]
+        ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Increment ->
-            ( model + 1, Cmd.none )
+            ( { model | counter = model.counter + 1 }, Cmd.none )
 
         Decrement ->
-            ( model - 1, Cmd.none )
+            ( { model | counter = model.counter - 1 }, Cmd.none )

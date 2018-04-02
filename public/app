@@ -9,9 +9,21 @@
             body { font-family: calibri, helvetica, arial, sans-serif; }
         </style>
 
+        <div id="event-creator", style="display: none;">
+            <div id="email">event.creator@gmail.com</div>
+        </div>
+
         <script src="nb_integration.js"></script>
     </head>
     <body>
-        <script type="text/javascript">Elm.Main.fullscreen()</script>
+        <script type="text/javascript">
+            var email = document.getElementById("email").textContent;
+            var access_token = "DEFAULT";
+
+            Elm.Main.fullscreen({
+                email: email,
+                access_token: access_token
+            })
+        </script>
     </body>
 </html>
