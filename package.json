@@ -14,5 +14,8 @@
   },
   "scripts": {
     "postinstall": "elm-package install -y && elm-make assets/nb_integration.elm --output public/nb_integration.js && gzip public/nb_integration.js"
+  },
+  "devDependencies": {
+    "markdown-toc": "^1.2.0"
   }
 }

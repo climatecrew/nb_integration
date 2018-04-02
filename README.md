@@ -1,6 +1,26 @@
 # nb_integration
 Integration to enhance CREW's NationBuilder website.
 
+<!-- toc -->
+
+- [Components](#components)
+  * [Ruby web service](#ruby-web-service)
+  * [Elm web client](#elm-web-client)
+- [Deployment](#deployment)
+  * [Environment variables](#environment-variables)
+  * [Buildpacks](#buildpacks)
+  * [Continuous Deployment](#continuous-deployment)
+  * [NationBuilder Setup](#nationbuilder-setup)
+- [Development and Testing](#development-and-testing)
+  * [Web Service](#web-service)
+    + [Prerequisites](#prerequisites)
+    + [Verify Environment](#verify-environment)
+    + [Run the test suite](#run-the-test-suite)
+    + [Run the development server](#run-the-development-server)
+    + [Making changes](#making-changes)
+
+<!-- tocstop -->
+
 # Components
 
 ## Ruby web service
@@ -132,3 +152,11 @@ Overall you should consult the documentation for:
     * Guide to [database migrations](http://sequel.jeremyevans.net/rdoc/files/doc/migration_rdoc.html)
 
 Please update and enhance the RSpec tests when editing the functionality.
+
+# Documentation
+
+If you update this README, update the table of contents by running:
+
+```
+yarn run -i README.md
+```
