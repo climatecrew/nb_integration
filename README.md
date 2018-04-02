@@ -158,5 +158,5 @@ Please update and enhance the RSpec tests when editing the functionality.
 If you update this README, update the table of contents by running:
 
 ```
-yarn run -i README.md
+yarn run markdown-toc -i README.md
 ```
