@@ -20,6 +20,7 @@ end
 
 group :test do
   gem 'database_cleaner'
+  gem 'json_expressions'
   gem 'rack-test'
   gem 'rspec'
   gem 'rspec_junit_formatter'

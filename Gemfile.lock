@@ -13,6 +13,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     ffi (1.9.23)
     hashdiff (0.3.7)
+    json_expressions (0.9.0)
     listen (3.1.5)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
@@ -68,6 +69,7 @@ DEPENDENCIES
   database_cleaner
   dotenv
   faraday
+  json_expressions
   pg
   pry
   puma
