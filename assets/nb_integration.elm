@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html exposing (Html, programWithFlags, div, button, text, input, label)
+import Html exposing (Html, programWithFlags, div, button, text, input, label, h2)
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
 
@@ -43,14 +43,19 @@ view : Model -> Html Msg
 view model =
     div [ class "nb-integration-container" ]
         [ div [] [ text model.email ]
-        , div [] [ label [] [ text "Name:", input [ type_ "text" ] [] ] ]
-        , div [] [ label [] [ text "Intro:", input [ type_ "text" ] [] ] ]
-        , div [] [ label [] [ text "Time Zone:", input [ type_ "text" ] [] ] ]
-        , div [] [ label [] [ text "Start Time:", input [ type_ "text" ] [] ] ]
-        , div [] [ label [] [ text "End Time:", input [ type_ "text" ] [] ] ]
-        , div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
-        , div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
-        , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
+        , div [ class "event-form" ]
+            [ div [] [ label [] [ text "Name:", input [ type_ "text" ] [] ] ]
+            , div [] [ label [] [ text "Intro:", input [ type_ "text" ] [] ] ]
+            , div [] [ label [] [ text "Time Zone:", input [ type_ "text" ] [] ] ]
+            , div [] [ label [] [ text "Start Time:", input [ type_ "text" ] [] ] ]
+            , div [] [ label [] [ text "End Time:", input [ type_ "text" ] [] ] ]
+            , div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
+            , div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
+            , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
+            ]
+        , div [ class "event-list" ]
+            [ h2 [] [ text "My Events" ]
+            ]
         ]
 
 
