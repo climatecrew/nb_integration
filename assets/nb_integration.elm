@@ -1,12 +1,12 @@
 module Main exposing (..)
 
-import Html exposing (Html, programWithFlags, div, button, text)
+import Html exposing (Html, programWithFlags, div, button, text, input, label)
+import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
 
 
 type Msg
-    = Increment
-    | Decrement
+    = SubmitEvent
 
 
 type alias Model =
@@ -41,19 +41,21 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ button [ onClick Decrement ] [ text "-" ]
-        , div [] [ text (toString model.counter) ]
-        , button [ onClick Increment ] [ text "+" ]
-        , div [] [ text model.email ]
+    div [ class "nb-integration-container" ]
+        [ div [] [ text model.email ]
+        , div [] [ label [] [ text "Name:", input [ type_ "text" ] [] ] ]
+        , div [] [ label [] [ text "Intro:", input [ type_ "text" ] [] ] ]
+        , div [] [ label [] [ text "Time Zone:", input [ type_ "text" ] [] ] ]
+        , div [] [ label [] [ text "Start Time:", input [ type_ "text" ] [] ] ]
+        , div [] [ label [] [ text "End Time:", input [ type_ "text" ] [] ] ]
+        , div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
+        , div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
+        , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
         ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Increment ->
-            ( { model | counter = model.counter + 1 }, Cmd.none )
-
-        Decrement ->
-            ( { model | counter = model.counter - 1 }, Cmd.none )
+        SubmitEvent ->
+            ( model, Cmd.none )
