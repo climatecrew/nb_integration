@@ -15,6 +15,7 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 require "database_cleaner"
 require "faraday"
+require "json_expressions/rspec"
 require "pry"
 require "sequel"
 require "warning"

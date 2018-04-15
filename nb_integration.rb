@@ -110,11 +110,23 @@ class App < Roda
         begin
           unless r.params["slug"].nil?
             Account.where(nb_slug: 'cat')
-            response.status =  201
+
+            r.post do
+              response.status =  201
+              {}
+            end
+
+            r.get do
+              response.status =  200
+              {
+                data: []
+              }
+            end
           else
             response.status =  422
           end
-        rescue
+        rescue => error
+          logger.warn(error)
           response.status = 500
         end
         {}
