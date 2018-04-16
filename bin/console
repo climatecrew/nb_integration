@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.expand_path(".")
+
+require "helpers/dotenv_loader"
+
+DotenvLoader.new(environment: :development).load
+
+command = "DATABASE_URL=#{ENV['DATABASE_URL']} sequel -I . -L helpers -L models #{ENV['DATABASE_URL']}"
+
+system(command)
