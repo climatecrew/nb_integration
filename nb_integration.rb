@@ -10,6 +10,7 @@ require "helpers/nb_app_install"
 
 $:.unshift File.expand_path(File.dirname(__FILE__), "models/")
 require "models/account"
+require "models/event"
 
 class App < Roda
   include AppConfiguration
@@ -109,7 +110,7 @@ class App < Roda
       r.is "events" do
         begin
           unless r.params["slug"].nil?
-            Account.where(nb_slug: 'cat')
+            Account.where(nb_slug: r.params["slug"])
 
             r.post do
               response.status =  201
@@ -118,9 +119,9 @@ class App < Roda
 
             r.get do
               response.status =  200
-              {
-                data: []
-              }
+              events = Event.where(nb_slug: r.params["slug"])
+              nb_events = events.map { |event| JSON.parse(event.nb_event) }
+              { data: nb_events }
             end
           else
             response.status =  422

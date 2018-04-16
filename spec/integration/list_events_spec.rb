@@ -1,4 +1,5 @@
 require "support/rack_test_helper"
+require "models/event"
 
 RSpec.describe "GET /api/events" do
   include RackTestHelper
@@ -35,13 +36,18 @@ RSpec.describe "GET /api/events" do
       expect(last_response.status).to eq(200)
     end
 
-    it "returns a list of events" do
+    it "returns a list of events for that slug" do
       slug = 'test_slug'
+      nb_event = JSON.parse(File.read("./spec/fixtures/nb_events_show.json"))
+
+      Event.create(nb_slug: slug,
+                   nb_event: JSON.generate(nb_event))
+      Event.create(nb_slug: "other_slug", nb_event: "{}")
 
       get "/api/events?slug=#{slug}", {}, test_rack_env
 
       data = JSON.parse(last_response.body)
-      expect(data).to match_json_expression({ data: [] })
+      expect(data).to match_json_expression({ data: [nb_event] })
     end
   end
 end
