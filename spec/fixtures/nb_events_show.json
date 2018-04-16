@@ -1,0 +1,47 @@
+{
+  "event": {
+    "id": 1,
+    "slug": "foobar",
+    "status": "unlisted",
+    "site_slug": "foobar",
+    "name": "foobar",
+    "headline": "foobar",
+    "title": "foobar - Foobar Softwares",
+    "excerpt": null,
+    "author_id": 1,
+    "published_at": null,
+    "external_id": null,
+    "tags": ["funny"],
+    "intro": null,
+    "calendar_id": 1,
+    "contact": {
+      "name": null,
+      "phone": null,
+      "show_phone": true,
+      "email": null,
+      "show_email": true
+    },
+    "start_time": "2013-02-07T18:00:00-00:00",
+    "end_time": "2013-02-07T21:00:00-00:00",
+    "time_zone": "Hawaii",
+    "rsvp_form": {
+      "phone": "hidden",
+      "address": "hidden",
+      "allow_guests": true,
+      "accept_rsvps": true,
+      "gather_volunteers": false
+    },
+    "capacity": 0,
+    "show_guests": true,
+    "venue": {
+      "name": null,
+      "address": null
+    },
+    "autoresponse": {
+      "broadcaster_id": 2,
+      "subject": "RSVP confirmation for foobar",
+      "body": null
+    },
+    "shifts": null
+  }
+}
