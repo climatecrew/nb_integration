@@ -19,10 +19,14 @@
         <script type="text/javascript">
             var email = document.getElementById("email").textContent;
             var access_token = "DEFAULT";
+            var rootURL = "http://localhost:3000";
+            var slug = "skarger";
 
             Elm.Main.fullscreen({
                 email: email,
-                access_token: access_token
+                access_token: access_token,
+                rootURL: rootURL,
+                slug: slug
             })
         </script>
     </body>
