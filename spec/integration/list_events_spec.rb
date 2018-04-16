@@ -9,6 +9,9 @@ RSpec.describe "GET /api/events" do
       get "/api/events", {}, test_rack_env
 
       expect(last_response.status).to eq(422)
+      expect(JSON.parse(last_response.body)).to match_json_expression({
+        "errors": [{"title": "missing slug parameter"}]
+      })
     end
 
     it "returns JSON on bad requests" do

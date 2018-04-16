@@ -107,6 +107,7 @@ class App < Roda
       # NationBuilder API URL provider
       @path_provider = PathProvider.new(slug: nb_slug,
                                         api_token: nb_api_token)
+      @response_body = {}
       r.is "events" do
         begin
           unless r.params["slug"].nil?
@@ -125,12 +126,13 @@ class App < Roda
             end
           else
             response.status =  422
+            @response_body = { errors: [{title: "missing slug parameter"}] }
           end
         rescue => error
           logger.warn(error)
           response.status = 500
         end
-        {}
+        @response_body
       end
     end
   end
