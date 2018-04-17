@@ -17,6 +17,7 @@ Integration to enhance CREW's NationBuilder website.
     + [Verify Environment](#verify-environment)
     + [Run the test suite](#run-the-test-suite)
     + [Run the development server](#run-the-development-server)
+    + [Console](#console)
     + [Making changes](#making-changes)
   * [Frontend Client](#frontend-client)
     + [Prerequisites](#prerequisites-1)
