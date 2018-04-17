@@ -145,6 +145,10 @@ Alternatively, if you have the [Heroku CLI](https://devcenter.heroku.com/categor
 heroku local web -p 3000
 ```
 
+### Console
+
+Run `bin/console` to access a command line client. It is a wrapper around Sequel's [bin/sequel utility](http://sequel.jeremyevans.net/rdoc/files/doc/bin_sequel_rdoc.html).
+
 ### Making changes
 
 Overall you should consult the documentation for:
