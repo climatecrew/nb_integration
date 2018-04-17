@@ -63,6 +63,8 @@ repl-temp-*
 
 node_modules/*
 
+yarn-error.log
+
 # compiled app
 public/nb_integration.js
 public/nb_integration.js.gz
