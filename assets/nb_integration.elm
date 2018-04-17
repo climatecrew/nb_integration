@@ -1,16 +1,24 @@
 module Main exposing (..)
 
-import Html exposing (Html, programWithFlags, div, button, text, input, label, h2)
+import Html exposing (Html, programWithFlags, div, button, text, input, label, h2, table, tr, td)
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
 import Http
-import Json.Decode exposing (list, string)
+import Json.Decode exposing (field, dict, list, string, array, int, map2)
+import String exposing (join)
+import Dict exposing (Dict)
 
 
 type Msg
     = SubmitEvent
     | FetchEvents
-    | FetchEventsResult (Result Http.Error (List String))
+    | FetchEventsResult (Result Http.Error (List Event))
+
+
+type alias Event =
+    { id : Int
+    , name : String
+    }
 
 
 type alias Model =
@@ -18,6 +26,7 @@ type alias Model =
     , email : String
     , rootURL : String
     , slug : String
+    , events : List Event
     }
 
 
@@ -41,6 +50,7 @@ init flags =
       , email = flags.email
       , rootURL = flags.rootURL
       , slug = flags.slug
+      , events = []
       }
     , Cmd.none
     )
@@ -68,6 +78,7 @@ view model =
         , div [ class "event-list" ]
             [ h2 [] [ text "My Events" ]
             , div [] [ button [ onClick FetchEvents ] [ text "Fetch Events" ] ]
+            , div [] [ table [] [ (tr [] [ (td []) (List.map text (List.map .name model.events)) ]) ] ]
             ]
         ]
 
@@ -82,12 +93,30 @@ update msg model =
             ( model, Http.send FetchEventsResult (getEvents model) )
 
         FetchEventsResult (Ok events) ->
+            ( { model | events = events }, Cmd.none )
+
+        FetchEventsResult (Err err) ->
             ( model, Cmd.none )
 
-        FetchEventsResult (Err _) ->
-            ( model, Cmd.none )
 
-
-getEvents : Model -> Http.Request (List String)
+getEvents : Model -> Http.Request (List Event)
 getEvents model =
-    Http.get (model.rootURL ++ "/api/events?slug=" ++ model.slug) (list string)
+    Http.get (model.rootURL ++ "/api/events?slug=" ++ model.slug)
+        (field "data" <|
+            list <|
+                field "event" <|
+                    map2 createEvent eventID eventName
+        )
+
+
+createEvent : Int -> String -> Event
+createEvent id name =
+    { id = id, name = name }
+
+
+eventID =
+    field "id" int
+
+
+eventName =
+    field "name" string
