@@ -21,8 +21,8 @@ type alias Event =
 
 
 type alias Model =
-    { counter : Int
-    , email : String
+    { email : String
+    , authorID : Int
     , rootURL : String
     , slug : String
     , events : List Event
@@ -30,7 +30,7 @@ type alias Model =
 
 
 type alias Flags =
-    { email : String, access_token : String, rootURL : String, slug : String }
+    { authorID : Int, email : String, access_token : String, rootURL : String, slug : String }
 
 
 main : Program Flags Model Msg
@@ -47,7 +47,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         model =
-            { counter = 0
+            { authorID = flags.authorID
             , email = flags.email
             , rootURL = flags.rootURL
             , slug = flags.slug
@@ -86,15 +86,16 @@ myEvents model =
         if List.length model.events > 0 then
             [ h2 [] [ text "My Events" ]
             , div []
-                [ table []
-                    [ tr []
-                        [ td [] <| List.map (text << .name) model.events
-                        ]
-                    ]
+                [ table [] (List.map eventRow model.events)
                 ]
             ]
         else
             []
+
+
+eventRow : Event -> Html Msg
+eventRow event =
+    tr [] [ td [] [ text event.name ] ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -112,7 +113,7 @@ update msg model =
 
 getEvents : Model -> Http.Request (List Event)
 getEvents model =
-    Http.get (model.rootURL ++ "/api/events?slug=" ++ model.slug)
+    Http.get (model.rootURL ++ "/api/events?slug=" ++ model.slug ++ "&author_nb_id=" ++ (toString model.authorID))
         (field "data" <|
             list <|
                 field "event" <|

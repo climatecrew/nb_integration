@@ -120,7 +120,11 @@ class App < Roda
 
             r.get do
               response.status =  200
-              events = Event.where(nb_slug: r.params["slug"])
+              conditions = { nb_slug: r.params["slug"] }
+              if !r.params["author_nb_id"].nil?
+                conditions[:author_nb_id] = r.params["author_nb_id"]
+              end
+              events = Event.where(conditions)
               nb_events = events.map { |event| JSON.parse(event.nb_event) }
               { data: nb_events }
             end

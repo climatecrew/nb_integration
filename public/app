@@ -11,6 +11,7 @@
 
         <div id="event-creator", style="display: none;">
             <div id="email">event.creator@gmail.com</div>
+            <div id="current-user-id">2</div>
         </div>
 
         <script src="nb_integration.js"></script>
@@ -21,9 +22,11 @@
             var access_token = "DEFAULT";
             var rootURL = "http://localhost:3000";
             var slug = "skarger";
+            var currentUserID = parseInt(document.getElementById("current-user-id").textContent, 10);
 
             Elm.Main.fullscreen({
                 email: email,
+                authorID : currentUserID,
                 access_token: access_token,
                 rootURL: rootURL,
                 slug: slug
