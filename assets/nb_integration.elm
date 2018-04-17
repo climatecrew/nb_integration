@@ -11,7 +11,6 @@ import Dict exposing (Dict)
 
 type Msg
     = SubmitEvent
-    | FetchEvents
     | FetchEventsResult (Result Http.Error (List Event))
 
 
@@ -46,14 +45,16 @@ main =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { counter = 0
-      , email = flags.email
-      , rootURL = flags.rootURL
-      , slug = flags.slug
-      , events = []
-      }
-    , Cmd.none
-    )
+    let
+        model =
+            { counter = 0
+            , email = flags.email
+            , rootURL = flags.rootURL
+            , slug = flags.slug
+            , events = []
+            }
+    in
+        ( model, Http.send FetchEventsResult (getEvents model) )
 
 
 subscriptions : Model -> Sub msg
@@ -75,12 +76,25 @@ view model =
             , div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
             , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
             ]
-        , div [ class "event-list" ]
-            [ h2 [] [ text "My Events" ]
-            , div [] [ button [ onClick FetchEvents ] [ text "Fetch Events" ] ]
-            , div [] [ table [] [ (tr [] [ (td []) (List.map text (List.map .name model.events)) ]) ] ]
-            ]
+        , div [ class "event-list" ] [ myEvents model ]
         ]
+
+
+myEvents : Model -> Html Msg
+myEvents model =
+    div [] <|
+        if List.length model.events > 0 then
+            [ h2 [] [ text "My Events" ]
+            , div []
+                [ table []
+                    [ tr []
+                        [ td [] <| List.map (text << .name) model.events
+                        ]
+                    ]
+                ]
+            ]
+        else
+            []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -88,9 +102,6 @@ update msg model =
     case msg of
         SubmitEvent ->
             ( model, Cmd.none )
-
-        FetchEvents ->
-            ( model, Http.send FetchEventsResult (getEvents model) )
 
         FetchEventsResult (Ok events) ->
             ( { model | events = events }, Cmd.none )
