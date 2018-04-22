@@ -54,21 +54,19 @@ RSpec.describe "GET /api/events" do
 
     context "when given a NationBuilder author id" do
       it "filters events to that author" do
-        nb_event_1 = JSON.parse(File.read("./spec/fixtures/nb_events_show.json"))
-        nb_event_2 = JSON.parse(File.read("./spec/fixtures/nb_events_show.json"))
-        nb_event_2["event"]["name"] = "Name 2"
+        nb_event = JSON.parse(File.read("./spec/fixtures/nb_events_show.json"))
 
         Event.create(nb_slug: slug,
                      author_nb_id: 1,
-                     nb_event: JSON.generate(nb_event_2))
+                     nb_event: JSON.generate(nb_event))
         Event.create(nb_slug: slug,
                      author_nb_id: 2,
-                     nb_event: JSON.generate(nb_event_2))
+                     nb_event: JSON.generate(nb_event))
 
         get "/api/events?slug=#{slug}&author_nb_id=2", {}, test_rack_env
 
         data = JSON.parse(last_response.body)
-        expect(data).to match_json_expression({ data: [nb_event_2] })
+        expect(data).to match_json_expression({ data: [nb_event] })
       end
     end
 
