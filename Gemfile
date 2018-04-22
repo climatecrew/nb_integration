@@ -1,5 +1,5 @@
 # instruct Heroku to use desired Ruby version
-ruby "2.5.0"
+ruby "2.5.1"
 
 source 'https://rubygems.org'
 
