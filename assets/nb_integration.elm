@@ -74,6 +74,8 @@ view model =
             , div [] [ label [] [ text "End Time:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
+            , div [] [ label [] [ text "Contact Name:", input [ type_ "text" ] [] ] ]
+            , div [] [ label [] [ text "Contact Email:", input [ type_ "text" ] [] ] ]
             , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
             ]
         , div [ class "event-list" ] [ myEvents model ]

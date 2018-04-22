@@ -1,8 +1,12 @@
 require "support/rack_test_helper"
+require "models/account"
 require "models/event"
 
 RSpec.describe "GET /api/events" do
   include RackTestHelper
+
+  let(:slug) { 'test_slug' }
+  let(:access_token) { SecureRandom.hex }
 
   context "invalid request" do
     it "returns 422 when missing parameters" do
@@ -23,7 +27,7 @@ RSpec.describe "GET /api/events" do
     it "returns JSON even when the server has an error" do
       allow(Account).to receive(:where).and_raise(RuntimeError, "bad")
 
-      get "/api/events?slug=test", {}, test_rack_env
+      get "/api/events?slug=#{slug}", {}, test_rack_env
 
       expect(last_response.headers['Content-Type']).to eq('application/json')
       expect { JSON.parse(last_response.body) }.not_to raise_error
@@ -31,9 +35,12 @@ RSpec.describe "GET /api/events" do
   end
 
   context "when request is successful" do
-    let(:slug) { "test_slug" }
+    before do
+      Account.create(nb_slug: slug, nb_access_token: access_token)
+    end
 
     it "returns 200" do
+
       get "/api/events?slug=#{slug}", {}, test_rack_env
 
       expect(last_response.status).to eq(200)

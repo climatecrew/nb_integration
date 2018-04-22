@@ -84,10 +84,10 @@ class App < Roda
       r.is do
         r.get do
           flash = if r.params["flash"]
-            r.params["flash"]
-          else
-            {}
-          end
+                    r.params["flash"]
+                  else
+                    {}
+                  end
           render("home", locals: { flash: flash })
         end
 
@@ -104,29 +104,36 @@ class App < Roda
     end
 
     r.on "api" do
-      # NationBuilder API URL provider
-      @path_provider = PathProvider.new(slug: nb_slug,
-                                        api_token: nb_api_token)
       @response_body = {}
       r.is "events" do
         begin
-          unless r.params["slug"].nil?
-            Account.where(nb_slug: r.params["slug"])
-
-            r.post do
-              response.status =  201
-              {}
-            end
-
-            r.get do
-              response.status =  200
-              conditions = { nb_slug: r.params["slug"] }
-              if !r.params["author_nb_id"].nil?
-                conditions[:author_nb_id] = r.params["author_nb_id"]
+          slug = r.params["slug"]
+          unless slug.nil?
+            account = Account.first(nb_slug: slug)
+            if account.nil?
+              response.status =  422
+              @response_body = { errors: [{title: "nation slug '#{slug}' not recognized"}] }
+            else
+              r.post do
+                logger.info("Attempting to create event for nation #{slug}")
+                response.status =  201
+                path_provider = PathProvider.new(slug: account.nb_slug,
+                                                 api_token: account.nb_access_token)
+                Client.create(path_provider: path_provider,
+                              resource: :events)
+                {}
               end
-              events = Event.where(conditions)
-              nb_events = events.map { |event| JSON.parse(event.nb_event) }
-              { data: nb_events }
+
+              r.get do
+                response.status =  200
+                conditions = { nb_slug: slug }
+                if !r.params["author_nb_id"].nil?
+                  conditions[:author_nb_id] = r.params["author_nb_id"]
+                end
+                events = Event.where(conditions)
+                nb_events = events.map { |event| JSON.parse(event.nb_event) }
+                { data: nb_events }
+              end
             end
           else
             response.status =  422
