@@ -44,32 +44,92 @@ RSpec.describe "POST /api/events" do
   end
 
   context "when request is successful" do
-    it "makes a request to NationBuilder with the formatted payload" do
-      url = "https://#{slug}.nationbuilder.com/api/v1/sites/#{slug}/pages/events" \
-            "?access_token=#{access_token}"
-      stub_request(:post, url)
-        .with("body": {})
-      Account.create(nb_slug: slug, nb_access_token: access_token)
+    let(:url) do
+      "https://#{slug}.nationbuilder.com/api/v1/sites/#{slug}/pages/events" \
+      "?access_token=#{access_token}"
+    end
+    let(:event_body) do
+      <<~JSON
+        {
+          "event": {
+            "name": "Day of Action"
+          }
+        }
+      JSON
+    end
 
-      post "/api/events?slug=#{slug}", {}, test_rack_env
+    let(:event_hash) { JSON.parse(event_body) }
+
+    let(:nb_event_body) do
+      {
+        "event" => {
+          "id" => 1,
+          "name" => "Day of Action"
+        }
+      }
+    end
+
+    before do
+      Account.create(nb_slug: slug, nb_access_token: access_token)
+    end
+
+    it "makes a request to NationBuilder with the formatted payload" do
+      stub_request(:post, url).with(body: event_hash)
+
+      post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
 
       expect(a_request(:post, url)
-        .with("body": {}))
+        .with("body": event_hash))
         .to have_been_made.once
     end
 
     context "when the NationBuilder request succeeds" do
-      it "writes the given event to the DB" do
+      it "writes the created event to the DB" do
+        stub_request(:post, url).with(body: event_hash)
+          .to_return(body: JSON.generate(nb_event_body))
 
+        post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
+
+        expect(Event.count).to eq(1)
+        expect(JSON.parse(Event.first.nb_event)).to eq(nb_event_body)
       end
 
-      it "returns the event" do
-        #expect(last_response.status).to eq(201)
+      it "returns 201 and the event" do
+        stub_request(:post, url).with(body: event_hash)
+          .to_return(body: JSON.generate(nb_event_body))
+
+        post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
+
+        expect(last_response.status).to eq(201)
+        expect(JSON.parse(last_response.body)).to match_json_expression({
+          "data" => nb_event_body
+        })
       end
     end
 
     context "when the NationBuilder request fails" do
       it "returns an error message" do
+        stub_request(:post, url).with(body: event_hash)
+          .to_return(status: 404, body: "{}")
+
+        post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
+
+        expect(last_response.status).to eq(404)
+        expect(JSON.parse(last_response.body)).to match_json_expression({
+          "errors" => [{ "title": "Failed to create event" }]
+        })
+      end
+
+      it "handles non-JSON responses from NationBuilder" do
+        stub_request(:post, url).with(body: event_hash)
+          .to_return(status: 200, body: "<html><body>Gateway Timeout</body></html>")
+
+        post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
+
+        expect(last_response.status).to eq(500)
+        expect(JSON.parse(last_response.body)).to match_json_expression({
+          "errors" => [{ "title": "Failed to create event" }]
+        })
       end
     end
   end

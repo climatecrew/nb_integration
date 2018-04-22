@@ -119,9 +119,31 @@ class App < Roda
                 response.status =  201
                 path_provider = PathProvider.new(slug: account.nb_slug,
                                                  api_token: account.nb_access_token)
-                Client.create(path_provider: path_provider,
-                              resource: :events)
-                {}
+                payload = r.params['data']
+                nb_response = Client.create(path_provider: path_provider,
+                                            resource: :events,
+                                            payload: payload)
+                if nb_response.status.to_i >= 400
+                  logger.warn("Create Event: NationBuilder request failed. Status: #{nb_response.status} / Body: #{nb_response.body}")
+                  response.status = nb_response.status
+                  @response_body = { errors: [{ title: "Failed to create event" }] }
+                else
+                  nb_event = begin
+                               JSON.parse(nb_response.body)
+                             rescue JSON::ParserError => e
+                               logger.warn("Create Event: Invalid JSON returned by NationBuilder: #{nb_response.body}")
+                               nil
+                             end
+
+                  if nb_event.nil?
+                    response.status = 500
+                    @response_body = { errors: [{ title: "Failed to create event" }] }
+                  else
+                    Event.create(nb_slug: slug,
+                                 nb_event: nb_response.body)
+                    @response_body = { data: JSON.parse(nb_response.body) }
+                  end
+                end
               end
 
               r.get do
@@ -132,7 +154,7 @@ class App < Roda
                 end
                 events = Event.where(conditions)
                 nb_events = events.map { |event| JSON.parse(event.nb_event) }
-                { data: nb_events }
+                @response_body = { data: nb_events }
               end
             end
           else
