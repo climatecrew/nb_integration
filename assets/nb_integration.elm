@@ -35,6 +35,11 @@ type alias APIResult =
     }
 
 
+defaultAPIResult : APIResult
+defaultAPIResult =
+    { errors = [], event = Nothing, events = [] }
+
+
 type alias Model =
     { apiResult : APIResult
     , authorID : Int
@@ -185,8 +190,29 @@ handleAPIError model err =
                     Err _ ->
                         model
 
-        _ ->
-            model
+        Http.BadPayload message response ->
+            { model
+                | apiResult =
+                    { defaultAPIResult | errors = [ Error "Unexpected response from server" ] }
+            }
+
+        Http.BadUrl url ->
+            { model
+                | apiResult =
+                    { defaultAPIResult | errors = [ Error <| "Invalid URL: " ++ url ] }
+            }
+
+        Http.Timeout ->
+            { model
+                | apiResult =
+                    { defaultAPIResult | errors = [ Error <| "Request timed out" ] }
+            }
+
+        Http.NetworkError ->
+            { model
+                | apiResult =
+                    { defaultAPIResult | errors = [ Error <| "Network Error" ] }
+            }
 
 
 createEvent : Model -> Http.Request APIResult
