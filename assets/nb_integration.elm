@@ -4,30 +4,46 @@ import Html exposing (Html, programWithFlags, div, button, text, input, label, h
 import Html.Attributes exposing (class, type_)
 import Html.Events exposing (onClick)
 import Http
-import Json.Decode exposing (field, dict, list, string, array, int, map2)
+import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString)
 import String exposing (join)
 import Dict exposing (Dict)
 
 
 type Msg
     = SubmitEvent
-    | FetchEventsResult (Result Http.Error (List Event))
-    | CreateEventResult (Result Http.Error Event)
+    | FetchEventsResult (Result Http.Error APIResult)
+    | CreateEventResult (Result Http.Error APIResult)
 
 
 type alias Event =
-    { id : Int
-    , name : String
+    { id : Int, name : String }
+
+
+type alias Error =
+    { title : String }
+
+
+type ResultPiece
+    = APIEvent Int String
+    | APIError String
+
+
+type alias APIResult =
+    { errors : List Error
+    , event : Event
+    , events : List Event
     }
 
 
 type alias Model =
-    { email : String
+    { apiResult : APIResult
     , authorID : Int
+    , email : String
+    , errors : List Error
+    , event : Event
+    , events : List Event
     , rootURL : String
     , slug : String
-    , events : List Event
-    , event : Event
     }
 
 
@@ -49,12 +65,14 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         model =
-            { authorID = flags.authorID
+            { apiResult = { errors = [], events = [], event = Event 0 "temp" }
+            , authorID = flags.authorID
             , email = flags.email
+            , event = Event 0 "Name..."
+            , events = []
+            , errors = []
             , rootURL = flags.rootURL
             , slug = flags.slug
-            , events = []
-            , event = constructEvent 0 "New Event"
             }
     in
         ( model, Http.send FetchEventsResult (getEvents model) )
@@ -81,6 +99,7 @@ view model =
             , div [] [ label [] [ text "Contact Email:", input [ type_ "text" ] [] ] ]
             , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
             ]
+        , div [ class "error-container" ] [ errorDisplay model ]
         , div [ class "event-list" ] [ myEvents model ]
         ]
 
@@ -88,19 +107,68 @@ view model =
 myEvents : Model -> Html Msg
 myEvents model =
     div [] <|
-        if List.length model.events > 0 then
-            [ h2 [] [ text "My Events" ]
-            , div []
-                [ table [] (List.map eventRow model.events)
+        let
+            events =
+                model.apiResult.events
+        in
+            if List.length events > 0 then
+                [ h2 [] [ text "My Events" ]
+                , div []
+                    [ table [] (List.map eventRow events)
+                    ]
                 ]
-            ]
-        else
-            []
+            else
+                []
+
+
+errorDisplay : Model -> Html Msg
+errorDisplay model =
+    div [] <|
+        let
+            errors =
+                model.apiResult.errors
+        in
+            if List.length errors > 0 then
+                [ h2 [] [ text "Errors" ]
+                , div []
+                    [ table [] (List.map errorRow errors)
+                    ]
+                ]
+            else
+                []
+
+
+
+--partitionResult : Model -> ( List Event, List Error )
+--partitionResult model =
+--    let
+--        f rp x =
+--            case rp of
+--                APIEvent id name ->
+--                    Tuple.mapFirst
+--                        (\v ->
+--                            (Event id name) :: v
+--                        )
+--                        x
+--
+--                APIError title ->
+--                    Tuple.mapSecond
+--                        (\v ->
+--                            (Error title) :: v
+--                        )
+--                        x
+--    in
+--        List.foldl (f) ( [], [] ) model.apiResult
 
 
 eventRow : Event -> Html Msg
 eventRow event =
     tr [] [ td [] [ text event.name ] ]
+
+
+errorRow : Error -> Html Msg
+errorRow error =
+    tr [] [ td [] [ text error.title ] ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -109,42 +177,43 @@ update msg model =
         SubmitEvent ->
             ( model, Http.send CreateEventResult (createEvent model) )
 
-        FetchEventsResult (Ok events) ->
-            ( { model | events = events }, Cmd.none )
+        FetchEventsResult (Ok resultPieces) ->
+            ( { model | apiResult = resultPieces }, Cmd.none )
 
         FetchEventsResult (Err err) ->
             ( model, Cmd.none )
 
-        CreateEventResult (Ok event) ->
-            ( { model | event = event }, Cmd.none )
+        CreateEventResult (Ok resultPiece) ->
+            let
+                x =
+                    Debug.log "CER Ok" "Ok 2"
+            in
+                ( { model | apiResult = resultPiece }, Cmd.none )
 
         CreateEventResult (Err err) ->
-            ( model, Cmd.none )
+            let
+                x =
+                    Debug.log "CER err" "Err 2"
+            in
+                case err of
+                    Http.BadStatus response ->
+                        ( model, Cmd.none )
+
+                    _ ->
+                        ( model, Cmd.none )
 
 
-createEvent : Model -> Http.Request Event
+createEvent : Model -> Http.Request APIResult
 createEvent model =
     Http.post (eventsURL model)
         Http.emptyBody
-        (field "data" <|
-            field "event" <|
-                map2 constructEvent eventID eventName
-        )
+        errorsDecoder
 
 
-getEvents : Model -> Http.Request (List Event)
+getEvents : Model -> Http.Request APIResult
 getEvents model =
     Http.get ((eventsURL model) ++ "&author_nb_id=" ++ (toString model.authorID))
-        (field "data" <|
-            list <|
-                field "event" <|
-                    map2 constructEvent eventID eventName
-        )
-
-
-constructEvent : Int -> String -> Event
-constructEvent id name =
-    { id = id, name = name }
+        errorsDecoder
 
 
 eventID =
@@ -153,6 +222,25 @@ eventID =
 
 eventName =
     field "name" string
+
+
+eventDecoder =
+    field "event" <|
+        Json.Decode.map2 Event eventID eventName
+
+
+eventsDecoder =
+    field "data" <|
+        list <|
+            eventDecoder
+
+
+errorsDecoder =
+    Json.Decode.map (\es -> { errors = es, events = [], event = Event 0 "temp" })
+        (field "errors" <|
+            list <|
+                Json.Decode.map Error (field "title" string)
+        )
 
 
 eventsURL : Model -> String
