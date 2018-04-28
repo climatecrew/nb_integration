@@ -30,7 +30,7 @@ type ResultPiece
 
 type alias APIResult =
     { errors : List Error
-    , event : Event
+    , event : Maybe Event
     , events : List Event
     }
 
@@ -39,7 +39,7 @@ type alias Model =
     { apiResult : APIResult
     , authorID : Int
     , email : String
-    , event : Event
+    , event : Maybe Event
     , events : List Event
     , rootURL : String
     , slug : String
@@ -64,10 +64,10 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         model =
-            { apiResult = { errors = [], events = [], event = Event 0 "temp" }
+            { apiResult = { errors = [], events = [], event = Nothing }
             , authorID = flags.authorID
             , email = flags.email
-            , event = Event 0 "Name..."
+            , event = Nothing
             , events = []
             , rootURL = flags.rootURL
             , slug = flags.slug
@@ -231,9 +231,9 @@ eventName =
 
 apiResultEvents : Json.Decode.Decoder (List Event) -> Json.Decode.Decoder APIResult
 apiResultEvents events =
-    Json.Decode.map (\evs -> { errors = [], events = evs, event = Event 0 "temp" }) events
+    Json.Decode.map (\evs -> { errors = [], events = evs, event = Nothing }) events
 
 
 apiResultErrors : Json.Decode.Decoder (List Error) -> Json.Decode.Decoder APIResult
 apiResultErrors errors =
-    Json.Decode.map (\errs -> { errors = errs, events = [], event = Event 0 "temp" }) errors
+    Json.Decode.map (\errs -> { errors = errs, events = [], event = Nothing }) errors
