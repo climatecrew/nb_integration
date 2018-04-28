@@ -12,6 +12,7 @@ import Dict exposing (Dict)
 type Msg
     = SubmitEvent
     | FetchEventsResult (Result Http.Error (List Event))
+    | CreateEventResult (Result Http.Error Event)
 
 
 type alias Event =
@@ -26,6 +27,7 @@ type alias Model =
     , rootURL : String
     , slug : String
     , events : List Event
+    , event : Event
     }
 
 
@@ -52,6 +54,7 @@ init flags =
             , rootURL = flags.rootURL
             , slug = flags.slug
             , events = []
+            , event = constructEvent 0 "New Event"
             }
     in
         ( model, Http.send FetchEventsResult (getEvents model) )
@@ -104,7 +107,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SubmitEvent ->
-            ( model, Cmd.none )
+            ( model, Http.send CreateEventResult (createEvent model) )
 
         FetchEventsResult (Ok events) ->
             ( { model | events = events }, Cmd.none )
@@ -112,19 +115,35 @@ update msg model =
         FetchEventsResult (Err err) ->
             ( model, Cmd.none )
 
+        CreateEventResult (Ok event) ->
+            ( { model | event = event }, Cmd.none )
 
-getEvents : Model -> Http.Request (List Event)
-getEvents model =
-    Http.get (model.rootURL ++ "/api/events?slug=" ++ model.slug ++ "&author_nb_id=" ++ (toString model.authorID))
+        CreateEventResult (Err err) ->
+            ( model, Cmd.none )
+
+
+createEvent : Model -> Http.Request Event
+createEvent model =
+    Http.post (eventsURL model)
+        Http.emptyBody
         (field "data" <|
-            list <|
-                field "event" <|
-                    map2 createEvent eventID eventName
+            field "event" <|
+                map2 constructEvent eventID eventName
         )
 
 
-createEvent : Int -> String -> Event
-createEvent id name =
+getEvents : Model -> Http.Request (List Event)
+getEvents model =
+    Http.get ((eventsURL model) ++ "&author_nb_id=" ++ (toString model.authorID))
+        (field "data" <|
+            list <|
+                field "event" <|
+                    map2 constructEvent eventID eventName
+        )
+
+
+constructEvent : Int -> String -> Event
+constructEvent id name =
     { id = id, name = name }
 
 
@@ -134,3 +153,8 @@ eventID =
 
 eventName =
     field "name" string
+
+
+eventsURL : Model -> String
+eventsURL model =
+    model.rootURL ++ "/api/events?slug=" ++ model.slug

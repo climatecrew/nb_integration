@@ -4,6 +4,7 @@ require "json"
 $:.unshift File.expand_path(File.dirname(__FILE__), "helpers/")
 require "helpers/path_provider"
 require "helpers/client"
+require "helpers/error_presenter"
 require "helpers/app_configuration"
 require "helpers/request_oauth_access_token"
 require "helpers/nb_app_install"
@@ -126,7 +127,11 @@ class App < Roda
                 if nb_response.status.to_i >= 400
                   logger.warn("Create Event: NationBuilder request failed. Status: #{nb_response.status} / Body: #{nb_response.body}")
                   response.status = nb_response.status
-                  @response_body = { errors: [{ title: "Failed to create event" }] }
+                                 @response_body = {
+                                   errors: [
+                                     ErrorPresenter.new(body: nb_response.body).transform.merge({ title: "Failed to create event" })
+                                   ]
+                                 }
                 else
                   nb_event = begin
                                JSON.parse(nb_response.body)
