@@ -130,7 +130,7 @@ class App < Roda
                 else
                   nb_event = begin
                                JSON.parse(nb_response.body)
-                             rescue JSON::ParserError => e
+                             rescue JSON::ParserError
                                logger.warn("Create Event: Invalid JSON returned by NationBuilder: #{nb_response.body}")
                                nil
                              end
