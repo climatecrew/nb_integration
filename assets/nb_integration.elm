@@ -138,29 +138,6 @@ errorDisplay model =
                 []
 
 
-
---partitionResult : Model -> ( List Event, List Error )
---partitionResult model =
---    let
---        f rp x =
---            case rp of
---                APIEvent id name ->
---                    Tuple.mapFirst
---                        (\v ->
---                            (Event id name) :: v
---                        )
---                        x
---
---                APIError title ->
---                    Tuple.mapSecond
---                        (\v ->
---                            (Error title) :: v
---                        )
---                        x
---    in
---        List.foldl (f) ( [], [] ) model.apiResult
-
-
 eventRow : Event -> Html Msg
 eventRow event =
     tr [] [ td [] [ text event.name ] ]
@@ -177,30 +154,45 @@ update msg model =
         SubmitEvent ->
             ( model, Http.send CreateEventResult (createEvent model) )
 
-        FetchEventsResult (Ok resultPieces) ->
-            ( { model | apiResult = resultPieces }, Cmd.none )
+        FetchEventsResult (Ok apiResult) ->
+            ( { model | apiResult = apiResult }, Cmd.none )
 
         FetchEventsResult (Err err) ->
-            ( model, Cmd.none )
+            ( handleAPIError model err, Cmd.none )
 
-        CreateEventResult (Ok resultPiece) ->
+        CreateEventResult (Ok apiResult) ->
             let
                 x =
                     Debug.log "CER Ok" "Ok 2"
             in
-                ( { model | apiResult = resultPiece }, Cmd.none )
+                ( { model | apiResult = apiResult }, Cmd.none )
 
         CreateEventResult (Err err) ->
-            let
-                x =
-                    Debug.log "CER err" "Err 2"
-            in
-                case err of
-                    Http.BadStatus response ->
-                        ( model, Cmd.none )
+            ( handleAPIError model err, Cmd.none )
 
-                    _ ->
-                        ( model, Cmd.none )
+
+eventsURL : Model -> String
+eventsURL model =
+    model.rootURL ++ "/api/events?slug=" ++ model.slug
+
+
+handleAPIError : Model -> Http.Error -> Model
+handleAPIError model err =
+    case err of
+        Http.BadStatus response ->
+            let
+                decodeResult =
+                    decodeString errorsDecoder response.body
+            in
+                case decodeResult of
+                    Ok apiResult ->
+                        { model | apiResult = apiResult }
+
+                    Err _ ->
+                        model
+
+        _ ->
+            model
 
 
 createEvent : Model -> Http.Request APIResult
@@ -213,7 +205,26 @@ createEvent model =
 getEvents : Model -> Http.Request APIResult
 getEvents model =
     Http.get ((eventsURL model) ++ "&author_nb_id=" ++ (toString model.authorID))
-        errorsDecoder
+        (oneOf [ errorsDecoder, eventsDecoder ])
+
+
+eventsDecoder =
+    apiResultEvents <|
+        field "data" <|
+            list <|
+                eventDecoder
+
+
+errorsDecoder =
+    apiResultErrors <|
+        field "errors" <|
+            list <|
+                Json.Decode.map Error (field "title" string)
+
+
+eventDecoder =
+    field "event" <|
+        Json.Decode.map2 Event eventID eventName
 
 
 eventID =
@@ -224,25 +235,11 @@ eventName =
     field "name" string
 
 
-eventDecoder =
-    field "event" <|
-        Json.Decode.map2 Event eventID eventName
+apiResultEvents : Json.Decode.Decoder (List Event) -> Json.Decode.Decoder APIResult
+apiResultEvents events =
+    Json.Decode.map (\evs -> { errors = [], events = evs, event = Event 0 "temp" }) events
 
 
-eventsDecoder =
-    field "data" <|
-        list <|
-            eventDecoder
-
-
-errorsDecoder =
-    Json.Decode.map (\es -> { errors = es, events = [], event = Event 0 "temp" })
-        (field "errors" <|
-            list <|
-                Json.Decode.map Error (field "title" string)
-        )
-
-
-eventsURL : Model -> String
-eventsURL model =
-    model.rootURL ++ "/api/events?slug=" ++ model.slug
+apiResultErrors : Json.Decode.Decoder (List Error) -> Json.Decode.Decoder APIResult
+apiResultErrors errors =
+    Json.Decode.map (\errs -> { errors = errs, events = [], event = Event 0 "temp" }) errors
