@@ -14,6 +14,7 @@
             <div id="current-user-id">2</div>
         </div>
 
+        <link rel="stylesheet" href="nb_integration.css" />
         <script src="nb_integration.js"></script>
     </head>
     <body>

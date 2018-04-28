@@ -48,6 +48,7 @@ type alias Model =
     , events : List Event
     , rootURL : String
     , slug : String
+    , loading : Bool
     }
 
 
@@ -76,6 +77,7 @@ init flags =
             , events = []
             , rootURL = flags.rootURL
             , slug = flags.slug
+            , loading = True
             }
     in
         ( model, Http.send FetchEventsResult (getEvents model) )
@@ -102,9 +104,18 @@ view model =
             , div [] [ label [] [ text "Contact Email:", input [ type_ "text" ] [] ] ]
             , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
             ]
+        , loadingSpinner model
         , div [ class "error-container" ] [ errorDisplay model ]
         , div [ class "event-list" ] [ myEvents model ]
         ]
+
+
+loadingSpinner : Model -> Html Msg
+loadingSpinner model =
+    if model.loading then
+        div [ class "loader" ] []
+    else
+        div [] []
 
 
 myEvents : Model -> Html Msg
@@ -155,16 +166,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SubmitEvent ->
-            ( model, Http.send CreateEventResult (createEvent model) )
+            ( { model | loading = True }, Http.send CreateEventResult (createEvent model) )
 
         FetchEventsResult (Ok apiResult) ->
-            ( { model | apiResult = apiResult, events = apiResult.events }, Cmd.none )
+            ( { model | loading = False, apiResult = apiResult, events = apiResult.events }, Cmd.none )
 
         FetchEventsResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
 
         CreateEventResult (Ok apiResult) ->
-            ( { model | apiResult = apiResult, event = apiResult.event }, Cmd.none )
+            ( { model | loading = False, apiResult = apiResult, event = apiResult.event }, Cmd.none )
 
         CreateEventResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
@@ -177,42 +188,46 @@ eventsURL model =
 
 handleAPIError : Model -> Http.Error -> Model
 handleAPIError model err =
-    case err of
-        Http.BadStatus response ->
-            let
-                decodeResult =
-                    decodeString errorsDecoder response.body
-            in
-                case decodeResult of
-                    Ok apiResult ->
-                        { model | apiResult = apiResult }
+    let
+        notLoadingModel =
+            { model | loading = False }
+    in
+        case err of
+            Http.BadStatus response ->
+                let
+                    decodeResult =
+                        decodeString errorsDecoder response.body
+                in
+                    case decodeResult of
+                        Ok apiResult ->
+                            { notLoadingModel | apiResult = apiResult }
 
-                    Err _ ->
-                        model
+                        Err _ ->
+                            { notLoadingModel | apiResult = { defaultAPIResult | errors = [ Error <| "Response failed: " ++ response.status.message ] } }
 
-        Http.BadPayload message response ->
-            { model
-                | apiResult =
-                    { defaultAPIResult | errors = [ Error "Unexpected response from server" ] }
-            }
+            Http.BadPayload message response ->
+                { notLoadingModel
+                    | apiResult =
+                        { defaultAPIResult | errors = [ Error "Unexpected response from server" ] }
+                }
 
-        Http.BadUrl url ->
-            { model
-                | apiResult =
-                    { defaultAPIResult | errors = [ Error <| "Invalid URL: " ++ url ] }
-            }
+            Http.BadUrl url ->
+                { notLoadingModel
+                    | apiResult =
+                        { defaultAPIResult | errors = [ Error <| "Invalid URL: " ++ url ] }
+                }
 
-        Http.Timeout ->
-            { model
-                | apiResult =
-                    { defaultAPIResult | errors = [ Error <| "Request timed out" ] }
-            }
+            Http.Timeout ->
+                { notLoadingModel
+                    | apiResult =
+                        { defaultAPIResult | errors = [ Error <| "Request timed out" ] }
+                }
 
-        Http.NetworkError ->
-            { model
-                | apiResult =
-                    { defaultAPIResult | errors = [ Error <| "Network Error" ] }
-            }
+            Http.NetworkError ->
+                { notLoadingModel
+                    | apiResult =
+                        { defaultAPIResult | errors = [ Error <| "Network Error" ] }
+                }
 
 
 createEvent : Model -> Http.Request APIResult
