@@ -39,7 +39,6 @@ type alias Model =
     { apiResult : APIResult
     , authorID : Int
     , email : String
-    , errors : List Error
     , event : Event
     , events : List Event
     , rootURL : String
@@ -70,7 +69,6 @@ init flags =
             , email = flags.email
             , event = Event 0 "Name..."
             , events = []
-            , errors = []
             , rootURL = flags.rootURL
             , slug = flags.slug
             }
@@ -109,7 +107,7 @@ myEvents model =
     div [] <|
         let
             events =
-                model.apiResult.events
+                model.events
         in
             if List.length events > 0 then
                 [ h2 [] [ text "My Events" ]
@@ -155,17 +153,13 @@ update msg model =
             ( model, Http.send CreateEventResult (createEvent model) )
 
         FetchEventsResult (Ok apiResult) ->
-            ( { model | apiResult = apiResult }, Cmd.none )
+            ( { model | apiResult = apiResult, events = apiResult.events }, Cmd.none )
 
         FetchEventsResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
 
         CreateEventResult (Ok apiResult) ->
-            let
-                x =
-                    Debug.log "CER Ok" "Ok 2"
-            in
-                ( { model | apiResult = apiResult }, Cmd.none )
+            ( { model | apiResult = apiResult, event = apiResult.event }, Cmd.none )
 
         CreateEventResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
