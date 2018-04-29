@@ -8,6 +8,7 @@ RSpec.describe "OPTIONS /api" do
 
     expect(last_response.status).to eq(200)
     expect(last_response.headers["Allow"]).to eq("GET, HEAD, POST, PUT")
+    expect(last_response.headers["Access-Control-Allow-Origin"]).to eq("*")
   end
 end
 
