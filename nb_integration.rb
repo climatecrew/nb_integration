@@ -110,6 +110,7 @@ class App < Roda
       r.options do
         response["Allow"] = "GET, HEAD, POST, PUT"
         response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Headers"] = "Accept, Accept-Language, Content-Language, Content-Type"
         {}
       end
 
