@@ -4,7 +4,7 @@ import Html exposing (Html, programWithFlags, div, button, text, input, label, h
 import Html.Attributes exposing (class, type_, value, step, id, selected, style)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (jsonBody)
-import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed)
+import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
 import Json.Encode as JE exposing (Value, encode, object)
 import String exposing (join)
 import Dict exposing (Dict)
@@ -22,12 +22,27 @@ type Msg
 
 
 type alias Event =
-    { id : Int, name : String, startTime : String, startTimestamp : EditingTimestamp, endTimestamp : EditingTimestamp }
+    { id : Int
+    , intro : Maybe String
+    , contact : Contact
+    , name : String
+    , startTime : String
+    , startTimestamp : EditingTimestamp
+    , endTimestamp : EditingTimestamp
+    }
+
+
+type alias Contact =
+    { name : Maybe String
+    , email : Maybe String
+    }
 
 
 defaultEvent : Event
 defaultEvent =
     { id = 0
+    , intro = Just "Event Intro..."
+    , contact = { email = Just "me@example.com", name = Just "Contact Name" }
     , name = "Event Name..."
     , startTime = "2018-09-03"
     , startTimestamp = defaultStartTimestamp
@@ -135,12 +150,12 @@ view model =
                     ]
                 ]
             , div [] [ label [] [ text "Intro:", input [ type_ "text" ] [] ] ]
-            , div [] [ label [] [ text "Time Zone:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Date: ", selectDay ] ]
             , div [] [ label [] [ selectTime StartTime (currentTimestamp model StartTime) ] ]
             , div [] [ label [] [ selectTime EndTime (currentTimestamp model EndTime) ] ]
-            , div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
-            , div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
+
+            --, div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
+            --, div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Contact Name:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Contact Email:", input [ type_ "text" ] [] ] ]
             , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
@@ -583,7 +598,7 @@ encodeEvent model =
 
         Just event ->
             let
-                { id, name, startTimestamp, endTimestamp } =
+                { id, name, intro, contact, startTime, startTimestamp, endTimestamp } =
                     event
             in
                 object
@@ -592,6 +607,8 @@ encodeEvent model =
                             [ ( "event"
                               , object
                                     [ ( "name", JE.string name )
+                                    , ( "intro", encodeMaybeString intro )
+                                    , ( "contact", encodeContact contact )
                                     , ( "start_time", JE.string <| serializeTimestamp startTimestamp )
                                     , ( "end_time", JE.string <| serializeTimestamp endTimestamp )
                                     , ( "author_id", JE.int <| model.authorID )
@@ -600,6 +617,38 @@ encodeEvent model =
                             ]
                       )
                     ]
+
+
+encodeContact : Contact -> Value
+encodeContact contact =
+    let
+        name =
+            case contact.name of
+                Just n ->
+                    ( "name", JE.string n )
+
+                Nothing ->
+                    ( "name", JE.null )
+
+        email =
+            case contact.email of
+                Just e ->
+                    ( "email", JE.string e )
+
+                Nothing ->
+                    ( "email", JE.null )
+    in
+        object [ name, email ]
+
+
+encodeMaybeString : Maybe String -> Value
+encodeMaybeString mString =
+    case mString of
+        Just str ->
+            JE.string str
+
+        Nothing ->
+            JE.null
 
 
 getEvents : Model -> Http.Request APIResult
@@ -630,7 +679,14 @@ errorsDecoder =
 
 eventDecoder =
     field "event" <|
-        Json.Decode.map5 Event eventID eventName startTime decodeStartTimestamp decodeEndTimestamp
+        Json.Decode.map7 Event
+            eventID
+            eventIntro
+            contact
+            eventName
+            startTime
+            decodeStartTimestamp
+            decodeEndTimestamp
 
 
 decodeStartTimestamp =
@@ -647,6 +703,23 @@ eventID =
 
 eventName =
     field "name" string
+
+
+eventIntro =
+    field "intro" (nullable string)
+
+
+contact =
+    field "contact" <|
+        Json.Decode.map2 Contact contactName contactEmail
+
+
+contactName =
+    field "name" (nullable string)
+
+
+contactEmail =
+    field "email" (nullable string)
 
 
 startTime =
