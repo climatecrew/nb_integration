@@ -18,6 +18,7 @@ class App < Roda
 
   plugin :json
   plugin :json_parser
+  plugin :all_verbs
   plugin :render
   plugin :public, gzip: true, default_mime: "text/html"
 
@@ -106,6 +107,11 @@ class App < Roda
     end
 
     r.on "api" do
+      r.options do
+        response["Allow"] = "GET, HEAD, POST, PUT"
+        {}
+      end
+
       @response_body = {}
       r.is "events" do
         begin

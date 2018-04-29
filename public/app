@@ -16,8 +16,10 @@
 
         <link rel="stylesheet" href="nb_integration.css" />
         <script src="nb_integration.js"></script>
+
     </head>
     <body>
+        <div id="event-interface"></div>
         <script type="text/javascript">
             var email = document.getElementById("email").textContent;
             var access_token = "DEFAULT";
@@ -25,7 +27,8 @@
             var slug = "skarger";
             var currentUserID = parseInt(document.getElementById("current-user-id").textContent, 10);
 
-            Elm.Main.fullscreen({
+            var node = document.getElementById('event-interface');
+            Elm.Main.embed(node, {
                 email: email,
                 authorID : currentUserID,
                 access_token: access_token,
