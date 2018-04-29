@@ -4,7 +4,7 @@ import Html exposing (Html, programWithFlags, div, button, text, input, label, h
 import Html.Attributes exposing (class, type_, value, step, id)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (jsonBody)
-import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString)
+import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed)
 import Json.Encode as JE exposing (Value, encode, object)
 import String exposing (join)
 import Dict exposing (Dict)
@@ -15,14 +15,32 @@ type Msg
     | FetchEventsResult (Result Http.Error APIResult)
     | CreateEventResult (Result Http.Error APIResult)
     | Name String
+    | Day String
+    | Hour String
+    | Minute String
+    | Meridiem String
 
 
 type alias Event =
-    { id : Int, name : String, startTime : String }
+    { id : Int, name : String, startTime : String, startTimestamp : EditingTimestamp }
 
 
+defaultEvent : Event
+defaultEvent =
+    { id = 0
+    , name = "Event Name..."
+    , startTime = "2018-09-03"
+    , startTimestamp = defaultStartTimestamp
+    }
 
---{ id : Int, name : String, ymd : String, startHour : String, startMinute : String, startMeridiem : String }
+
+type alias EditingTimestamp =
+    { border : BorderTime, ymd : String, hour : Int, minute : Int, meridiem : String }
+
+
+defaultStartTimestamp : EditingTimestamp
+defaultStartTimestamp =
+    { border = StartTime, ymd = "2018-09-03", hour = 1, minute = 0, meridiem = "PM" }
 
 
 type alias Error =
@@ -84,7 +102,7 @@ init flags =
             { apiResult = { errors = [], events = [], event = Nothing }
             , authorID = flags.authorID
             , email = flags.email
-            , event = Nothing
+            , event = Just defaultEvent
             , events = []
             , rootURL = flags.rootURL
             , slug = flags.slug
@@ -121,10 +139,43 @@ view model =
             , div [] [ label [] [ text "Contact Email:", input [ type_ "text" ] [] ] ]
             , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
             ]
+        , div [ id "display-event" ]
+            [ text <| formatTimestamp model.event ]
         , loadingSpinner model
         , div [ class "error-container" ] [ errorDisplay model ]
         , div [ class "event-list" ] [ myEvents model ]
         ]
+
+
+formatTimestamp : Maybe Event -> String
+formatTimestamp mEvent =
+    case mEvent of
+        Just ev ->
+            let
+                hour24 =
+                    case ev.startTimestamp.meridiem of
+                        "AM" ->
+                            if ev.startTimestamp.hour == 12 then
+                                0
+                            else
+                                ev.startTimestamp.hour
+
+                        otherwise ->
+                            if ev.startTimestamp.hour == 12 then
+                                ev.startTimestamp.hour
+                            else
+                                ev.startTimestamp.hour + 12
+            in
+                ev.startTimestamp.ymd
+                    ++ "T"
+                    ++ (String.padLeft 2 '0' <| toString hour24)
+                    ++ ":"
+                    ++ (String.padLeft 2 '0' <| toString ev.startTimestamp.minute)
+                    ++ ":00"
+                    ++ "-04:00"
+
+        Nothing ->
+            ""
 
 
 selectDay : Html Msg
@@ -132,7 +183,7 @@ selectDay =
     span []
         [ span [] [ text "September" ]
         , select
-            []
+            [ onInput Day ]
             [ option [ value "2018-09-03" ] [ text "3 Monday" ]
             , option [ value "2018-09-04" ] [ text "4 Tuesday" ]
             , option [ value "2018-09-05" ] [ text "5 Wednesday" ]
@@ -150,22 +201,22 @@ selectTime borderTime =
             case borderTime of
                 StartTime ->
                     ( span [] [ text "Start Time" ]
-                    , id "startHour"
-                    , id "startMinute"
-                    , id "startMeridiem"
+                    , [ id "startHour", onInput Hour ]
+                    , [ id "startMinute", onInput Minute ]
+                    , [ id "startMeridiem", onInput Meridiem ]
                     )
 
                 EndTime ->
                     ( span [] [ text "End Time" ]
-                    , id "endHour"
-                    , id "endMinute"
-                    , id "endMeridiem"
+                    , [ id "endHour", onInput Hour ]
+                    , [ id "endMinute", onInput Minute ]
+                    , [ id "endMeridiem", onInput Meridiem ]
                     )
     in
         span []
             [ labelText
             , select
-                [ hour ]
+                hour
                 [ option [ value "01" ] [ text "01" ]
                 , option [ value "02" ] [ text "02" ]
                 , option [ value "03" ] [ text "03" ]
@@ -180,12 +231,12 @@ selectTime borderTime =
                 , option [ value "12" ] [ text "12" ]
                 ]
             , select
-                [ minute ]
+                minute
                 [ option [ value "00" ] [ text "00" ]
                 , option [ value "30" ] [ text "30" ]
                 ]
             , select
-                [ meridiem ]
+                meridiem
                 [ option [ value "AM" ] [ text "AM" ]
                 , option [ value "PM" ] [ text "PM" ]
                 ]
@@ -253,6 +304,100 @@ update msg model =
                     case model.event of
                         Just ev ->
                             Just { ev | name = name }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
+        Day day ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentTS =
+                                    ev.startTimestamp
+
+                                updatedTS =
+                                    { currentTS | ymd = day }
+                            in
+                                Just { ev | startTimestamp = updatedTS }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
+        Hour hour ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentTS =
+                                    ev.startTimestamp
+
+                                updatedTS =
+                                    let
+                                        updatedHour =
+                                            case String.toInt hour of
+                                                Ok hr ->
+                                                    hr
+
+                                                Err err ->
+                                                    currentTS.hour
+                                    in
+                                        { currentTS | hour = updatedHour }
+                            in
+                                Just { ev | startTimestamp = updatedTS }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
+        Minute minute ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentTS =
+                                    ev.startTimestamp
+
+                                updatedTS =
+                                    let
+                                        updatedMinute =
+                                            case String.toInt minute of
+                                                Ok min ->
+                                                    min
+
+                                                Err err ->
+                                                    currentTS.minute
+                                    in
+                                        { currentTS | minute = updatedMinute }
+                            in
+                                Just { ev | startTimestamp = updatedTS }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
+        Meridiem meridiem ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentTS =
+                                    ev.startTimestamp
+
+                                updatedTS =
+                                    { currentTS | meridiem = meridiem }
+                            in
+                                Just { ev | startTimestamp = updatedTS }
 
                         Nothing ->
                             Nothing
@@ -375,7 +520,11 @@ errorsDecoder =
 
 eventDecoder =
     field "event" <|
-        Json.Decode.map3 Event eventID eventName startTime
+        Json.Decode.map4 Event eventID eventName startTime decodeEditingTimestamp
+
+
+decodeEditingTimestamp =
+    succeed defaultStartTimestamp
 
 
 eventID =
