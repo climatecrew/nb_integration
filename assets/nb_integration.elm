@@ -8,8 +8,6 @@ import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decod
 import Json.Encode as JE exposing (Value, encode, object)
 import String exposing (join)
 import Dict exposing (Dict)
-import Date exposing (Date)
-import DatePicker exposing (DatePicker)
 
 
 type Msg
@@ -17,7 +15,6 @@ type Msg
     | FetchEventsResult (Result Http.Error APIResult)
     | CreateEventResult (Result Http.Error APIResult)
     | Name String
-    | SetDatePicker DatePicker.Msg
 
 
 type alias Event =
@@ -48,14 +45,12 @@ defaultAPIResult =
 type alias Model =
     { apiResult : APIResult
     , authorID : Int
-    , datePicker : DatePicker
     , email : String
     , event : Maybe Event
     , events : List Event
-    , loading : Bool
     , rootURL : String
     , slug : String
-    , startDate : Maybe Date
+    , loading : Bool
     }
 
 
@@ -76,29 +71,18 @@ main =
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
-        ( datePicker, datePickerCmd ) =
-            DatePicker.init
-
         model =
             { apiResult = { errors = [], events = [], event = Nothing }
             , authorID = flags.authorID
-            , datePicker = datePicker
             , email = flags.email
             , event = Nothing
             , events = []
-            , loading = True
             , rootURL = flags.rootURL
             , slug = flags.slug
-            , startDate = Just (Date.fromTime 1524970106)
+            , loading = True
             }
-
-        cmds =
-            Cmd.batch
-                [ Http.send FetchEventsResult (getEvents model)
-                , Cmd.map SetDatePicker datePickerCmd
-                ]
     in
-        ( model, cmds )
+        ( model, Http.send FetchEventsResult (getEvents model) )
 
 
 subscriptions : Model -> Sub msg
@@ -119,16 +103,7 @@ view model =
                 ]
             , div [] [ label [] [ text "Intro:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Time Zone:", input [ type_ "text" ] [] ] ]
-            , div []
-                [ label [] [ text "Start Time:" ]
-                , div []
-                    [ DatePicker.view
-                        model.startDate
-                        DatePicker.defaultSettings
-                        model.datePicker
-                        |> Html.map SetDatePicker
-                    ]
-                ]
+            , div [] [ label [] [ text "Start Time:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "End Time:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
@@ -199,23 +174,6 @@ update msg model =
     case msg of
         Name name ->
             ( { model | event = Just (Event 0 name) }, Cmd.none )
-
-        SetDatePicker msg ->
-            let
-                ( newDatePicker, datePickerCmd, dateEvent ) =
-                    DatePicker.update DatePicker.defaultSettings msg model.datePicker
-
-                date =
-                    case dateEvent of
-                        DatePicker.NoChange ->
-                            model.startDate
-
-                        DatePicker.Changed newDate ->
-                            newDate
-            in
-                ( { model | startDate = date, datePicker = newDatePicker }
-                , Cmd.map SetDatePicker datePickerCmd
-                )
 
         SubmitEvent ->
             ( { model | loading = True }, Http.send CreateEventResult (createEvent model) )
