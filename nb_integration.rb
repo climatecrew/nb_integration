@@ -17,6 +17,7 @@ class App < Roda
   include AppConfiguration
 
   plugin :json
+  plugin :json_parser
   plugin :render
   plugin :public, gzip: true, default_mime: "text/html"
 
@@ -121,6 +122,7 @@ class App < Roda
                 path_provider = PathProvider.new(slug: account.nb_slug,
                                                  api_token: account.nb_access_token)
                 payload = r.params['data']
+                payload["event"]["status"] = "published"
                 nb_response = Client.create(path_provider: path_provider,
                                             resource: :events,
                                             payload: payload)

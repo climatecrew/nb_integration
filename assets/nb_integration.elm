@@ -2,9 +2,10 @@ module Main exposing (..)
 
 import Html exposing (Html, programWithFlags, div, button, text, input, label, h2, table, tr, td)
 import Html.Attributes exposing (class, type_)
-import Html.Events exposing (onClick)
-import Http
+import Html.Events exposing (onClick, onInput)
+import Http exposing (jsonBody)
 import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString)
+import Json.Encode as JE exposing (Value, encode, object)
 import String exposing (join)
 import Dict exposing (Dict)
 
@@ -13,6 +14,7 @@ type Msg
     = SubmitEvent
     | FetchEventsResult (Result Http.Error APIResult)
     | CreateEventResult (Result Http.Error APIResult)
+    | Name String
 
 
 type alias Event =
@@ -93,7 +95,12 @@ view model =
     div [ class "nb-integration-container" ]
         [ div [] [ text model.email ]
         , div [ class "event-form" ]
-            [ div [] [ label [] [ text "Name:", input [ type_ "text" ] [] ] ]
+            [ div []
+                [ label []
+                    [ text "Name:"
+                    , input [ type_ "text", onInput Name ] []
+                    ]
+                ]
             , div [] [ label [] [ text "Intro:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Time Zone:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Start Time:", input [ type_ "text" ] [] ] ]
@@ -165,6 +172,9 @@ errorRow error =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        Name name ->
+            ( { model | event = Just (Event 0 name) }, Cmd.none )
+
         SubmitEvent ->
             ( { model | loading = True }, Http.send CreateEventResult (createEvent model) )
 
@@ -233,8 +243,30 @@ handleAPIError model err =
 createEvent : Model -> Http.Request APIResult
 createEvent model =
     Http.post (eventsURL model)
-        Http.emptyBody
+        (jsonBody <| encodeEvent model)
         errorsDecoder
+
+
+encodeEvent : Model -> Value
+encodeEvent model =
+    case model.event of
+        Nothing ->
+            object []
+
+        Just event ->
+            let
+                { id, name } =
+                    event
+            in
+                object
+                    [ ( "data"
+                      , object
+                            [ ( "event"
+                              , object [ ( "name", JE.string name ) ]
+                              )
+                            ]
+                      )
+                    ]
 
 
 getEvents : Model -> Http.Request APIResult

@@ -58,13 +58,18 @@ RSpec.describe "POST /api/events" do
       JSON
     end
 
-    let(:event_hash) { JSON.parse(event_body) }
+    let(:event_hash) do
+      hash = JSON.parse(event_body)
+      hash["event"]["status"] = "published"
+      hash
+    end
 
     let(:nb_event_body) do
       {
         "event" => {
           "id" => 1,
-          "name" => "Day of Action"
+          "name" => "Day of Action",
+          "status" => "published"
         }
       }
     end
