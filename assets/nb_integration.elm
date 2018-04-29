@@ -559,7 +559,7 @@ createEvent : Model -> Http.Request APIResult
 createEvent model =
     Http.post (eventsURL model)
         (jsonBody <| encodeEvent model)
-        errorsDecoder
+        (oneOf [ dataEventDecoder, errorsDecoder ])
 
 
 encodeEvent : Model -> Value
@@ -592,14 +592,20 @@ encodeEvent model =
 getEvents : Model -> Http.Request APIResult
 getEvents model =
     Http.get ((eventsURL model) ++ "&author_nb_id=" ++ (toString model.authorID))
-        (oneOf [ errorsDecoder, eventsDecoder ])
+        (oneOf [ errorsDecoder, dataEventsDecoder ])
 
 
-eventsDecoder =
+dataEventsDecoder =
     apiResultEvents <|
         field "data" <|
             list <|
                 eventDecoder
+
+
+dataEventDecoder =
+    apiResultEvent <|
+        field "data" <|
+            eventDecoder
 
 
 errorsDecoder =
@@ -632,6 +638,11 @@ eventName =
 
 startTime =
     field "start_time" string
+
+
+apiResultEvent : Json.Decode.Decoder Event -> Json.Decode.Decoder APIResult
+apiResultEvent event =
+    Json.Decode.map (\ev -> { errors = [], events = [], event = Just ev }) event
 
 
 apiResultEvents : Json.Decode.Decoder (List Event) -> Json.Decode.Decoder APIResult
