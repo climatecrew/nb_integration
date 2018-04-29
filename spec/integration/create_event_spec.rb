@@ -58,20 +58,21 @@ RSpec.describe "POST /api/events" do
       JSON
     end
 
-    let(:event_hash) do
-      hash = JSON.parse(event_body)
-      hash["event"]["status"] = "published"
-      hash
+    let(:client_event) { JSON.parse(event_body) }
+    let(:forwarded_event) do
+      base_event = client_event["event"]
+      {
+        "event" => base_event.merge(
+          "status" => "published",
+          "calendar_id" => ENV["NB_CALENDAR_ID"].to_i
+        )
+      }
     end
 
     let(:nb_event_body) do
-      {
-        "event" => {
-          "id" => 1,
-          "name" => "Day of Action",
-          "status" => "published"
-        }
-      }
+      forwarded_event.merge(
+        "id" => 12
+      )
     end
 
     before do
@@ -79,31 +80,31 @@ RSpec.describe "POST /api/events" do
     end
 
     it "makes a request to NationBuilder with the formatted payload" do
-      stub_request(:post, url).with(body: event_hash)
+      stub_request(:post, url).with(body: forwarded_event)
 
-      post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
+      post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
 
       expect(a_request(:post, url)
-        .with("body": event_hash))
+        .with("body": forwarded_event))
         .to have_been_made.once
     end
 
     context "when the NationBuilder request succeeds" do
       it "writes the created event to the DB" do
-        stub_request(:post, url).with(body: event_hash)
+        stub_request(:post, url).with(body: forwarded_event)
           .to_return(body: JSON.generate(nb_event_body))
 
-        post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
+        post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
 
         expect(Event.count).to eq(1)
         expect(JSON.parse(Event.first.nb_event)).to eq(nb_event_body)
       end
 
       it "returns 201 and the event" do
-        stub_request(:post, url).with(body: event_hash)
+        stub_request(:post, url).with(body: forwarded_event)
           .to_return(body: JSON.generate(nb_event_body))
 
-        post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
+        post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
 
         expect(last_response.status).to eq(201)
         expect(JSON.parse(last_response.body)).to match_json_expression({
@@ -114,10 +115,10 @@ RSpec.describe "POST /api/events" do
 
     context "when the NationBuilder request fails" do
       it "returns an error message" do
-        stub_request(:post, url).with(body: event_hash)
+        stub_request(:post, url).with(body: forwarded_event )
           .to_return(status: 404, body: "{}")
 
-        post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
+        post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
 
         expect(last_response.status).to eq(404)
         expect(JSON.parse(last_response.body)).to match_json_expression({
@@ -126,10 +127,10 @@ RSpec.describe "POST /api/events" do
       end
 
       it "handles non-JSON responses from NationBuilder" do
-        stub_request(:post, url).with(body: event_hash)
+        stub_request(:post, url).with(body: forwarded_event )
           .to_return(status: 200, body: "<html><body>Gateway Timeout</body></html>")
 
-        post "/api/events?slug=#{slug}", { "data" => event_hash }, test_rack_env
+        post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
 
         expect(last_response.status).to eq(500)
         expect(JSON.parse(last_response.body)).to match_json_expression({
