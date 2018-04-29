@@ -1,7 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (Html, programWithFlags, div, button, text, input, label, h2, table, tr, td)
-import Html.Attributes exposing (class, type_)
+import Html exposing (Html, programWithFlags, div, button, text, input, label, h2, table, tr, td, select, option, span)
+import Html.Attributes exposing (class, type_, value, step, id)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (jsonBody)
 import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString)
@@ -23,6 +23,11 @@ type alias Event =
 
 type alias Error =
     { title : String }
+
+
+type BorderTime
+    = StartTime
+    | EndTime
 
 
 type ResultPiece
@@ -103,8 +108,9 @@ view model =
                 ]
             , div [] [ label [] [ text "Intro:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Time Zone:", input [ type_ "text" ] [] ] ]
-            , div [] [ label [] [ text "Start Time:", input [ type_ "text" ] [] ] ]
-            , div [] [ label [] [ text "End Time:", input [ type_ "text" ] [] ] ]
+            , div [] [ label [] [ text "Start Date: ", selectDay ] ]
+            , div [] [ label [] [ selectTime StartTime ] ]
+            , div [] [ label [] [ selectTime EndTime ] ]
             , div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Contact Name:", input [ type_ "text" ] [] ] ]
@@ -115,6 +121,71 @@ view model =
         , div [ class "error-container" ] [ errorDisplay model ]
         , div [ class "event-list" ] [ myEvents model ]
         ]
+
+
+selectDay : Html Msg
+selectDay =
+    span []
+        [ span [] [ text "September" ]
+        , select
+            []
+            [ option [ value "2018-09-03" ] [ text "3 Monday" ]
+            , option [ value "2018-09-04" ] [ text "4 Tuesday" ]
+            , option [ value "2018-09-05" ] [ text "5 Wednesday" ]
+            , option [ value "2018-09-06" ] [ text "6 Thursday" ]
+            , option [ value "2018-09-07" ] [ text "7 Friday" ]
+            ]
+        , span [] [ text "2018" ]
+        ]
+
+
+selectTime : BorderTime -> Html Msg
+selectTime borderTime =
+    let
+        ( labelText, hour, minute, meridiem ) =
+            case borderTime of
+                StartTime ->
+                    ( span [] [ text "Start Time" ]
+                    , id "startHour"
+                    , id "startMinute"
+                    , id "startMeridiem"
+                    )
+
+                EndTime ->
+                    ( span [] [ text "End Time" ]
+                    , id "endHour"
+                    , id "endMinute"
+                    , id "endMeridiem"
+                    )
+    in
+        span []
+            [ labelText
+            , select
+                [ hour ]
+                [ option [ value "01" ] [ text "01" ]
+                , option [ value "02" ] [ text "02" ]
+                , option [ value "03" ] [ text "03" ]
+                , option [ value "04" ] [ text "04" ]
+                , option [ value "05" ] [ text "05" ]
+                , option [ value "06" ] [ text "06" ]
+                , option [ value "07" ] [ text "07" ]
+                , option [ value "08" ] [ text "08" ]
+                , option [ value "09" ] [ text "09" ]
+                , option [ value "10" ] [ text "10" ]
+                , option [ value "11" ] [ text "11" ]
+                , option [ value "12" ] [ text "12" ]
+                ]
+            , select
+                [ minute ]
+                [ option [ value "00" ] [ text "00" ]
+                , option [ value "30" ] [ text "30" ]
+                ]
+            , select
+                [ meridiem ]
+                [ option [ value "AM" ] [ text "AM" ]
+                , option [ value "PM" ] [ text "PM" ]
+                ]
+            ]
 
 
 loadingSpinner : Model -> Html Msg
