@@ -132,6 +132,7 @@ class App < Roda
                 payload = r.params['data']
                 payload["event"]["status"] = "published"
                 payload["event"]["calendar_id"] = ENV["NB_CALENDAR_ID"].to_i
+                logger.info("Creation URL: #{path_provider.create(:events)}")
                 logger.info("Sending payload:\n#{payload}")
                 nb_response = Client.create(path_provider: path_provider,
                                             resource: :events,
