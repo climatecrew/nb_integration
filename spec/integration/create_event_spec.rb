@@ -9,6 +9,10 @@ RSpec.describe "POST /api/events" do
   let(:slug) { 'test_slug' }
   let(:access_token) { SecureRandom.hex }
 
+  let(:api_test_rack_env) do
+    test_rack_env.merge("CONTENT_TYPE" => "application/json")
+  end
+
   context "when request is not successful" do
     it "returns 422 when missing parameters" do
       post "/api/events", {}, test_rack_env
@@ -48,17 +52,24 @@ RSpec.describe "POST /api/events" do
       "https://#{slug}.nationbuilder.com/api/v1/sites/#{slug}/pages/events" \
       "?access_token=#{access_token}"
     end
+
+    let(:actual_author_id) { 45 }
+    let(:admin_author_id) { 2 }
     let(:event_body) do
       <<~JSON
         {
           "event": {
-            "name": "Day of Action"
+            "name": "Day of Action",
+            "start_time": "2018-09-03T13:30:00-04:00",
+            "end_time": "2018-09-03T17:00:00-04:00",
+            "author_id": #{actual_author_id.to_i}
           }
         }
       JSON
     end
 
     let(:client_event) { JSON.parse(event_body) }
+    let(:client_body) { JSON.generate({ "data" => client_event }) }
     let(:forwarded_event) do
       base_event = client_event["event"]
       {
@@ -71,7 +82,8 @@ RSpec.describe "POST /api/events" do
 
     let(:nb_event_body) do
       forwarded_event.merge(
-        "id" => 12
+        "id" => 12,
+        "author_id" => admin_author_id
       )
     end
 
@@ -82,7 +94,7 @@ RSpec.describe "POST /api/events" do
     it "makes a request to NationBuilder with the formatted payload" do
       stub_request(:post, url).with(body: forwarded_event)
 
-      post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
+      post "/api/events?slug=#{slug}", client_body, api_test_rack_env
 
       expect(a_request(:post, url)
         .with("body": forwarded_event))
@@ -94,17 +106,19 @@ RSpec.describe "POST /api/events" do
         stub_request(:post, url).with(body: forwarded_event)
           .to_return(body: JSON.generate(nb_event_body))
 
-        post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
+        post "/api/events?slug=#{slug}", client_body, api_test_rack_env
 
         expect(Event.count).to eq(1)
-        expect(JSON.parse(Event.first.nb_event)).to eq(nb_event_body)
+        stored_event = Event.first
+        expect(JSON.parse(stored_event.nb_event)).to eq(nb_event_body)
+        expect(stored_event.author_nb_id).to eq(actual_author_id)
       end
 
       it "returns 201 and the event" do
         stub_request(:post, url).with(body: forwarded_event)
           .to_return(body: JSON.generate(nb_event_body))
 
-        post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
+        post "/api/events?slug=#{slug}", client_body, api_test_rack_env
 
         expect(last_response.status).to eq(201)
         expect(JSON.parse(last_response.body)).to match_json_expression({
@@ -118,7 +132,7 @@ RSpec.describe "POST /api/events" do
         stub_request(:post, url).with(body: forwarded_event )
           .to_return(status: 404, body: "{}")
 
-        post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
+        post "/api/events?slug=#{slug}", client_body, api_test_rack_env
 
         expect(last_response.status).to eq(404)
         expect(JSON.parse(last_response.body)).to match_json_expression({
@@ -130,7 +144,7 @@ RSpec.describe "POST /api/events" do
         stub_request(:post, url).with(body: forwarded_event )
           .to_return(status: 200, body: "<html><body>Gateway Timeout</body></html>")
 
-        post "/api/events?slug=#{slug}", { "data" => client_event }, test_rack_env
+        post "/api/events?slug=#{slug}", client_body, api_test_rack_env
 
         expect(last_response.status).to eq(500)
         expect(JSON.parse(last_response.body)).to match_json_expression({

@@ -148,6 +148,7 @@ class App < Roda
                     @response_body = { errors: [{ title: "Failed to create event" }] }
                   else
                     Event.create(nb_slug: slug,
+                                 author_nb_id: payload["event"]["author_id"],
                                  nb_event: nb_response.body)
                     @response_body = { data: JSON.parse(nb_response.body) }
                   end
