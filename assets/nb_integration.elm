@@ -18,7 +18,11 @@ type Msg
 
 
 type alias Event =
-    { id : Int, name : String }
+    { id : Int, name : String, startTime : String }
+
+
+
+--{ id : Int, name : String, ymd : String, startHour : String, startMinute : String, startMeridiem : String }
 
 
 type alias Error =
@@ -108,7 +112,7 @@ view model =
                 ]
             , div [] [ label [] [ text "Intro:", input [ type_ "text" ] [] ] ]
             , div [] [ label [] [ text "Time Zone:", input [ type_ "text" ] [] ] ]
-            , div [] [ label [] [ text "Start Date: ", selectDay ] ]
+            , div [] [ label [] [ text "Date: ", selectDay ] ]
             , div [] [ label [] [ selectTime StartTime ] ]
             , div [] [ label [] [ selectTime EndTime ] ]
             , div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
@@ -232,7 +236,7 @@ errorDisplay model =
 
 eventRow : Event -> Html Msg
 eventRow event =
-    tr [] [ td [] [ text event.name ] ]
+    tr [] [ td [] [ text event.name ], td [] [ text event.startTime ] ]
 
 
 errorRow : Error -> Html Msg
@@ -244,7 +248,16 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Name name ->
-            ( { model | event = Just (Event 0 name) }, Cmd.none )
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            Just { ev | name = name }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
 
         SubmitEvent ->
             ( { model | loading = True }, Http.send CreateEventResult (createEvent model) )
@@ -362,7 +375,7 @@ errorsDecoder =
 
 eventDecoder =
     field "event" <|
-        Json.Decode.map2 Event eventID eventName
+        Json.Decode.map3 Event eventID eventName startTime
 
 
 eventID =
@@ -371,6 +384,10 @@ eventID =
 
 eventName =
     field "name" string
+
+
+startTime =
+    field "start_time" string
 
 
 apiResultEvents : Json.Decode.Decoder (List Event) -> Json.Decode.Decoder APIResult
