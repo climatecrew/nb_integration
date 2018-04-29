@@ -192,31 +192,37 @@ formatTimestamp mEvent borderTime =
 
                         EndTime ->
                             ev.endTimestamp
-
-                hour24 =
-                    case timestamp.meridiem of
-                        "AM" ->
-                            if timestamp.hour == 12 then
-                                0
-                            else
-                                timestamp.hour
-
-                        otherwise ->
-                            if timestamp.hour == 12 then
-                                timestamp.hour
-                            else
-                                timestamp.hour + 12
             in
-                timestamp.ymd
-                    ++ "T"
-                    ++ padTimePart hour24
-                    ++ ":"
-                    ++ padTimePart timestamp.minute
-                    ++ ":00"
-                    ++ "-04:00"
+                serializeTimestamp timestamp
 
         Nothing ->
             ""
+
+
+serializeTimestamp : EditingTimestamp -> String
+serializeTimestamp timestamp =
+    let
+        hour24 =
+            case timestamp.meridiem of
+                "AM" ->
+                    if timestamp.hour == 12 then
+                        0
+                    else
+                        timestamp.hour
+
+                otherwise ->
+                    if timestamp.hour == 12 then
+                        timestamp.hour
+                    else
+                        timestamp.hour + 12
+    in
+        timestamp.ymd
+            ++ "T"
+            ++ padTimePart hour24
+            ++ ":"
+            ++ padTimePart timestamp.minute
+            ++ ":00"
+            ++ "-04:00"
 
 
 selectDay : Html Msg
@@ -564,14 +570,18 @@ encodeEvent model =
 
         Just event ->
             let
-                { id, name } =
+                { id, name, startTimestamp, endTimestamp } =
                     event
             in
                 object
                     [ ( "data"
                       , object
                             [ ( "event"
-                              , object [ ( "name", JE.string name ) ]
+                              , object
+                                    [ ( "name", JE.string name )
+                                    , ( "start_time", JE.string <| serializeTimestamp startTimestamp )
+                                    , ( "end_time", JE.string <| serializeTimestamp endTimestamp )
+                                    ]
                               )
                             ]
                       )
