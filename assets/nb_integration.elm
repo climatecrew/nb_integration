@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (Html, programWithFlags, div, button, text, input, label, h2, table, tr, td, select, option, span)
-import Html.Attributes exposing (class, type_, value, step, id, selected)
+import Html.Attributes exposing (class, type_, value, step, id, selected, style)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (jsonBody)
 import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed)
@@ -145,7 +145,7 @@ view model =
             , div [] [ label [] [ text "Contact Email:", input [ type_ "text" ] [] ] ]
             , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
             ]
-        , div [ id "display-event" ]
+        , div [ id "display-event", style [ ( "display", "none" ) ] ]
             [ div [] [ text <| "Start Time: " ++ formatTimestamp model.event StartTime ]
             , div [] [ text <| "End Time: " ++ formatTimestamp model.event EndTime ]
             ]
@@ -500,7 +500,20 @@ update msg model =
             ( handleAPIError model err, Cmd.none )
 
         CreateEventResult (Ok apiResult) ->
-            ( { model | loading = False, apiResult = apiResult, event = apiResult.event }, Cmd.none )
+            ( { model
+                | loading = False
+                , apiResult = apiResult
+                , event = apiResult.event
+                , events =
+                    case apiResult.event of
+                        Just ev ->
+                            ev :: model.events
+
+                        Nothing ->
+                            model.events
+              }
+            , Cmd.none
+            )
 
         CreateEventResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
@@ -642,7 +655,7 @@ startTime =
 
 apiResultEvent : Json.Decode.Decoder Event -> Json.Decode.Decoder APIResult
 apiResultEvent event =
-    Json.Decode.map (\ev -> { errors = [], events = [], event = Just ev }) event
+    Json.Decode.map (\ev -> { errors = [], events = [ ev ], event = Just ev }) event
 
 
 apiResultEvents : Json.Decode.Decoder (List Event) -> Json.Decode.Decoder APIResult
