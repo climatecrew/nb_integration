@@ -11,7 +11,7 @@
 
         <div id="event-creator", style="display: none;">
             <div id="email">event.creator@gmail.com</div>
-            <div id="current-user-id">2</div>
+            <div id="current-user-id">30</div>
         </div>
 
         <link rel="stylesheet" href="nb_integration.css" />

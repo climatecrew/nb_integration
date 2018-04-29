@@ -581,6 +581,7 @@ encodeEvent model =
                                     [ ( "name", JE.string name )
                                     , ( "start_time", JE.string <| serializeTimestamp startTimestamp )
                                     , ( "end_time", JE.string <| serializeTimestamp endTimestamp )
+                                    , ( "author_id", JE.int <| model.authorID )
                                     ]
                               )
                             ]
