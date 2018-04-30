@@ -15,6 +15,9 @@ type Msg
     | FetchEventsResult (Result Http.Error APIResult)
     | CreateEventResult (Result Http.Error APIResult)
     | Name String
+    | Intro String
+    | ContactName String
+    | ContactEmail String
     | Day String
     | Hour BorderTime String
     | Minute BorderTime String
@@ -141,23 +144,16 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div [ class "nb-integration-container" ]
-        [ div [] [ text model.email ]
-        , div [ class "event-form" ]
-            [ div []
-                [ label []
-                    [ text "Name:"
-                    , input [ type_ "text", onInput Name ] []
-                    ]
-                ]
-            , div [] [ label [] [ text "Intro:", input [ type_ "text" ] [] ] ]
-            , div [] [ label [] [ text "Date: ", selectDay ] ]
-            , div [] [ label [] [ selectTime StartTime (currentTimestamp model StartTime) ] ]
-            , div [] [ label [] [ selectTime EndTime (currentTimestamp model EndTime) ] ]
+        [ div [ class "event-form " ]
+            [ div [] [ selectDay ]
+            , div [] [ selectTime StartTime (currentTimestamp model StartTime) ]
+            , div [] [ selectTime EndTime (currentTimestamp model EndTime) ]
+            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Contact Name:" ], input [ class "child", type_ "text", onInput ContactName ] [], span [ class "child" ] [ text "Optional - will be shown on website" ] ] ]
+            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Contact Email:" ], input [ class "child", type_ "text", onInput ContactEmail ] [], span [ class "child" ] [ text "Optional - will be shown on website" ] ] ]
+            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Event Name:" ], input [ class "child", type_ "text", onInput Name ] [] ] ]
+            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Event Intro:" ], input [ class "child", type_ "text", onInput Intro ] [] ] ]
 
-            --, div [] [ label [] [ text "Capacity:", input [ type_ "text" ] [] ] ]
             --, div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
-            , div [] [ label [] [ text "Contact Name:", input [ type_ "text" ] [] ] ]
-            , div [] [ label [] [ text "Contact Email:", input [ type_ "text" ] [] ] ]
             , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
             ]
         , div [ id "display-event", style [ ( "display", "none" ) ] ]
@@ -242,17 +238,18 @@ serializeTimestamp timestamp =
 
 selectDay : Html Msg
 selectDay =
-    span []
-        [ span [] [ text "September" ]
+    span [ class "parent" ]
+        [ span [ class "child" ] [ text "Date: " ]
+        , span [ class "child" ] [ text "September" ]
         , select
-            [ onInput Day ]
+            [ class "child", onInput Day ]
             [ option [ value "2018-09-03" ] [ text "3 Monday" ]
             , option [ value "2018-09-04" ] [ text "4 Tuesday" ]
             , option [ value "2018-09-05" ] [ text "5 Wednesday" ]
             , option [ value "2018-09-06" ] [ text "6 Thursday" ]
             , option [ value "2018-09-07" ] [ text "7 Friday" ]
             ]
-        , span [] [ text "2018" ]
+        , span [ class "child" ] [ text "2018" ]
         ]
 
 
@@ -262,17 +259,17 @@ selectTime borderTime timestamp =
         ( labelText, hour, minute, meridiem ) =
             case borderTime of
                 StartTime ->
-                    ( span [] [ text "Start Time" ]
-                    , [ id "startHour", onInput (Hour StartTime) ]
-                    , [ id "startMinute", onInput (Minute StartTime) ]
-                    , [ id "startMeridiem", onInput (Meridiem StartTime) ]
+                    ( span [ class "child" ] [ text "Start Time" ]
+                    , [ class "child", id "startHour", onInput (Hour StartTime) ]
+                    , [ class "child", id "startMinute", onInput (Minute StartTime) ]
+                    , [ class "child", id "startMeridiem", onInput (Meridiem StartTime) ]
                     )
 
                 EndTime ->
-                    ( span [] [ text "End Time" ]
-                    , [ id "endHour", onInput (Hour EndTime) ]
-                    , [ id "endMinute", onInput (Minute EndTime) ]
-                    , [ id "endMeridiem", onInput (Meridiem EndTime) ]
+                    ( span [ class "child" ] [ text "End Time" ]
+                    , [ class "child", id "endHour", onInput (Hour EndTime) ]
+                    , [ class "child", id "endMinute", onInput (Minute EndTime) ]
+                    , [ class "child", id "endMeridiem", onInput (Meridiem EndTime) ]
                     )
 
         hourSelected =
@@ -284,7 +281,7 @@ selectTime borderTime timestamp =
         meridiemSelected =
             \value -> value == timestamp.meridiem
     in
-        span []
+        span [ class "parent" ]
             [ labelText
             , select
                 hour
@@ -375,6 +372,56 @@ update msg model =
                     case model.event of
                         Just ev ->
                             Just { ev | name = name }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
+        Intro intro ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            Just { ev | intro = Just intro }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
+        ContactEmail email ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentContact =
+                                    ev.contact
+
+                                updatedContact =
+                                    { currentContact | email = Just email }
+                            in
+                                Just { ev | contact = updatedContact }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
+        ContactName name ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentContact =
+                                    ev.contact
+
+                                updatedContact =
+                                    { currentContact | name = Just name }
+                            in
+                                Just { ev | contact = updatedContact }
 
                         Nothing ->
                             Nothing
