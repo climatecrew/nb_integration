@@ -355,7 +355,7 @@ errorDisplay model =
 
 eventRow : Event -> Html Msg
 eventRow event =
-    tr [] [ td [] [ text event.name ], td [] [ text event.startTime ] ]
+    tr [] [ td [] [ text event.name ] ]
 
 
 errorRow : Error -> Html Msg
