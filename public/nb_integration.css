@@ -42,19 +42,15 @@
   padding-left: 0;
 }
 
-.flex-inner select {
-  width: 50px;
-}
-
 .flex-outer li button {
   margin-left: auto;
-  /*
   padding: 8px 16px;
-  border: none;
-  background: #333;
-  color: #f2f2f2;
+  background: #353535;
+  color: #fff;
   text-transform: uppercase;
   letter-spacing: .09em;
   border-radius: 2px;
+  /*
+  border: none;
   */
 }
