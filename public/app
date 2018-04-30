@@ -23,8 +23,8 @@
         <script type="text/javascript">
             var email = document.getElementById("email").textContent;
             var access_token = "DEFAULT";
-            var rootURL = "https://polar-temple-72955.herokuapp.com";
-            //var rootURL = "http://localhost:3000";
+            //var rootURL = "https://polar-temple-72955.herokuapp.com";
+            var rootURL = "http://localhost:3000";
             var slug = "skarger";
             var currentUserID = parseInt(document.getElementById("current-user-id").textContent, 10);
 

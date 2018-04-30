@@ -44,8 +44,8 @@ type alias Contact =
 defaultEvent : Event
 defaultEvent =
     { id = 0
-    , intro = Just "Event Intro..."
-    , contact = { email = Just "me@example.com", name = Just "Contact Name" }
+    , intro = Nothing
+    , contact = { email = Nothing, name = Nothing }
     , name = "Event Name..."
     , startTime = "2018-09-03"
     , startTimestamp = defaultStartTimestamp
@@ -148,8 +148,8 @@ view model =
             [ div [] [ selectDay ]
             , div [] [ selectTime StartTime (currentTimestamp model StartTime) ]
             , div [] [ selectTime EndTime (currentTimestamp model EndTime) ]
-            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Contact Name:" ], input [ class "child", type_ "text", onInput ContactName ] [], span [ class "child" ] [ text "Optional - will be shown on website" ] ] ]
-            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Contact Email:" ], input [ class "child", type_ "text", onInput ContactEmail ] [], span [ class "child" ] [ text "Optional - will be shown on website" ] ] ]
+            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Contact Name:" ], input [ class "child", type_ "text", onInput ContactName ] [] ] ]
+            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Contact Email:" ], input [ class "child", type_ "text", onInput ContactEmail ] [] ] ]
             , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Event Name:" ], input [ class "child", type_ "text", onInput Name ] [] ] ]
             , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Event Intro:" ], input [ class "child", type_ "text", onInput Intro ] [] ] ]
 

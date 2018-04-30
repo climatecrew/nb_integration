@@ -55,6 +55,8 @@ RSpec.describe "POST /api/events" do
 
     let(:actual_author_id) { 45 }
     let(:admin_author_id) { 2 }
+    let(:author_email) { "author@example.com" }
+    let(:contact_email) { "contact@example.com" }
     let(:event_body) do
       <<~JSON
         {
@@ -62,7 +64,12 @@ RSpec.describe "POST /api/events" do
             "name": "Day of Action",
             "start_time": "2018-09-03T13:30:00-04:00",
             "end_time": "2018-09-03T17:00:00-04:00",
-            "author_id": #{actual_author_id.to_i}
+            "author_id": #{actual_author_id.to_i},
+            "author_email": "#{author_email}",
+            "contact": {
+              "name": "Contact Name",
+              "email": "#{contact_email}"
+            }
           }
         }
       JSON
@@ -71,7 +78,7 @@ RSpec.describe "POST /api/events" do
     let(:client_event) { JSON.parse(event_body) }
     let(:client_body) { JSON.generate({ "data" => client_event }) }
     let(:forwarded_event) do
-      base_event = client_event["event"]
+      base_event = client_event["event"].reject { |k, v| k == "author_email" }
       {
         "event" => base_event.merge(
           "status" => "published",
@@ -112,6 +119,8 @@ RSpec.describe "POST /api/events" do
         stored_event = Event.first
         expect(JSON.parse(stored_event.nb_event)).to eq(nb_event_body)
         expect(stored_event.author_nb_id).to eq(actual_author_id)
+        expect(stored_event.author_email).to eq(author_email)
+        expect(stored_event.contact_email).to eq(contact_email)
       end
 
       it "returns 201 and the event" do

@@ -133,6 +133,8 @@ class App < Roda
                 payload = r.params['data']
                 payload["event"]["status"] = "published"
                 payload["event"]["calendar_id"] = ENV["NB_CALENDAR_ID"].to_i
+                author_email = payload["event"]["author_email"]
+                payload["event"].delete("author_email")
                 logger.info("Creation URL: #{path_provider.create(:events)}")
                 logger.info("Sending payload:\n#{payload}")
                 nb_response = Client.create(path_provider: path_provider,
@@ -158,8 +160,17 @@ class App < Roda
                     response.status = 500
                     @response_body = { errors: [{ title: "Failed to create event" }] }
                   else
+                    author_id = payload
+                      .fetch("event")
+                      .fetch("author_id")
+                    contact_email = payload
+                      .fetch("event")
+                      .fetch("contact")
+                      .fetch("email")
                     Event.create(nb_slug: slug,
-                                 author_nb_id: payload["event"]["author_id"],
+                                 author_nb_id: author_id,
+                                 author_email: author_email,
+                                 contact_email: contact_email,
                                  nb_event: nb_response.body)
                     @response_body = { data: JSON.parse(nb_response.body) }
                   end
