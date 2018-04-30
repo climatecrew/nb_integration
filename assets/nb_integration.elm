@@ -96,7 +96,7 @@ defaultAPIResult =
 type alias Model =
     { apiResult : APIResult
     , authorID : Int
-    , email : String
+    , authorEmail : String
     , event : Maybe Event
     , events : List Event
     , rootURL : String
@@ -106,7 +106,7 @@ type alias Model =
 
 
 type alias Flags =
-    { authorID : Int, email : String, access_token : String, rootURL : String, slug : String }
+    { authorID : Int, authorEmail : String, access_token : String, rootURL : String, slug : String }
 
 
 main : Program Flags Model Msg
@@ -125,7 +125,7 @@ init flags =
         model =
             { apiResult = { errors = [], events = [], event = Nothing }
             , authorID = flags.authorID
-            , email = flags.email
+            , authorEmail = flags.authorEmail
             , event = Just defaultEvent
             , events = []
             , rootURL = flags.rootURL
@@ -669,6 +669,7 @@ encodeEvent model =
                                     , ( "start_time", JE.string <| serializeTimestamp startTimestamp )
                                     , ( "end_time", JE.string <| serializeTimestamp endTimestamp )
                                     , ( "author_id", JE.int <| model.authorID )
+                                    , ( "author_email", JE.string <| model.authorEmail )
                                     ]
                               )
                             ]

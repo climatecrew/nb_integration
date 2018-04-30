@@ -30,7 +30,7 @@
 
             var node = document.getElementById('event-interface');
             Elm.Main.embed(node, {
-                email: email,
+                authorEmail: email,
                 authorID : currentUserID,
                 access_token: access_token,
                 rootURL: rootURL,
