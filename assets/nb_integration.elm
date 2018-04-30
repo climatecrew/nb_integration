@@ -434,13 +434,23 @@ update msg model =
                     case model.event of
                         Just ev ->
                             let
-                                currentTS =
+                                currentStartTS =
                                     ev.startTimestamp
 
-                                updatedTS =
-                                    { currentTS | ymd = day }
+                                currentEndTS =
+                                    ev.endTimestamp
+
+                                updatedStartTS =
+                                    { currentStartTS | ymd = day }
+
+                                updatedEndTS =
+                                    { currentEndTS | ymd = day }
                             in
-                                Just { ev | startTimestamp = updatedTS }
+                                Just
+                                    { ev
+                                        | startTimestamp = updatedStartTS
+                                        , endTimestamp = updatedEndTS
+                                    }
 
                         Nothing ->
                             Nothing
