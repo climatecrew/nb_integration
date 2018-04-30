@@ -1,7 +1,7 @@
 module Main exposing (..)
 
-import Html exposing (Html, programWithFlags, div, button, text, input, label, h2, table, tr, td, select, option, span)
-import Html.Attributes exposing (class, type_, value, step, id, selected, style)
+import Html exposing (Html, programWithFlags, div, button, text, input, label, h2, table, tr, td, select, option, span, ul, li)
+import Html.Attributes exposing (class, type_, value, step, id, selected, style, for)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (jsonBody)
 import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
@@ -14,8 +14,8 @@ type Msg
     = SubmitEvent
     | FetchEventsResult (Result Http.Error APIResult)
     | CreateEventResult (Result Http.Error APIResult)
-    | Name String
-    | Intro String
+    | EventName String
+    | EventIntro String
     | ContactName String
     | ContactEmail String
     | Day String
@@ -144,18 +144,30 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div [ class "nb-integration-container" ]
-        [ div [ class "event-form " ]
-            [ div [] [ selectDay ]
-            , div [] [ selectTime StartTime (currentTimestamp model StartTime) ]
-            , div [] [ selectTime EndTime (currentTimestamp model EndTime) ]
-            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Contact Name:" ], input [ class "child", type_ "text", onInput ContactName ] [] ] ]
-            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Contact Email:" ], input [ class "child", type_ "text", onInput ContactEmail ] [] ] ]
-            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Event Name:" ], input [ class "child", type_ "text", onInput Name ] [] ] ]
-            , div [] [ span [ class "parent" ] [ span [ class "child" ] [ text "Event Intro:" ], input [ class "child", type_ "text", onInput Intro ] [] ] ]
-
-            --, div [] [ label [] [ text "Venue:", input [ type_ "text" ] [] ] ]
-            , div [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
+        [ div [ class "event-form " ] [
+          ul [ class "flex-outer" ] [
+              selectDay
+              , selectTime StartTime (currentTimestamp model StartTime)
+              , selectTime EndTime (currentTimestamp model EndTime)
+              , li [] [
+                label [for "contact-name"] [ text "Contact Name" ]
+              , input [ id "contact-name", type_ "contact-name", onInput ContactName ] []
+              ] 
+              , li [] [
+                label [for "contact-email"] [ text "Contact Email" ]
+              , input [ id "contact-email", type_ "contact-email", onInput ContactEmail ] []
+              ] 
+              , li [] [
+                label [for "event-name"] [ text "Event Name" ]
+              , input [ id "event-name", type_ "event-name", onInput EventName ] []
+              ] 
+              , li [] [
+                label [for "event-intro"] [ text "Event Intro" ]
+              , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
+              ] 
+              , li [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
             ]
+        ]
         , div [ id "display-event", style [ ( "display", "none" ) ] ]
             [ div [] [ text <| "Start Time: " ++ formatTimestamp model.event StartTime ]
             , div [] [ text <| "End Time: " ++ formatTimestamp model.event EndTime ]
@@ -238,19 +250,17 @@ serializeTimestamp timestamp =
 
 selectDay : Html Msg
 selectDay =
-    span [ class "parent" ]
-        [ span [ class "child" ] [ text "Date: " ]
-        , span [ class "child" ] [ text "September" ]
+  li [] [
+        label [ for "date" ] [ text "Date: September" ]
         , select
-            [ class "child", onInput Day ]
+            [ onInput Day ]
             [ option [ value "2018-09-03" ] [ text "3 Monday" ]
             , option [ value "2018-09-04" ] [ text "4 Tuesday" ]
             , option [ value "2018-09-05" ] [ text "5 Wednesday" ]
             , option [ value "2018-09-06" ] [ text "6 Thursday" ]
             , option [ value "2018-09-07" ] [ text "7 Friday" ]
             ]
-        , span [ class "child" ] [ text "2018" ]
-        ]
+            ]
 
 
 selectTime : BorderTime -> EditingTimestamp -> Html Msg
@@ -259,17 +269,17 @@ selectTime borderTime timestamp =
         ( labelText, hour, minute, meridiem ) =
             case borderTime of
                 StartTime ->
-                    ( span [ class "child" ] [ text "Start Time" ]
-                    , [ class "child", id "startHour", onInput (Hour StartTime) ]
-                    , [ class "child", id "startMinute", onInput (Minute StartTime) ]
-                    , [ class "child", id "startMeridiem", onInput (Meridiem StartTime) ]
+                    ( label [for "start-time"] [ text "Start Time" ]
+                    , [ id "startHour", onInput (Hour StartTime) ]
+                    , [ id "startMinute", onInput (Minute StartTime) ]
+                    , [ id "startMeridiem", onInput (Meridiem StartTime) ]
                     )
 
                 EndTime ->
-                    ( span [ class "child" ] [ text "End Time" ]
-                    , [ class "child", id "endHour", onInput (Hour EndTime) ]
-                    , [ class "child", id "endMinute", onInput (Minute EndTime) ]
-                    , [ class "child", id "endMeridiem", onInput (Meridiem EndTime) ]
+                    ( label [ for "end-time" ] [ text "End Time" ]
+                    , [ id "endHour", onInput (Hour EndTime) ]
+                    , [ id "endMinute", onInput (Minute EndTime) ]
+                    , [ id "endMeridiem", onInput (Meridiem EndTime) ]
                     )
 
         hourSelected =
@@ -281,9 +291,10 @@ selectTime borderTime timestamp =
         meridiemSelected =
             \value -> value == timestamp.meridiem
     in
-        span [ class "parent" ]
-            [ labelText
-            , select
+      li [] [
+        labelText
+        , ul [ class "flex-inner" ] [
+             select
                 hour
                 [ option [ value "01", selected (hourSelected "01") ] [ text "1" ]
                 , option [ value "02", selected (hourSelected "02") ] [ text "2" ]
@@ -308,6 +319,7 @@ selectTime borderTime timestamp =
                 [ option [ value "AM", selected (meridiemSelected "AM") ] [ text "AM" ]
                 , option [ value "PM", selected (meridiemSelected "PM") ] [ text "PM" ]
                 ]
+            ]
             ]
 
 
@@ -366,7 +378,7 @@ errorRow error =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Name name ->
+        EventName name ->
             let
                 updatedEvent =
                     case model.event of
@@ -378,7 +390,7 @@ update msg model =
             in
                 ( { model | event = updatedEvent }, Cmd.none )
 
-        Intro intro ->
+        EventIntro intro ->
             let
                 updatedEvent =
                     case model.event of
