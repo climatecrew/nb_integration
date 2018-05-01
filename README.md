@@ -60,7 +60,7 @@ The last Heroku buildpack determines the process type of the deployed applicatio
 
 We have a build and deploy workflow defined in [CircleCI](https://circleci.com). You will need access to the [climatecrew](https://circleci.com/gh/climatecrew) team in CircleCI.
 
-When you push the `master` branch, Circle runs the test suite, and if it passes it will deploy to Heroku.
+When you push the `master` branch, Circle runs the test suite, and if it passes it will deploy to Heroku. The `master` branch is protected with status checks on CI.
 
 We have a Heroku pipeline, crew-1, to deploy staging and then production.
 
