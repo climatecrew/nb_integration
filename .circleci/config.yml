@@ -105,9 +105,9 @@ workflows:
   build-deploy:
     jobs:
       - build
-      - deploy:  # only deploy when master successfully builds
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
+        #- deploy:  # only deploy when master successfully builds
+        #    requires:
+        #      - build
+        #    filters:
+        #      branches:
+        #        only: master
