@@ -62,7 +62,7 @@ We have a build and deploy workflow defined in [CircleCI](https://circleci.com).
 
 When you push the `master` branch, Circle runs the test suite, and if it passes it will deploy to Heroku.
 
-We have a Heroku pipeline, crew-1, to deploy staging and then production. Staging is configured to deploy automatically after CircleCI successfully builds master.
+We have a Heroku pipeline, crew-1, to deploy staging and then production.
 
 ## NationBuilder Setup
 
