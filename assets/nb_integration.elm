@@ -144,30 +144,30 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div [ class "nb-integration-container" ]
-        [ div [ class "event-form " ] [
-          ul [ class "flex-outer" ] [
-              selectDay
-              , selectTime StartTime (currentTimestamp model StartTime)
-              , selectTime EndTime (currentTimestamp model EndTime)
-              , li [] [
-                label [for "contact-name"] [ text "Contact Name" ]
-              , input [ id "contact-name", type_ "contact-name", onInput ContactName ] []
-              ] 
-              , li [] [
-                label [for "contact-email"] [ text "Contact Email" ]
-              , input [ id "contact-email", type_ "contact-email", onInput ContactEmail ] []
-              ] 
-              , li [] [
-                label [for "event-name"] [ text "Event Name" ]
-              , input [ id "event-name", type_ "event-name", onInput EventName ] []
-              ] 
-              , li [] [
-                label [for "event-intro"] [ text "Event Intro" ]
-              , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
-              ] 
-              , li [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
+        [ div [ class "event-form " ]
+            [ ul [ class "flex-outer" ]
+                [ selectDay
+                , selectTime StartTime (currentTimestamp model StartTime)
+                , selectTime EndTime (currentTimestamp model EndTime)
+                , li []
+                    [ label [ for "contact-name" ] [ text "Contact Name" ]
+                    , input [ id "contact-name", type_ "contact-name", onInput ContactName ] []
+                    ]
+                , li []
+                    [ label [ for "contact-email" ] [ text "Contact Email" ]
+                    , input [ id "contact-email", type_ "contact-email", onInput ContactEmail ] []
+                    ]
+                , li []
+                    [ label [ for "event-name" ] [ text "Event Name" ]
+                    , input [ id "event-name", type_ "event-name", onInput EventName ] []
+                    ]
+                , li []
+                    [ label [ for "event-intro" ] [ text "Event Intro" ]
+                    , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
+                    ]
+                , li [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
+                ]
             ]
-        ]
         , div [ id "display-event", style [ ( "display", "none" ) ] ]
             [ div [] [ text <| "Start Time: " ++ formatTimestamp model.event StartTime ]
             , div [] [ text <| "End Time: " ++ formatTimestamp model.event EndTime ]
@@ -250,17 +250,19 @@ serializeTimestamp timestamp =
 
 selectDay : Html Msg
 selectDay =
-  li [] [
-        label [ for "date" ] [ text "Date: September" ]
+    li []
+        [ label [ for "date" ] [ text "Date" ]
         , select
             [ onInput Day ]
-            [ option [ value "2018-09-03" ] [ text "3 Monday" ]
-            , option [ value "2018-09-04" ] [ text "4 Tuesday" ]
-            , option [ value "2018-09-05" ] [ text "5 Wednesday" ]
-            , option [ value "2018-09-06" ] [ text "6 Thursday" ]
-            , option [ value "2018-09-07" ] [ text "7 Friday" ]
+            [ option [ value "2018-09-24" ] [ text "Mon 9/24" ]
+            , option [ value "2018-09-25" ] [ text "Tue 9/25" ]
+            , option [ value "2018-09-26" ] [ text "Wed 9/26" ]
+            , option [ value "2018-09-27" ] [ text "Thu 9/27" ]
+            , option [ value "2018-09-28" ] [ text "Fri 9/28" ]
+            , option [ value "2018-09-29" ] [ text "Sat 9/29" ]
+            , option [ value "2018-09-30" ] [ text "Sun 9/30" ]
             ]
-            ]
+        ]
 
 
 selectTime : BorderTime -> EditingTimestamp -> Html Msg
@@ -269,7 +271,7 @@ selectTime borderTime timestamp =
         ( labelText, hour, minute, meridiem ) =
             case borderTime of
                 StartTime ->
-                    ( label [for "start-time"] [ text "Start Time" ]
+                    ( label [ for "start-time" ] [ text "Start Time" ]
                     , [ id "startHour", onInput (Hour StartTime) ]
                     , [ id "startMinute", onInput (Minute StartTime) ]
                     , [ id "startMeridiem", onInput (Meridiem StartTime) ]
@@ -291,35 +293,35 @@ selectTime borderTime timestamp =
         meridiemSelected =
             \value -> value == timestamp.meridiem
     in
-      li [] [
-        labelText
-        , ul [ class "flex-inner" ] [
-             select
-                hour
-                [ option [ value "01", selected (hourSelected "01") ] [ text "1" ]
-                , option [ value "02", selected (hourSelected "02") ] [ text "2" ]
-                , option [ value "03", selected (hourSelected "03") ] [ text "3" ]
-                , option [ value "04", selected (hourSelected "04") ] [ text "4" ]
-                , option [ value "05", selected (hourSelected "05") ] [ text "5" ]
-                , option [ value "06", selected (hourSelected "06") ] [ text "6" ]
-                , option [ value "07", selected (hourSelected "07") ] [ text "7" ]
-                , option [ value "08", selected (hourSelected "08") ] [ text "8" ]
-                , option [ value "09", selected (hourSelected "09") ] [ text "9" ]
-                , option [ value "10", selected (hourSelected "10") ] [ text "10" ]
-                , option [ value "11", selected (hourSelected "11") ] [ text "11" ]
-                , option [ value "12", selected (hourSelected "12") ] [ text "12" ]
+        li []
+            [ labelText
+            , ul [ class "flex-inner" ]
+                [ select
+                    hour
+                    [ option [ value "01", selected (hourSelected "01") ] [ text "1" ]
+                    , option [ value "02", selected (hourSelected "02") ] [ text "2" ]
+                    , option [ value "03", selected (hourSelected "03") ] [ text "3" ]
+                    , option [ value "04", selected (hourSelected "04") ] [ text "4" ]
+                    , option [ value "05", selected (hourSelected "05") ] [ text "5" ]
+                    , option [ value "06", selected (hourSelected "06") ] [ text "6" ]
+                    , option [ value "07", selected (hourSelected "07") ] [ text "7" ]
+                    , option [ value "08", selected (hourSelected "08") ] [ text "8" ]
+                    , option [ value "09", selected (hourSelected "09") ] [ text "9" ]
+                    , option [ value "10", selected (hourSelected "10") ] [ text "10" ]
+                    , option [ value "11", selected (hourSelected "11") ] [ text "11" ]
+                    , option [ value "12", selected (hourSelected "12") ] [ text "12" ]
+                    ]
+                , select
+                    minute
+                    [ option [ value "00", selected (minuteSelected "00") ] [ text "00" ]
+                    , option [ value "30", selected (minuteSelected "30") ] [ text "30" ]
+                    ]
+                , select
+                    meridiem
+                    [ option [ value "AM", selected (meridiemSelected "AM") ] [ text "AM" ]
+                    , option [ value "PM", selected (meridiemSelected "PM") ] [ text "PM" ]
+                    ]
                 ]
-            , select
-                minute
-                [ option [ value "00", selected (minuteSelected "00") ] [ text "00" ]
-                , option [ value "30", selected (minuteSelected "30") ] [ text "30" ]
-                ]
-            , select
-                meridiem
-                [ option [ value "AM", selected (meridiemSelected "AM") ] [ text "AM" ]
-                , option [ value "PM", selected (meridiemSelected "PM") ] [ text "PM" ]
-                ]
-            ]
             ]
 
 
