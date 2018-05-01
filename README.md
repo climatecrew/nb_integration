@@ -43,6 +43,9 @@ We host the app on Heroku. To deploy you must have access to the CREW Heroku acc
 
 You will need the [Heroku CLI](https://devcenter.heroku.com/categories/command-line) for various server administration tasks. See Heroku's docs for more information.
 
+Staging: https://staging-nb-integration.herokuapp.com/
+Production: TBD, currently https://polar-temple-72955.herokuapp.com/
+
 ## Environment variables
 
 Consult the Heroku settings page with the config variable values and the references to them in the source code for the comprehensive truth. With that said, here is a sampling:
