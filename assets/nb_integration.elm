@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (Html, programWithFlags, div, button, text, input, label, h2, table, tr, td, select, option, span, ul, li)
-import Html.Attributes exposing (class, type_, value, step, id, selected, style, for)
+import Html.Attributes exposing (class, type_, value, step, id, selected, style, for, disabled)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (jsonBody)
 import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
@@ -151,6 +151,10 @@ view model =
                 [ selectDay
                 , selectTime StartTime (currentTimestamp model StartTime)
                 , selectTime EndTime (currentTimestamp model EndTime)
+                , li [ style [("visibility", dateErrorVisibility model)] ] [
+                    label [for "date-errors"] []
+                    , span [] [text "End Time must be after Start Time" ]
+                  ]
                 , li []
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
                     , input [ id "contact-name", type_ "contact-name", onInput ContactName ] []
@@ -167,10 +171,10 @@ view model =
                     [ label [ for "event-intro" ] [ text "Event Intro" ]
                     , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
                     ]
-                , li [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
+                , li [] [ button [ onClick SubmitEvent, disabled <| submitButtonDisabled model ] [ text "Submit Event" ] ]
                 ]
             ]
-        , div [ id "display-event" ]
+        , div [ id "display-event", style [("display", "none")] ]
             [ div [] [ text <| "Start Time: " ++ formatTimestamp model.event StartTime ]
             , div [] [ text <| "End Time: " ++ formatTimestamp model.event EndTime ]
             , div []
@@ -635,6 +639,16 @@ lessThan : ( Date, Date ) -> Bool
 lessThan ( d1, d2 ) =
     Date.toTime d1 < Date.toTime d2
 
+
+submitButtonDisabled : Model -> Bool
+submitButtonDisabled model = not <| datesOk model
+
+dateErrorVisibility: Model -> String
+dateErrorVisibility model =
+  if datesOk model then
+      "hidden"
+    else
+      "visible"
 
 datesOk : Model -> Bool
 datesOk model =

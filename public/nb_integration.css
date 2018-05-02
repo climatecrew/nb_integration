@@ -54,3 +54,7 @@
   border: none;
   */
 }
+
+.flex-outer li button:disabled {
+  background: #A9A9A9;
+}
