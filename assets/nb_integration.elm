@@ -8,6 +8,8 @@ import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decod
 import Json.Encode as JE exposing (Value, encode, object)
 import String exposing (join)
 import Dict exposing (Dict)
+import Date exposing (Date)
+import Result exposing (Result, andThen)
 
 
 type Msg
@@ -168,9 +170,18 @@ view model =
                 , li [] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
                 ]
             ]
-        , div [ id "display-event", style [ ( "display", "none" ) ] ]
+        , div [ id "display-event" ]
             [ div [] [ text <| "Start Time: " ++ formatTimestamp model.event StartTime ]
             , div [] [ text <| "End Time: " ++ formatTimestamp model.event EndTime ]
+            , div []
+                [ text <|
+                    "Start Time < End Time: "
+                        ++ (if datesOk model then
+                                "true"
+                            else
+                                "false"
+                           )
+                ]
             ]
         , loadingSpinner model
         , div [ class "error-container" ] [ errorDisplay model ]
@@ -603,6 +614,46 @@ update msg model =
 
         CreateEventResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
+
+
+asDate : EditingTimestamp -> Result String Date
+asDate et =
+    Date.fromString (serializeTimestamp et)
+
+
+secondDate : EditingTimestamp -> Date -> Result String ( Date, Date )
+secondDate et firstDate =
+    case asDate et of
+        Ok date ->
+            Ok ( firstDate, date )
+
+        Err err ->
+            Err err
+
+
+lessThan : ( Date, Date ) -> Bool
+lessThan ( d1, d2 ) =
+    Date.toTime d1 < Date.toTime d2
+
+
+datesOk : Model -> Bool
+datesOk model =
+    case model.event of
+        Just ev ->
+            let
+                dates =
+                    asDate ev.startTimestamp
+                        |> andThen (secondDate ev.endTimestamp)
+            in
+                case dates of
+                    Ok ( sd, ed ) ->
+                        lessThan ( sd, ed )
+
+                    Err _ ->
+                        False
+
+        Nothing ->
+            False
 
 
 eventsURL : Model -> String
