@@ -18,6 +18,8 @@ type Msg
     | CreateEventResult (Result Http.Error APIResult)
     | EventName String
     | EventIntro String
+    | EventVenueName String
+    | EventVenueAddress1 String
     | ContactName String
     | ContactEmail String
     | Day String
@@ -34,6 +36,35 @@ type alias Event =
     , startTime : String
     , startTimestamp : EditingTimestamp
     , endTimestamp : EditingTimestamp
+    , venue : Venue
+    }
+
+
+type alias Venue =
+    { name : Maybe String
+    , address : Maybe Address
+    }
+
+
+defaultVenue : Venue
+defaultVenue =
+    { name = Nothing
+    , address = Nothing
+    }
+
+
+type alias Address =
+    { address1 : Maybe String
+
+    --, city : String
+    --, state : String
+    --, zip : String
+    }
+
+
+defaultAddress : Address
+defaultAddress =
+    { address1 = Nothing
     }
 
 
@@ -52,6 +83,7 @@ defaultEvent =
     , startTime = "2018-09-03"
     , startTimestamp = defaultStartTimestamp
     , endTimestamp = defaultEndTimestamp
+    , venue = defaultVenue
     }
 
 
@@ -151,10 +183,10 @@ view model =
                 [ selectDay
                 , selectTime StartTime (currentTimestamp model StartTime)
                 , selectTime EndTime (currentTimestamp model EndTime)
-                , li [ style [("visibility", dateErrorVisibility model)] ] [
-                    label [for "date-errors"] []
-                    , span [] [text "End Time must be after Start Time" ]
-                  ]
+                , li [ style [ ( "visibility", dateErrorVisibility model ) ] ]
+                    [ label [ for "date-errors" ] []
+                    , span [] [ text "End Time must be after Start Time" ]
+                    ]
                 , li []
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
                     , input [ id "contact-name", type_ "contact-name", onInput ContactName ] []
@@ -171,10 +203,18 @@ view model =
                     [ label [ for "event-intro" ] [ text "Event Intro" ]
                     , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
                     ]
+                , li []
+                    [ label [ for "event-venue-name" ] [ text "Venue" ]
+                    , input [ id "event-venue-name", type_ "event-venue-name", onInput EventVenueName ] []
+                    ]
+                , li []
+                    [ label [ for "event-venue-address1" ] [ text "Street Address" ]
+                    , input [ id "event-venue-address1", type_ "event-venue-address1", onInput EventVenueAddress1 ] []
+                    ]
                 , li [] [ button [ onClick SubmitEvent, disabled <| submitButtonDisabled model ] [ text "Submit Event" ] ]
                 ]
             ]
-        , div [ id "display-event", style [("display", "none")] ]
+        , div [ id "display-event", style [ ( "display", "none" ) ] ]
             [ div [] [ text <| "Start Time: " ++ formatTimestamp model.event StartTime ]
             , div [] [ text <| "End Time: " ++ formatTimestamp model.event EndTime ]
             , div []
@@ -419,6 +459,55 @@ update msg model =
             in
                 ( { model | event = updatedEvent }, Cmd.none )
 
+        EventVenueAddress1 address1 ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentVenue =
+                                    ev.venue
+
+                                currentAddress =
+                                    currentVenue.address
+
+                                updatedAddress =
+                                    case currentAddress of
+                                        Just address ->
+                                            Just { address | address1 = Just address1 }
+
+                                        Nothing ->
+                                            Just { defaultAddress | address1 = Just address1 }
+
+                                updatedVenue =
+                                    { currentVenue | address = updatedAddress }
+                            in
+                                Just { ev | venue = updatedVenue }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
+        EventVenueName name ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentVenue =
+                                    ev.venue
+
+                                updatedVenue =
+                                    { currentVenue | name = Just name }
+                            in
+                                Just { ev | venue = updatedVenue }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
         ContactEmail email ->
             let
                 updatedEvent =
@@ -641,14 +730,17 @@ lessThan ( d1, d2 ) =
 
 
 submitButtonDisabled : Model -> Bool
-submitButtonDisabled model = not <| datesOk model
+submitButtonDisabled model =
+    not <| datesOk model
 
-dateErrorVisibility: Model -> String
+
+dateErrorVisibility : Model -> String
 dateErrorVisibility model =
-  if datesOk model then
-      "hidden"
+    if datesOk model then
+        "hidden"
     else
-      "visible"
+        "visible"
+
 
 datesOk : Model -> Bool
 datesOk model =
@@ -734,7 +826,7 @@ encodeEvent model =
 
         Just event ->
             let
-                { id, name, intro, contact, startTime, startTimestamp, endTimestamp } =
+                { id, name, intro, contact, startTime, startTimestamp, endTimestamp, venue } =
                     event
             in
                 object
@@ -749,11 +841,48 @@ encodeEvent model =
                                     , ( "end_time", JE.string <| serializeTimestamp endTimestamp )
                                     , ( "author_id", JE.int <| model.authorID )
                                     , ( "author_email", JE.string <| model.authorEmail )
+                                    , ( "venue", encodeVenue venue )
                                     ]
                               )
                             ]
                       )
                     ]
+
+
+encodeVenue : Venue -> Value
+encodeVenue venue =
+    let
+        name =
+            case venue.name of
+                Just n ->
+                    ( "name", JE.string n )
+
+                Nothing ->
+                    ( "name", JE.null )
+
+        address =
+            encodeAddress venue.address
+    in
+        object [ name, address ]
+
+
+encodeAddress : Maybe Address -> ( String, Value )
+encodeAddress address =
+    let
+        encodedAddress =
+            case address of
+                Just a ->
+                    case a.address1 of
+                        Just a1 ->
+                            JE.object [ ( "address1", JE.string a1 ) ]
+
+                        Nothing ->
+                            JE.object [ ( "address1", JE.null ) ]
+
+                Nothing ->
+                    JE.null
+    in
+        ( "address", encodedAddress )
 
 
 encodeContact : Contact -> Value
@@ -816,7 +945,7 @@ errorsDecoder =
 
 eventDecoder =
     field "event" <|
-        Json.Decode.map7 Event
+        Json.Decode.map8 Event
             eventID
             eventIntro
             contact
@@ -824,6 +953,19 @@ eventDecoder =
             startTime
             decodeStartTimestamp
             decodeEndTimestamp
+            decodeVenue
+
+
+decodeVenue =
+    field "venue" <| Json.Decode.map2 Venue decodeVenueName decodeVenueAddress
+
+
+decodeVenueName =
+    Json.Decode.maybe <| field "name" string
+
+
+decodeVenueAddress =
+    Json.Decode.maybe <| field "address" <| Json.Decode.map Address <| Json.Decode.maybe (field "address1" string)
 
 
 decodeStartTimestamp =
