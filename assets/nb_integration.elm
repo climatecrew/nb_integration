@@ -20,6 +20,8 @@ type Msg
     | EventIntro String
     | EventVenueName String
     | EventVenueAddress1 String
+    | EventVenueCity String
+    | EventVenueState String
     | ContactName String
     | ContactEmail String
     | Day String
@@ -55,16 +57,16 @@ defaultVenue =
 
 type alias Address =
     { address1 : Maybe String
-
-    --, city : String
-    --, state : String
-    --, zip : String
+    , city : Maybe String
+    , state : Maybe String
     }
 
 
 defaultAddress : Address
 defaultAddress =
     { address1 = Nothing
+    , city = Nothing
+    , state = Nothing
     }
 
 
@@ -203,7 +205,7 @@ view model =
                     [ label [ for "event-intro" ] [ text "Event Intro" ]
                     , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
                     ]
-                , li [ style [ ( "visibility", "hidden" ) ] ]
+                , li [ style [ ( "visibility", eventNameErrorVisibility model ) ] ]
                     [ label [ for "event-overview-errors" ] []
                     , span [] [ text "Event name must be present" ]
                     ]
@@ -214,6 +216,18 @@ view model =
                 , li []
                     [ label [ for "event-venue-address1" ] [ text "Street Address" ]
                     , input [ id "event-venue-address1", type_ "event-venue-address1", onInput EventVenueAddress1 ] []
+                    ]
+                , li []
+                    [ label [ for "event-venue-city" ] [ text "City" ]
+                    , input [ id "event-venue-city", type_ "event-venue-city", onInput EventVenueCity ] []
+                    ]
+                , li []
+                    [ label [ for "event-venue-state" ] [ text "State" ]
+                    , input [ id "event-venue-state", type_ "event-venue-state", onInput EventVenueState ] []
+                    ]
+                , li [ style [ ( "visibility", "hidden" ) ] ]
+                    [ label [ for "event-venue-errors" ] []
+                    , span [] [ text "Event venue must be present" ]
                     ]
                 , li [] [ button [ onClick SubmitEvent, disabled <| submitButtonDisabled model ] [ text "Submit Event" ] ]
                 ]
@@ -493,6 +507,66 @@ update msg model =
             in
                 ( { model | event = updatedEvent }, Cmd.none )
 
+        EventVenueCity city ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentVenue =
+                                    ev.venue
+
+                                currentAddress =
+                                    currentVenue.address
+
+                                updatedAddress =
+                                    case currentAddress of
+                                        Just address ->
+                                            Just { address | city = Just city }
+
+                                        Nothing ->
+                                            Just { defaultAddress | city = Just city }
+
+                                updatedVenue =
+                                    { currentVenue | address = updatedAddress }
+                            in
+                                Just { ev | venue = updatedVenue }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
+        EventVenueState state ->
+            let
+                updatedEvent =
+                    case model.event of
+                        Just ev ->
+                            let
+                                currentVenue =
+                                    ev.venue
+
+                                currentAddress =
+                                    currentVenue.address
+
+                                updatedAddress =
+                                    case currentAddress of
+                                        Just address ->
+                                            Just { address | state = Just state }
+
+                                        Nothing ->
+                                            Just { defaultAddress | state = Just state }
+
+                                updatedVenue =
+                                    { currentVenue | address = updatedAddress }
+                            in
+                                Just { ev | venue = updatedVenue }
+
+                        Nothing ->
+                            Nothing
+            in
+                ( { model | event = updatedEvent }, Cmd.none )
+
         EventVenueName name ->
             let
                 updatedEvent =
@@ -746,6 +820,20 @@ dateErrorVisibility model =
         "visible"
 
 
+eventNameErrorVisibility : Model -> String
+eventNameErrorVisibility model =
+    let
+        visibility =
+            (\ev ->
+                if String.length ev.name > 0 then
+                    "hidden"
+                else
+                    "visible"
+            )
+    in
+        Maybe.withDefault "hidden" <| Maybe.map visibility model.event
+
+
 datesOk : Model -> Bool
 datesOk model =
     case model.event of
@@ -876,12 +964,11 @@ encodeAddress address =
         encodedAddress =
             case address of
                 Just a ->
-                    case a.address1 of
-                        Just a1 ->
-                            JE.object [ ( "address1", JE.string a1 ) ]
-
-                        Nothing ->
-                            JE.object [ ( "address1", JE.null ) ]
+                    JE.object
+                        [ ( "address1", encodeMaybeString a.address1 )
+                        , ( "city", encodeMaybeString a.city )
+                        , ( "state", encodeMaybeString a.state )
+                        ]
 
                 Nothing ->
                     JE.null
@@ -969,7 +1056,12 @@ decodeVenueName =
 
 
 decodeVenueAddress =
-    Json.Decode.maybe <| field "address" <| Json.Decode.map Address <| Json.Decode.maybe (field "address1" string)
+    Json.Decode.maybe <|
+        field "address" <|
+            Json.Decode.map3 Address
+                (Json.Decode.maybe (field "address1" string))
+                (Json.Decode.maybe (field "city" string))
+                (Json.Decode.maybe (field "state" string))
 
 
 decodeStartTimestamp =
