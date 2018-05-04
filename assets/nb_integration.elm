@@ -1,7 +1,7 @@
 module Main exposing (..)
 
 import Html exposing (Html, programWithFlags, div, button, text, input, label, h2, table, tr, td, select, option, span, ul, li)
-import Html.Attributes exposing (class, type_, value, step, id, selected, style, for, disabled)
+import Html.Attributes exposing (class, type_, value, step, id, selected, style, for, disabled, placeholder)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (jsonBody)
 import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
@@ -191,15 +191,15 @@ view model =
                     ]
                 , li []
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
-                    , input [ id "contact-name", type_ "contact-name", onInput ContactName ] []
+                    , input [ id "contact-name", type_ "contact-name", placeholder "(Required)", onInput ContactName ] []
                     ]
                 , li []
                     [ label [ for "contact-email" ] [ text "Contact Email" ]
-                    , input [ id "contact-email", type_ "contact-email", onInput ContactEmail ] []
+                    , input [ id "contact-email", type_ "contact-email", placeholder "(Required)", onInput ContactEmail ] []
                     ]
                 , li []
                     [ label [ for "event-name" ] [ text "Event Name" ]
-                    , input [ id "event-name", type_ "event-name", onInput EventName ] []
+                    , input [ id "event-name", type_ "event-name", placeholder "(Required)", onInput EventName ] []
                     ]
                 , li []
                     [ label [ for "event-intro" ] [ text "Event Intro" ]
@@ -215,15 +215,15 @@ view model =
                     ]
                 , li []
                     [ label [ for "event-venue-address1" ] [ text "Street Address" ]
-                    , input [ id "event-venue-address1", type_ "event-venue-address1", onInput EventVenueAddress1 ] []
+                    , input [ id "event-venue-address1", type_ "event-venue-address1", placeholder "(Required)", onInput EventVenueAddress1 ] []
                     ]
                 , li []
                     [ label [ for "event-venue-city" ] [ text "City" ]
-                    , input [ id "event-venue-city", type_ "event-venue-city", onInput EventVenueCity ] []
+                    , input [ id "event-venue-city", type_ "event-venue-city", placeholder "(Required)", onInput EventVenueCity ] []
                     ]
                 , li []
                     [ label [ for "event-venue-state" ] [ text "State" ]
-                    , input [ id "event-venue-state", type_ "event-venue-state", onInput EventVenueState ] []
+                    , input [ id "event-venue-state", type_ "event-venue-state", placeholder "(Required)", onInput EventVenueState ] []
                     ]
                 , li [ style [ ( "visibility", "hidden" ) ] ]
                     [ label [ for "event-venue-errors" ] []
