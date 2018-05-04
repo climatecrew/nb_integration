@@ -35,10 +35,21 @@ type alias Event =
     , intro : Maybe String
     , contact : Contact
     , name : String
-    , startTime : String
     , startTimestamp : EditingTimestamp
     , endTimestamp : EditingTimestamp
     , venue : Venue
+    }
+
+
+defaultEvent : Event
+defaultEvent =
+    { id = 0
+    , intro = Nothing
+    , contact = { email = Nothing, name = Nothing }
+    , name = "Event Name..."
+    , startTimestamp = defaultStartTimestamp
+    , endTimestamp = defaultEndTimestamp
+    , venue = defaultVenue
     }
 
 
@@ -73,19 +84,6 @@ defaultAddress =
 type alias Contact =
     { name : Maybe String
     , email : Maybe String
-    }
-
-
-defaultEvent : Event
-defaultEvent =
-    { id = 0
-    , intro = Nothing
-    , contact = { email = Nothing, name = Nothing }
-    , name = "Event Name..."
-    , startTime = "2018-09-03"
-    , startTimestamp = defaultStartTimestamp
-    , endTimestamp = defaultEndTimestamp
-    , venue = defaultVenue
     }
 
 
@@ -918,7 +916,7 @@ encodeEvent model =
 
         Just event ->
             let
-                { id, name, intro, contact, startTime, startTimestamp, endTimestamp, venue } =
+                { id, name, intro, contact, startTimestamp, endTimestamp, venue } =
                     event
             in
                 object
@@ -1036,12 +1034,11 @@ errorsDecoder =
 
 eventDecoder =
     field "event" <|
-        Json.Decode.map8 Event
+        Json.Decode.map7 Event
             eventID
             eventIntro
             contact
             eventName
-            startTime
             decodeStartTimestamp
             decodeEndTimestamp
             decodeVenue
@@ -1095,10 +1092,6 @@ contactName =
 
 contactEmail =
     field "email" (nullable string)
-
-
-startTime =
-    field "start_time" string
 
 
 apiResultEvent : Json.Decode.Decoder Event -> Json.Decode.Decoder APIResult
