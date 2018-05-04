@@ -34,7 +34,7 @@ type alias Event =
     { id : Int
     , intro : Maybe String
     , contact : Contact
-    , name : String
+    , name : Maybe String
     , startTimestamp : EditingTimestamp
     , endTimestamp : EditingTimestamp
     , venue : Venue
@@ -46,7 +46,7 @@ defaultEvent =
     { id = 0
     , intro = Nothing
     , contact = { email = Nothing, name = Nothing }
-    , name = "Event Name..."
+    , name = Nothing
     , startTimestamp = defaultStartTimestamp
     , endTimestamp = defaultEndTimestamp
     , venue = defaultVenue
@@ -440,7 +440,7 @@ errorDisplay model =
 
 eventRow : Event -> Html Msg
 eventRow event =
-    tr [] [ td [] [ text event.name ] ]
+    tr [] [ td [] [ text <| Maybe.withDefault "" event.name ] ]
 
 
 errorRow : Error -> Html Msg
@@ -456,7 +456,7 @@ update msg model =
                 updatedEvent =
                     case model.event of
                         Just ev ->
-                            Just { ev | name = name }
+                            Just { ev | name = Just name }
 
                         Nothing ->
                             Nothing
@@ -823,7 +823,7 @@ eventNameErrorVisibility model =
     let
         visibility =
             (\ev ->
-                if String.length ev.name > 0 then
+                if (Maybe.withDefault "" ev.name |> String.length) > 0 then
                     "hidden"
                 else
                     "visible"
@@ -924,7 +924,7 @@ encodeEvent model =
                       , object
                             [ ( "event"
                               , object
-                                    [ ( "name", JE.string name )
+                                    [ ( "name", encodeMaybeString name )
                                     , ( "intro", encodeMaybeString intro )
                                     , ( "contact", encodeContact contact )
                                     , ( "start_time", JE.string <| serializeTimestamp startTimestamp )
@@ -1074,7 +1074,7 @@ eventID =
 
 
 eventName =
-    field "name" string
+    field "name" (nullable string)
 
 
 eventIntro =
