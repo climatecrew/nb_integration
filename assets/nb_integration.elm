@@ -136,6 +136,7 @@ type alias Model =
     , rootURL : String
     , slug : String
     , loading : Bool
+    , showValidationErrors : Bool
     }
 
 
@@ -165,6 +166,7 @@ init flags =
             , rootURL = flags.rootURL
             , slug = flags.slug
             , loading = True
+            , showValidationErrors = False
             }
     in
         ( model, Http.send FetchEventsResult (getEvents model) )
@@ -752,7 +754,10 @@ update msg model =
                 ( { model | event = updatedEvent }, Cmd.none )
 
         SubmitEvent ->
-            ( { model | loading = True }, Http.send CreateEventResult (createEvent model) )
+            if invalidInput model then
+                ( { model | showValidationErrors = True }, Cmd.none )
+            else
+                ( { model | showValidationErrors = False, loading = True }, Http.send CreateEventResult (createEvent model) )
 
         FetchEventsResult (Ok apiResult) ->
             ( { model | loading = False, apiResult = apiResult, events = apiResult.events }, Cmd.none )
@@ -802,7 +807,35 @@ lessThan ( d1, d2 ) =
 
 submitButtonDisabled : Model -> Bool
 submitButtonDisabled model =
-    not <| datesOk model
+    invalidInput model
+
+
+invalidInput : Model -> Bool
+invalidInput model =
+    not <| List.all identity [ datesOk model, eventNamePresent model ]
+
+
+eventNameErrorVisibility : Model -> String
+eventNameErrorVisibility model =
+    let
+        visibility =
+            (\ev ->
+                if model.showValidationErrors && invalidInput model then
+                    "visible"
+                else
+                    "hidden"
+            )
+    in
+        Maybe.withDefault "hidden" <| Maybe.map visibility model.event
+
+
+eventNamePresent : Model -> Bool
+eventNamePresent model =
+    (Maybe.andThen .name model.event
+        |> Maybe.withDefault ""
+        |> String.length
+    )
+        > 0
 
 
 dateErrorVisibility : Model -> String
@@ -811,20 +844,6 @@ dateErrorVisibility model =
         "hidden"
     else
         "visible"
-
-
-eventNameErrorVisibility : Model -> String
-eventNameErrorVisibility model =
-    let
-        visibility =
-            (\ev ->
-                if (Maybe.withDefault "" ev.name |> String.length) > 0 then
-                    "hidden"
-                else
-                    "visible"
-            )
-    in
-        Maybe.withDefault "hidden" <| Maybe.map visibility model.event
 
 
 datesOk : Model -> Bool
