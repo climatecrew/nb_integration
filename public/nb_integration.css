@@ -20,6 +20,10 @@
 }
 
 .flex-outer > li {
+  max-width: 1200px;
+}
+
+.flex-outer > li.submit-button {
   max-width: 800px;
 }
 
@@ -40,6 +44,10 @@
 
 .flex-outer > li > ul {
   padding-left: 0;
+}
+
+.flex-outer > li > span {
+  padding-left: 15px;
 }
 
 .flex-outer li button {
