@@ -38,6 +38,12 @@
   max-width: 580px;
 }
 
+.flex-outer > li > input {
+  box-sizing: border-box;
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .flex-inner {
   justify-content: space-between;
 }

@@ -181,11 +181,14 @@ view model =
         [ div [ class "event-form " ]
             [ ul [ class "flex-outer" ]
                 [ selectDay
-                , selectTime StartTime (currentTimestamp model StartTime)
-                , selectTime EndTime (currentTimestamp model EndTime)
-                , li [ style [ ( "visibility", dateErrorVisibility model ) ] ]
-                    [ label [ for "date-errors" ] []
-                    , span [] [ text "End Time must be after Start Time" ]
+                , li []
+                    [ label [ for "start-time" ] [ text "Start Time" ]
+                    , selectTime StartTime (currentTimestamp model StartTime)
+                    ]
+                , li []
+                    [ label [ for "end-time" ] [ text "End Time" ]
+                    , selectTime EndTime (currentTimestamp model EndTime)
+                    , span [ style [ ( "visibility", dateErrorVisibility model ) ] ] [ text "End Time must be after Start Time" ]
                     ]
                 , li []
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
@@ -336,18 +339,16 @@ selectDay =
 selectTime : BorderTime -> EditingTimestamp -> Html Msg
 selectTime borderTime timestamp =
     let
-        ( labelText, hour, minute, meridiem ) =
+        ( hour, minute, meridiem ) =
             case borderTime of
                 StartTime ->
-                    ( label [ for "start-time" ] [ text "Start Time" ]
-                    , [ id "startHour", onInput (Hour StartTime) ]
+                    ( [ id "startHour", onInput (Hour StartTime) ]
                     , [ id "startMinute", onInput (Minute StartTime) ]
                     , [ id "startMeridiem", onInput (Meridiem StartTime) ]
                     )
 
                 EndTime ->
-                    ( label [ for "end-time" ] [ text "End Time" ]
-                    , [ id "endHour", onInput (Hour EndTime) ]
+                    ( [ id "endHour", onInput (Hour EndTime) ]
                     , [ id "endMinute", onInput (Minute EndTime) ]
                     , [ id "endMeridiem", onInput (Meridiem EndTime) ]
                     )
@@ -361,34 +362,31 @@ selectTime borderTime timestamp =
         meridiemSelected =
             \value -> value == timestamp.meridiem
     in
-        li []
-            [ labelText
-            , ul [ class "flex-inner" ]
-                [ select
-                    hour
-                    [ option [ value "01", selected (hourSelected "01") ] [ text "1" ]
-                    , option [ value "02", selected (hourSelected "02") ] [ text "2" ]
-                    , option [ value "03", selected (hourSelected "03") ] [ text "3" ]
-                    , option [ value "04", selected (hourSelected "04") ] [ text "4" ]
-                    , option [ value "05", selected (hourSelected "05") ] [ text "5" ]
-                    , option [ value "06", selected (hourSelected "06") ] [ text "6" ]
-                    , option [ value "07", selected (hourSelected "07") ] [ text "7" ]
-                    , option [ value "08", selected (hourSelected "08") ] [ text "8" ]
-                    , option [ value "09", selected (hourSelected "09") ] [ text "9" ]
-                    , option [ value "10", selected (hourSelected "10") ] [ text "10" ]
-                    , option [ value "11", selected (hourSelected "11") ] [ text "11" ]
-                    , option [ value "12", selected (hourSelected "12") ] [ text "12" ]
-                    ]
-                , select
-                    minute
-                    [ option [ value "00", selected (minuteSelected "00") ] [ text "00" ]
-                    , option [ value "30", selected (minuteSelected "30") ] [ text "30" ]
-                    ]
-                , select
-                    meridiem
-                    [ option [ value "AM", selected (meridiemSelected "AM") ] [ text "AM" ]
-                    , option [ value "PM", selected (meridiemSelected "PM") ] [ text "PM" ]
-                    ]
+        ul [ class "flex-inner" ]
+            [ select
+                hour
+                [ option [ value "01", selected (hourSelected "01") ] [ text "1" ]
+                , option [ value "02", selected (hourSelected "02") ] [ text "2" ]
+                , option [ value "03", selected (hourSelected "03") ] [ text "3" ]
+                , option [ value "04", selected (hourSelected "04") ] [ text "4" ]
+                , option [ value "05", selected (hourSelected "05") ] [ text "5" ]
+                , option [ value "06", selected (hourSelected "06") ] [ text "6" ]
+                , option [ value "07", selected (hourSelected "07") ] [ text "7" ]
+                , option [ value "08", selected (hourSelected "08") ] [ text "8" ]
+                , option [ value "09", selected (hourSelected "09") ] [ text "9" ]
+                , option [ value "10", selected (hourSelected "10") ] [ text "10" ]
+                , option [ value "11", selected (hourSelected "11") ] [ text "11" ]
+                , option [ value "12", selected (hourSelected "12") ] [ text "12" ]
+                ]
+            , select
+                minute
+                [ option [ value "00", selected (minuteSelected "00") ] [ text "00" ]
+                , option [ value "30", selected (minuteSelected "30") ] [ text "30" ]
+                ]
+            , select
+                meridiem
+                [ option [ value "AM", selected (meridiemSelected "AM") ] [ text "AM" ]
+                , option [ value "PM", selected (meridiemSelected "PM") ] [ text "PM" ]
                 ]
             ]
 
