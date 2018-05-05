@@ -140,6 +140,20 @@ type alias Model =
     }
 
 
+defaultModel : Flags -> Model
+defaultModel flags =
+    { apiResult = { errors = [], events = [], event = Nothing }
+    , authorID = flags.authorID
+    , authorEmail = flags.authorEmail
+    , event = Just defaultEvent
+    , events = []
+    , rootURL = flags.rootURL
+    , slug = flags.slug
+    , loading = True
+    , showEventNameErrors = False
+    }
+
+
 type alias Flags =
     { authorID : Int, authorEmail : String, access_token : String, rootURL : String, slug : String }
 
@@ -158,16 +172,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         model =
-            { apiResult = { errors = [], events = [], event = Nothing }
-            , authorID = flags.authorID
-            , authorEmail = flags.authorEmail
-            , event = Just defaultEvent
-            , events = []
-            , rootURL = flags.rootURL
-            , slug = flags.slug
-            , loading = True
-            , showEventNameErrors = False
-            }
+            defaultModel flags
     in
         ( model, Http.send FetchEventsResult (getEvents model) )
 
