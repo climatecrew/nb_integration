@@ -44,6 +44,10 @@
   padding-right: 0;
 }
 
+.flex-outer > li > span.event-name-errors {
+  color: #f70f32;
+}
+
 .flex-inner {
   justify-content: space-between;
 }
@@ -55,6 +59,7 @@
 .flex-outer > li > span {
   padding-left: 15px;
 }
+
 
 .flex-outer li button {
   margin-left: auto;
@@ -69,6 +74,6 @@
   */
 }
 
-.flex-outer li button:disabled {
+.flex-outer li.submit-button-disabled button {
   background: #A9A9A9;
 }

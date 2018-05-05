@@ -136,7 +136,7 @@ type alias Model =
     , rootURL : String
     , slug : String
     , loading : Bool
-    , showValidationErrors : Bool
+    , showEventNameErrors : Bool
     }
 
 
@@ -166,7 +166,7 @@ init flags =
             , rootURL = flags.rootURL
             , slug = flags.slug
             , loading = True
-            , showValidationErrors = False
+            , showEventNameErrors = False
             }
     in
         ( model, Http.send FetchEventsResult (getEvents model) )
@@ -203,7 +203,11 @@ view model =
                 , li []
                     [ label [ for "event-name" ] [ text "Event Name" ]
                     , input [ id "event-name", type_ "event-name", placeholder "(Required)", onInput EventName ] []
-                    , span [ style [ ( "visibility", eventNameErrorVisibility model ) ] ] [ text "Event name must be present" ]
+                    , span
+                        [ class <| eventNameClass model
+                        , style [ ( "visibility", eventNameErrorVisibility model ) ]
+                        ]
+                        [ text "Event name must be present" ]
                     ]
                 , li []
                     [ label [ for "event-intro" ] [ text "Event Intro" ]
@@ -229,7 +233,7 @@ view model =
                     [ label [ for "event-venue-errors" ] []
                     , span [] [ text "Event venue must be present" ]
                     ]
-                , li [ class "submit-button" ] [ button [ onClick SubmitEvent, disabled <| submitButtonDisabled model ] [ text "Submit Event" ] ]
+                , li [ class <| submitButtonClass model ] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
                 ]
             ]
         , div [ id "display-event", style [ ( "display", "none" ) ] ]
@@ -755,9 +759,9 @@ update msg model =
 
         SubmitEvent ->
             if invalidInput model then
-                ( { model | showValidationErrors = True }, Cmd.none )
+                ( { model | showEventNameErrors = True }, Cmd.none )
             else
-                ( { model | showValidationErrors = False, loading = True }, Http.send CreateEventResult (createEvent model) )
+                ( { model | showEventNameErrors = False, loading = True }, Http.send CreateEventResult (createEvent model) )
 
         FetchEventsResult (Ok apiResult) ->
             ( { model | loading = False, apiResult = apiResult, events = apiResult.events }, Cmd.none )
@@ -805,9 +809,12 @@ lessThan ( d1, d2 ) =
     Date.toTime d1 < Date.toTime d2
 
 
-submitButtonDisabled : Model -> Bool
-submitButtonDisabled model =
-    invalidInput model
+submitButtonClass : Model -> String
+submitButtonClass model =
+    if invalidInput model then
+        "submit-button submit-button-disabled"
+    else
+        "submit-button"
 
 
 invalidInput : Model -> Bool
@@ -815,27 +822,38 @@ invalidInput model =
     not <| List.all identity [ datesOk model, eventNamePresent model ]
 
 
-eventNameErrorVisibility : Model -> String
-eventNameErrorVisibility model =
+displayEventNameErrors : Model -> Bool
+displayEventNameErrors model =
+    model.showEventNameErrors && invalidInput model
+
+
+valueIfError : Model -> a -> a -> a
+valueIfError model errorValue noErrorValue =
     let
-        visibility =
+        f =
             (\ev ->
-                if model.showValidationErrors && invalidInput model then
-                    "visible"
+                if displayEventNameErrors model then
+                    errorValue
                 else
-                    "hidden"
+                    noErrorValue
             )
     in
-        Maybe.withDefault "hidden" <| Maybe.map visibility model.event
+        Maybe.withDefault noErrorValue <| Maybe.map f model.event
+
+
+eventNameClass : Model -> String
+eventNameClass model =
+    valueIfError model "event-name event-name-errors" "event-name"
+
+
+eventNameErrorVisibility : Model -> String
+eventNameErrorVisibility model =
+    valueIfError model "visible" "hidden"
 
 
 eventNamePresent : Model -> Bool
 eventNamePresent model =
-    (Maybe.andThen .name model.event
-        |> Maybe.withDefault ""
-        |> String.length
-    )
-        > 0
+    (Maybe.andThen .name model.event |> Maybe.withDefault "" |> String.length) > 0
 
 
 dateErrorVisibility : Model -> String
