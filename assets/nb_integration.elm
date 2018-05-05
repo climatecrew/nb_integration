@@ -132,6 +132,9 @@ type alias ShowValidationErrors =
     , showContactNameErrors : Bool
     , showContactEmailErrors : Bool
     , showDateErrors : Bool
+    , showStreetAddressErrors : Bool
+    , showCityErrors : Bool
+    , showStateErrors : Bool
     }
 
 
@@ -141,6 +144,9 @@ defaultShowValidationErrors =
     , showContactNameErrors = False
     , showContactEmailErrors = False
     , showDateErrors = False
+    , showStreetAddressErrors = False
+    , showCityErrors = False
+    , showStateErrors = False
     }
 
 
@@ -256,14 +262,29 @@ view model =
                 , li []
                     [ label [ for "event-venue-address1" ] [ text "Street Address" ]
                     , input [ id "event-venue-address1", type_ "event-venue-address1", placeholder "(Required)", onInput EventVenueAddress1 ] []
+                    , span
+                        [ class <| validationClass model.validationErrors.showStreetAddressErrors
+                        , style [ ( "visibility", validationVisibility model.validationErrors.showStreetAddressErrors ) ]
+                        ]
+                        [ text "Street address must be present" ]
                     ]
                 , li []
                     [ label [ for "event-venue-city" ] [ text "City" ]
                     , input [ id "event-venue-city", type_ "event-venue-city", placeholder "(Required)", onInput EventVenueCity ] []
+                    , span
+                        [ class <| validationClass model.validationErrors.showCityErrors
+                        , style [ ( "visibility", validationVisibility model.validationErrors.showCityErrors ) ]
+                        ]
+                        [ text "City must be present" ]
                     ]
                 , li []
                     [ label [ for "event-venue-state" ] [ text "State" ]
                     , input [ id "event-venue-state", type_ "event-venue-state", placeholder "(Required)", onInput EventVenueState ] []
+                    , span
+                        [ class <| validationClass model.validationErrors.showStateErrors
+                        , style [ ( "visibility", validationVisibility model.validationErrors.showStateErrors ) ]
+                        ]
+                        [ text "State must be present" ]
                     ]
                 , li [ style [ ( "visibility", "hidden" ) ] ]
                     [ label [ for "event-venue-errors" ] []
@@ -517,6 +538,30 @@ showContactEmailError validationErrors shouldShow =
         { validationErrors | showContactEmailErrors = False }
 
 
+showStreetAddressError : ShowValidationErrors -> Bool -> ShowValidationErrors
+showStreetAddressError validationErrors shouldShow =
+    if shouldShow then
+        { validationErrors | showStreetAddressErrors = True }
+    else
+        { validationErrors | showStreetAddressErrors = False }
+
+
+showCityError : ShowValidationErrors -> Bool -> ShowValidationErrors
+showCityError validationErrors shouldShow =
+    if shouldShow then
+        { validationErrors | showCityErrors = True }
+    else
+        { validationErrors | showCityErrors = False }
+
+
+showStateError : ShowValidationErrors -> Bool -> ShowValidationErrors
+showStateError validationErrors shouldShow =
+    if shouldShow then
+        { validationErrors | showStateErrors = True }
+    else
+        { validationErrors | showStateErrors = False }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -574,8 +619,14 @@ update msg model =
 
                         Nothing ->
                             Nothing
+
+                updatedModel =
+                    { model | event = updatedEvent }
+
+                updatedErrors =
+                    showStreetAddressError model.validationErrors (not <| streetAddressPresent updatedModel)
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
 
         EventVenueCity city ->
             let
@@ -604,8 +655,14 @@ update msg model =
 
                         Nothing ->
                             Nothing
+
+                updatedModel =
+                    { model | event = updatedEvent }
+
+                updatedErrors =
+                    showCityError model.validationErrors (not <| cityPresent updatedModel)
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
 
         EventVenueState state ->
             let
@@ -634,8 +691,14 @@ update msg model =
 
                         Nothing ->
                             Nothing
+
+                updatedModel =
+                    { model | event = updatedEvent }
+
+                updatedErrors =
+                    showStateError model.validationErrors (not <| statePresent updatedModel)
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
 
         EventVenueName name ->
             let
@@ -897,12 +960,41 @@ showValidationErrors model =
     , showContactNameErrors = not <| contactNamePresent model
     , showContactEmailErrors = not <| contactEmailPresent model
     , showDateErrors = not <| datesOk model
+    , showStreetAddressErrors = not <| streetAddressPresent model
+    , showCityErrors = not <| cityPresent model
+    , showStateErrors = not <| statePresent model
     }
 
 
 eventNamePresent : Model -> Bool
 eventNamePresent model =
     (Maybe.andThen .name model.event |> Maybe.withDefault "" |> String.length) > 0
+
+
+eventAddress : Model -> Maybe Address
+eventAddress model =
+    Maybe.map .venue model.event |> Maybe.andThen .address
+
+
+streetAddressPresent : Model -> Bool
+streetAddressPresent model =
+    String.length
+        (Maybe.withDefault "" (eventAddress model |> Maybe.andThen .address1))
+        > 0
+
+
+cityPresent : Model -> Bool
+cityPresent model =
+    String.length
+        (Maybe.withDefault "" (eventAddress model |> Maybe.andThen .city))
+        > 0
+
+
+statePresent : Model -> Bool
+statePresent model =
+    String.length
+        (Maybe.withDefault "" (eventAddress model |> Maybe.andThen .state))
+        > 0
 
 
 contactNamePresent : Model -> Bool
@@ -969,6 +1061,9 @@ invalidInput model =
             , contactNamePresent model
             , contactEmailPresent model
             , eventNamePresent model
+            , streetAddressPresent model
+            , cityPresent model
+            , statePresent model
             ]
 
 
