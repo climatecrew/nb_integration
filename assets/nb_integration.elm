@@ -127,6 +127,23 @@ defaultAPIResult =
     { errors = [], event = Nothing, events = [] }
 
 
+type alias ShowValidationErrors =
+    { showEventNameErrors : Bool
+    , showContactNameErrors : Bool
+    , showContactEmailErrors : Bool
+    , showDateErrors : Bool
+    }
+
+
+defaultShowValidationErrors : ShowValidationErrors
+defaultShowValidationErrors =
+    { showEventNameErrors = False
+    , showContactNameErrors = False
+    , showContactEmailErrors = False
+    , showDateErrors = False
+    }
+
+
 type alias Model =
     { apiResult : APIResult
     , authorID : Int
@@ -136,7 +153,7 @@ type alias Model =
     , rootURL : String
     , slug : String
     , loading : Bool
-    , showEventNameErrors : Bool
+    , validationErrors : ShowValidationErrors
     }
 
 
@@ -150,7 +167,7 @@ defaultModel flags =
     , rootURL = flags.rootURL
     , slug = flags.slug
     , loading = True
-    , showEventNameErrors = False
+    , validationErrors = defaultShowValidationErrors
     }
 
 
@@ -196,8 +213,8 @@ view model =
                     [ label [ for "end-time" ] [ text "End Time" ]
                     , selectTime EndTime (currentTimestamp model EndTime)
                     , span
-                        [ class <| validationClass model
-                        , style [ ( "visibility", validationVisibility model ) ]
+                        [ class <| validationClass model.validationErrors.showDateErrors
+                        , style [ ( "visibility", validationVisibility model.validationErrors.showDateErrors ) ]
                         ]
                         [ text "End Time must be after Start Time" ]
                     ]
@@ -205,26 +222,26 @@ view model =
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
                     , input [ id "contact-name", type_ "contact-name", placeholder "(Required)", onInput ContactName ] []
                     , span
-                        [ class <| validationClass model
-                        , style [ ( "visibility", validationVisibility model ) ]
+                        [ class <| validationClass model.validationErrors.showContactNameErrors
+                        , style [ ( "visibility", validationVisibility model.validationErrors.showContactNameErrors ) ]
                         ]
-                        [ text "Contact email must be present" ]
+                        [ text "Contact name must be present" ]
                     ]
                 , li []
                     [ label [ for "contact-email" ] [ text "Contact Email" ]
                     , input [ id "contact-email", type_ "contact-email", placeholder "(Required)", onInput ContactEmail ] []
                     , span
-                        [ class <| validationClass model
-                        , style [ ( "visibility", validationVisibility model ) ]
+                        [ class <| validationClass model.validationErrors.showContactEmailErrors
+                        , style [ ( "visibility", validationVisibility model.validationErrors.showContactEmailErrors ) ]
                         ]
-                        [ text "Contact name must be present" ]
+                        [ text "Contact email must be present" ]
                     ]
                 , li []
                     [ label [ for "event-name" ] [ text "Event Name" ]
                     , input [ id "event-name", type_ "event-name", placeholder "(Required)", onInput EventName ] []
                     , span
-                        [ class <| validationClass model
-                        , style [ ( "visibility", validationVisibility model ) ]
+                        [ class <| validationClass model.validationErrors.showEventNameErrors
+                        , style [ ( "visibility", validationVisibility model.validationErrors.showEventNameErrors ) ]
                         ]
                         [ text "Event name must be present" ]
                     ]
@@ -233,7 +250,7 @@ view model =
                     , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
                     ]
                 , li []
-                    [ label [ for "event-venue-name" ] [ text "Venue" ]
+                    [ label [ for "event-venue-name" ] [ text "Venue Name" ]
                     , input [ id "event-venue-name", type_ "event-venue-name", onInput EventVenueName ] []
                     ]
                 , li []
@@ -468,20 +485,55 @@ errorRow error =
     tr [] [ td [] [ text error.title ] ]
 
 
+showDateError : ShowValidationErrors -> Bool -> ShowValidationErrors
+showDateError validationErrors shouldShow =
+    if shouldShow then
+        { validationErrors | showDateErrors = True }
+    else
+        { validationErrors | showDateErrors = False }
+
+
+showEventNameError : ShowValidationErrors -> Bool -> ShowValidationErrors
+showEventNameError validationErrors shouldShow =
+    if shouldShow then
+        { validationErrors | showEventNameErrors = True }
+    else
+        { validationErrors | showEventNameErrors = False }
+
+
+showContactNameError : ShowValidationErrors -> Bool -> ShowValidationErrors
+showContactNameError validationErrors shouldShow =
+    if shouldShow then
+        { validationErrors | showContactNameErrors = True }
+    else
+        { validationErrors | showContactNameErrors = False }
+
+
+showContactEmailError : ShowValidationErrors -> Bool -> ShowValidationErrors
+showContactEmailError validationErrors shouldShow =
+    if shouldShow then
+        { validationErrors | showContactEmailErrors = True }
+    else
+        { validationErrors | showContactEmailErrors = False }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         EventName name ->
             let
+                updatedErrors =
+                    showEventNameError model.validationErrors (String.length name == 0)
+
                 updatedEvent =
                     case model.event of
                         Just ev ->
                             Just { ev | name = Just name }
 
                         Nothing ->
-                            Nothing
+                            Just { defaultEvent | name = Just name }
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
 
         EventIntro intro ->
             let
@@ -606,6 +658,9 @@ update msg model =
 
         ContactEmail email ->
             let
+                updatedErrors =
+                    showContactEmailError model.validationErrors (String.length email == 0)
+
                 updatedEvent =
                     case model.event of
                         Just ev ->
@@ -621,10 +676,13 @@ update msg model =
                         Nothing ->
                             Nothing
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
 
         ContactName name ->
             let
+                updatedErrors =
+                    showContactNameError model.validationErrors (String.length name == 0)
+
                 updatedEvent =
                     case model.event of
                         Just ev ->
@@ -640,7 +698,7 @@ update msg model =
                         Nothing ->
                             Nothing
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
 
         Day day ->
             let
@@ -706,8 +764,14 @@ update msg model =
 
                         Nothing ->
                             Nothing
+
+                updatedModel =
+                    { model | event = updatedEvent }
+
+                updatedErrors =
+                    showDateError model.validationErrors (not <| datesOk updatedModel)
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
 
         Minute borderTime minute ->
             let
@@ -744,8 +808,14 @@ update msg model =
 
                         Nothing ->
                             Nothing
+
+                updatedModel =
+                    { model | event = updatedEvent }
+
+                updatedErrors =
+                    showDateError model.validationErrors (not <| datesOk updatedModel)
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
 
         Meridiem borderTime meridiem ->
             let
@@ -773,14 +843,27 @@ update msg model =
 
                         Nothing ->
                             Nothing
+
+                updatedModel =
+                    { model | event = updatedEvent }
+
+                updatedErrors =
+                    showDateError model.validationErrors (not <| datesOk updatedModel)
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
 
         SubmitEvent ->
             if invalidInput model then
-                ( { model | showEventNameErrors = True }, Cmd.none )
+                ( { model | validationErrors = showValidationErrors model }
+                , Cmd.none
+                )
             else
-                ( { model | showEventNameErrors = False, loading = True }, Http.send CreateEventResult (createEvent model) )
+                ( { model
+                    | validationErrors = showValidationErrors model
+                    , loading = True
+                  }
+                , Http.send CreateEventResult (createEvent model)
+                )
 
         FetchEventsResult (Ok apiResult) ->
             ( { model | loading = False, apiResult = apiResult, events = apiResult.events }, Cmd.none )
@@ -806,6 +889,48 @@ update msg model =
 
         CreateEventResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
+
+
+showValidationErrors : Model -> ShowValidationErrors
+showValidationErrors model =
+    { showEventNameErrors = not <| eventNamePresent model
+    , showContactNameErrors = not <| contactNamePresent model
+    , showContactEmailErrors = not <| contactEmailPresent model
+    , showDateErrors = not <| datesOk model
+    }
+
+
+eventNamePresent : Model -> Bool
+eventNamePresent model =
+    (Maybe.andThen .name model.event |> Maybe.withDefault "" |> String.length) > 0
+
+
+contactNamePresent : Model -> Bool
+contactNamePresent model =
+    let
+        cName =
+            case model.event of
+                Just ev ->
+                    Maybe.withDefault "" ev.contact.name
+
+                Nothing ->
+                    ""
+    in
+        String.length cName > 0
+
+
+contactEmailPresent : Model -> Bool
+contactEmailPresent model =
+    let
+        val =
+            case model.event of
+                Just ev ->
+                    Maybe.withDefault "" ev.contact.email
+
+                Nothing ->
+                    ""
+    in
+        String.length val > 0
 
 
 asDate : EditingTimestamp -> Result String Date
@@ -838,49 +963,34 @@ submitButtonClass model =
 
 invalidInput : Model -> Bool
 invalidInput model =
-    not <| List.all identity [ datesOk model, eventNamePresent model ]
+    not <|
+        List.all identity
+            [ datesOk model
+            , contactNamePresent model
+            , contactEmailPresent model
+            , eventNamePresent model
+            ]
 
 
 displayEventNameErrors : Model -> Bool
 displayEventNameErrors model =
-    model.showEventNameErrors && invalidInput model
+    model.validationErrors.showEventNameErrors && invalidInput model
 
 
-valueIfError : Model -> a -> a -> a
-valueIfError model errorValue noErrorValue =
-    let
-        f =
-            (\ev ->
-                if displayEventNameErrors model then
-                    errorValue
-                else
-                    noErrorValue
-            )
-    in
-        Maybe.withDefault noErrorValue <| Maybe.map f model.event
-
-
-validationClass : Model -> String
-validationClass model =
-    valueIfError model "validation validation-errors" "validation"
-
-
-validationVisibility : Model -> String
-validationVisibility model =
-    valueIfError model "visible" "hidden"
-
-
-eventNamePresent : Model -> Bool
-eventNamePresent model =
-    (Maybe.andThen .name model.event |> Maybe.withDefault "" |> String.length) > 0
-
-
-dateErrorVisibility : Model -> String
-dateErrorVisibility model =
-    if datesOk model then
-        "hidden"
+validationClass : Bool -> String
+validationClass showErrors =
+    if showErrors then
+        "validation validation-errors"
     else
+        "validation"
+
+
+validationVisibility : Bool -> String
+validationVisibility showErrors =
+    if showErrors then
         "visible"
+    else
+        "hidden"
 
 
 datesOk : Model -> Bool
