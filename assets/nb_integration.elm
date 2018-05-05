@@ -195,22 +195,36 @@ view model =
                 , li []
                     [ label [ for "end-time" ] [ text "End Time" ]
                     , selectTime EndTime (currentTimestamp model EndTime)
-                    , span [ style [ ( "visibility", dateErrorVisibility model ) ] ] [ text "End Time must be after Start Time" ]
+                    , span
+                        [ class <| validationClass model
+                        , style [ ( "visibility", validationVisibility model ) ]
+                        ]
+                        [ text "End Time must be after Start Time" ]
                     ]
                 , li []
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
                     , input [ id "contact-name", type_ "contact-name", placeholder "(Required)", onInput ContactName ] []
+                    , span
+                        [ class <| validationClass model
+                        , style [ ( "visibility", validationVisibility model ) ]
+                        ]
+                        [ text "Contact email must be present" ]
                     ]
                 , li []
                     [ label [ for "contact-email" ] [ text "Contact Email" ]
                     , input [ id "contact-email", type_ "contact-email", placeholder "(Required)", onInput ContactEmail ] []
+                    , span
+                        [ class <| validationClass model
+                        , style [ ( "visibility", validationVisibility model ) ]
+                        ]
+                        [ text "Contact name must be present" ]
                     ]
                 , li []
                     [ label [ for "event-name" ] [ text "Event Name" ]
                     , input [ id "event-name", type_ "event-name", placeholder "(Required)", onInput EventName ] []
                     , span
-                        [ class <| eventNameClass model
-                        , style [ ( "visibility", eventNameErrorVisibility model ) ]
+                        [ class <| validationClass model
+                        , style [ ( "visibility", validationVisibility model ) ]
                         ]
                         [ text "Event name must be present" ]
                     ]
@@ -846,13 +860,13 @@ valueIfError model errorValue noErrorValue =
         Maybe.withDefault noErrorValue <| Maybe.map f model.event
 
 
-eventNameClass : Model -> String
-eventNameClass model =
-    valueIfError model "event-name event-name-errors" "event-name"
+validationClass : Model -> String
+validationClass model =
+    valueIfError model "validation validation-errors" "validation"
 
 
-eventNameErrorVisibility : Model -> String
-eventNameErrorVisibility model =
+validationVisibility : Model -> String
+validationVisibility model =
     valueIfError model "visible" "hidden"
 
 
