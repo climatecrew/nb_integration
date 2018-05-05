@@ -1048,9 +1048,9 @@ lessThan ( d1, d2 ) =
 submitButtonClass : Model -> String
 submitButtonClass model =
     if invalidInput model then
-        "submit-button submit-button-disabled"
+        "create-event-button create-event-button-disabled"
     else
-        "submit-button"
+        "create-event-button"
 
 
 invalidInput : Model -> Bool

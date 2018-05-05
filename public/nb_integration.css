@@ -23,7 +23,7 @@
   max-width: 1200px;
 }
 
-.flex-outer > li.submit-button {
+.flex-outer > li.create-event-button {
   max-width: 800px;
 }
 
@@ -74,6 +74,6 @@
   */
 }
 
-.flex-outer li.submit-button-disabled button {
+.flex-outer li.create-event-button-disabled button {
   background: #A9A9A9;
 }
