@@ -24,6 +24,7 @@ require 'webmock/rspec'
 # Set environment first for any setup that depends on it
 require File.expand_path("../../helpers/dotenv_loader.rb", __FILE__)
 DotenvLoader.new(environment: :test).load
+require File.expand_path("../../helpers/database_access.rb", __FILE__)
 
 # Prevent outbound network requests
 WebMock.disable_net_connect!(allow_localhost: true)
@@ -121,7 +122,7 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 
-  DatabaseCleaner[:sequel].db = Sequel.connect(ENV.fetch('DATABASE_URL'))
+  DatabaseCleaner[:sequel].db = DatabaseAccess::DB
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)

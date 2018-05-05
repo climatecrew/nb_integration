@@ -48,10 +48,11 @@ namespace :db do
   desc "Migrate database"
   task :migrate, [:env, :version] do |t, args|
     env = args[:env] || "development"
-    DotenvLoader.new(environment: env).load
     require "sequel"
     Sequel.extension :migration
-    db = Sequel.connect(ENV.fetch("DATABASE_URL"))
+    DotenvLoader.new(environment: env).load
+    require "helpers/database_access"
+    db = DatabaseAccess::DB
     if args[:version]
       puts "Migrating to version #{args[:version]}"
       Sequel::Migrator.run(db, "db/migrate", target: args[:version].to_i)
