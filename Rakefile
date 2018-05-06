@@ -38,7 +38,7 @@ namespace :db do
     end
   end
 
-  # default to development DB
+  # default to development database
   desc "Create development database"
   task :create => 'development:create'
 
@@ -52,7 +52,7 @@ namespace :db do
     Sequel.extension :migration
     DotenvLoader.new(environment: env).load
     require "helpers/database_access"
-    db = DatabaseAccess::DB
+    db = DatabaseAccess.database
     if args[:version]
       puts "Migrating to version #{args[:version]}"
       Sequel::Migrator.run(db, "db/migrate", target: args[:version].to_i)

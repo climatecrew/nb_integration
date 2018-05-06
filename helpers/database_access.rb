@@ -26,6 +26,17 @@ module DatabaseAccess
     end
   end
 
+  module_function def disconnect
+    DB.disconnect
+  rescue => e
+    puts "DB disconnect failed: #{e}"
+  end
+
+  module_function def database
+    disconnect
+    DB
+  end
+
   unless const_defined?(:DB)
     DB = connect
   end

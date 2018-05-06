@@ -122,7 +122,7 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 
-  DatabaseCleaner[:sequel].db = DatabaseAccess::DB
+  DatabaseCleaner[:sequel].db = DatabaseAccess.database
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
