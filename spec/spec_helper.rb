@@ -133,13 +133,13 @@ RSpec.configure do |config|
       DatabaseCleaner.strategy = :transaction
     end
 
-    DatabaseAccess.attempt("before(:suite) clean") do
+    DatabaseAccess.attempt(operation: "before(:suite) DB clean") do
       DatabaseCleaner.clean_with(:truncation)
     end
   end
 
   config.around(:each) do |example|
-    DatabaseAccess.attempt("example.run") do
+    DatabaseAccess.attempt(operation: "spec example.run") do
       DatabaseCleaner.cleaning do
         example.run
       end

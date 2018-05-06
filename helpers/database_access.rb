@@ -8,7 +8,7 @@ module DatabaseAccess
   end
 
   module_function def connect
-    attempt("connect") do
+    attempt(operation: "Sequel.connect") do
       Sequel.connect(connect_options)
     end
   end
@@ -17,7 +17,7 @@ module DatabaseAccess
     DB
   end
 
-  module_function def attempt(operation)
+  module_function def attempt(operation: "database operation")
     wait_time = 1
     max_attempts = 3
     attempts ||= 1
@@ -25,18 +25,19 @@ module DatabaseAccess
   rescue Sequel::DatabaseDisconnectError, Sequel::DatabaseConnectionError => e
     if attempts <= max_attempts
       attempts += 1
-      $stderr.puts "Database connection error: #{e}"
+      $stderr.puts "#{operation} encountered database connection error:\n#{e}"
       $stderr.puts ""
-      $stderr.puts "Sleeping for #{wait_time}s and retrying"
+      $stderr.puts "Sleeping for #{wait_time}s and retrying #{operation}"
       $stderr.puts "=" * 80
       sleep wait_time
       retry
     else
-      $stderr.puts "Could not #{operation} after #{max_attempts} attempts. Giving up."
+      $stderr.puts "#{operation} still unsuccessful after #{max_attempts} attempts. Giving up."
       raise e
     end
   end
 
+  # this executes when the module is loaded to avoid dynamic constant assignment
   unless const_defined?(:DB)
     DB = connect
   end
