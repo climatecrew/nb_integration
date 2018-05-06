@@ -229,7 +229,7 @@ view model =
                     ]
                 , li [ class "section-start" ]
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
-                    , input [ id "contact-name", type_ "contact-name", placeholder "(Required)", onInput ContactName ] []
+                    , input [ id "contact-name", type_ "contact-name", placeholder "Required", onInput ContactName ] []
                     , span
                         [ class <| validationClass model.validationErrors.showContactNameErrors
                         , style [ ( "visibility", validationVisibility model.validationErrors.showContactNameErrors ) ]
@@ -238,7 +238,7 @@ view model =
                     ]
                 , li []
                     [ label [ for "contact-email" ] [ text "Contact Email" ]
-                    , input [ id "contact-email", type_ "contact-email", placeholder "(Required)", onInput ContactEmail ] []
+                    , input [ id "contact-email", type_ "contact-email", placeholder "Required", onInput ContactEmail ] []
                     , span
                         [ class <| validationClass model.validationErrors.showContactEmailErrors
                         , style [ ( "visibility", validationVisibility model.validationErrors.showContactEmailErrors ) ]
@@ -247,7 +247,7 @@ view model =
                     ]
                 , li [ class "section-start" ]
                     [ label [ for "event-name" ] [ text "Event Name" ]
-                    , input [ id "event-name", type_ "event-name", placeholder "(Required)", onInput EventName ] []
+                    , input [ id "event-name", type_ "event-name", placeholder "Required", onInput EventName ] []
                     , span
                         [ class <| validationClass model.validationErrors.showEventNameErrors
                         , style [ ( "visibility", validationVisibility model.validationErrors.showEventNameErrors ) ]
@@ -261,7 +261,7 @@ view model =
                     ]
                 , li [ class "section-start" ]
                     [ label [ for "event-venue-name" ] [ text "Venue Name" ]
-                    , input [ id "event-venue-name", type_ "event-venue-name", placeholder "(Required)", onInput EventVenueName ] []
+                    , input [ id "event-venue-name", type_ "event-venue-name", placeholder "Required", onInput EventVenueName ] []
                     , span
                         [ class <| validationClass model.validationErrors.showVenueNameErrors
                         , style [ ( "visibility", validationVisibility model.validationErrors.showVenueNameErrors ) ]
@@ -270,7 +270,7 @@ view model =
                     ]
                 , li []
                     [ label [ for "event-venue-address1" ] [ text "Street Address" ]
-                    , input [ id "event-venue-address1", type_ "event-venue-address1", placeholder "(Required)", onInput EventVenueAddress1 ] []
+                    , input [ id "event-venue-address1", type_ "event-venue-address1", placeholder "Required", onInput EventVenueAddress1 ] []
                     , span
                         [ class <| validationClass model.validationErrors.showStreetAddressErrors
                         , style [ ( "visibility", validationVisibility model.validationErrors.showStreetAddressErrors ) ]
@@ -279,7 +279,7 @@ view model =
                     ]
                 , li []
                     [ label [ for "event-venue-city" ] [ text "City" ]
-                    , input [ id "event-venue-city", type_ "event-venue-city", placeholder "(Required)", onInput EventVenueCity ] []
+                    , input [ id "event-venue-city", type_ "event-venue-city", placeholder "Required", onInput EventVenueCity ] []
                     , span
                         [ class <| validationClass model.validationErrors.showCityErrors
                         , style [ ( "visibility", validationVisibility model.validationErrors.showCityErrors ) ]
@@ -288,7 +288,7 @@ view model =
                     ]
                 , li []
                     [ label [ for "event-venue-state" ] [ text "State" ]
-                    , input [ id "event-venue-state", type_ "event-venue-state", placeholder "(Required)", onInput EventVenueState ] []
+                    , input [ id "event-venue-state", type_ "event-venue-state", placeholder "Required", onInput EventVenueState ] []
                     , span
                         [ class <| validationClass model.validationErrors.showStateErrors
                         , style [ ( "visibility", validationVisibility model.validationErrors.showStateErrors ) ]
