@@ -24,8 +24,8 @@
   margin-bottom: 6px;
 }
 
-.flex-outer > li.section-end {
-  margin-bottom: 24px;
+.flex-outer > li.section-start {
+  margin-top: 36px;
 }
 
 .flex-outer > li > label {
@@ -41,16 +41,13 @@
 .flex-outer li button {
   box-sizing: border-box;
   margin-left: auto;
-  max-width: 150px;
+  max-width: 240px;
   padding: 8px 0px;
   background: #353535;
   color: #fff;
   text-transform: uppercase;
   letter-spacing: .09em;
   border-radius: 2px;
-  /*
-  border: none;
-  */
 }
 
 .flex-outer li.create-event-button-disabled button {

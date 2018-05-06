@@ -132,6 +132,7 @@ type alias ShowValidationErrors =
     , showContactNameErrors : Bool
     , showContactEmailErrors : Bool
     , showDateErrors : Bool
+    , showVenueNameErrors : Bool
     , showStreetAddressErrors : Bool
     , showCityErrors : Bool
     , showStateErrors : Bool
@@ -144,6 +145,7 @@ defaultShowValidationErrors =
     , showContactNameErrors = False
     , showContactEmailErrors = False
     , showDateErrors = False
+    , showVenueNameErrors = False
     , showStreetAddressErrors = False
     , showCityErrors = False
     , showStateErrors = False
@@ -216,7 +218,7 @@ view model =
                     , selectTime StartTime (currentTimestamp model StartTime)
                     , span [ class <| validationClass False ] []
                     ]
-                , li [ class "section-end" ]
+                , li []
                     [ label [ for "end-time" ] [ text "End Time" ]
                     , selectTime EndTime (currentTimestamp model EndTime)
                     , span
@@ -225,7 +227,7 @@ view model =
                         ]
                         [ text "End Time must be after Start Time" ]
                     ]
-                , li []
+                , li [ class "section-start" ]
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
                     , input [ id "contact-name", type_ "contact-name", placeholder "(Required)", onInput ContactName ] []
                     , span
@@ -234,7 +236,7 @@ view model =
                         ]
                         [ text "Contact name must be present" ]
                     ]
-                , li [ class "section-end" ]
+                , li []
                     [ label [ for "contact-email" ] [ text "Contact Email" ]
                     , input [ id "contact-email", type_ "contact-email", placeholder "(Required)", onInput ContactEmail ] []
                     , span
@@ -243,7 +245,7 @@ view model =
                         ]
                         [ text "Contact email must be present" ]
                     ]
-                , li []
+                , li [ class "section-start" ]
                     [ label [ for "event-name" ] [ text "Event Name" ]
                     , input [ id "event-name", type_ "event-name", placeholder "(Required)", onInput EventName ] []
                     , span
@@ -252,15 +254,19 @@ view model =
                         ]
                         [ text "Event name must be present" ]
                     ]
-                , li [ class "section-end" ]
+                , li []
                     [ label [ for "event-intro" ] [ text "Event Intro" ]
                     , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
                     , span [ class <| validationClass False ] []
                     ]
-                , li []
+                , li [ class "section-start" ]
                     [ label [ for "event-venue-name" ] [ text "Venue Name" ]
-                    , input [ id "event-venue-name", type_ "event-venue-name", onInput EventVenueName ] []
-                    , span [ class <| validationClass False ] []
+                    , input [ id "event-venue-name", type_ "event-venue-name", placeholder "(Required)", onInput EventVenueName ] []
+                    , span
+                        [ class <| validationClass model.validationErrors.showVenueNameErrors
+                        , style [ ( "visibility", validationVisibility model.validationErrors.showVenueNameErrors ) ]
+                        ]
+                        [ text "Venue name must be present" ]
                     ]
                 , li []
                     [ label [ for "event-venue-address1" ] [ text "Street Address" ]
@@ -540,6 +546,14 @@ showContactEmailError validationErrors shouldShow =
         { validationErrors | showContactEmailErrors = False }
 
 
+showVenueNameError : ShowValidationErrors -> Bool -> ShowValidationErrors
+showVenueNameError validationErrors shouldShow =
+    if shouldShow then
+        { validationErrors | showVenueNameErrors = True }
+    else
+        { validationErrors | showVenueNameErrors = False }
+
+
 showStreetAddressError : ShowValidationErrors -> Bool -> ShowValidationErrors
 showStreetAddressError validationErrors shouldShow =
     if shouldShow then
@@ -718,8 +732,14 @@ update msg model =
 
                         Nothing ->
                             Nothing
+
+                updatedModel =
+                    { model | event = updatedEvent }
+
+                updatedErrors =
+                    showVenueNameError model.validationErrors (not <| venueNamePresent updatedModel)
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
 
         ContactEmail email ->
             let
@@ -962,6 +982,7 @@ showValidationErrors model =
     , showContactNameErrors = not <| contactNamePresent model
     , showContactEmailErrors = not <| contactEmailPresent model
     , showDateErrors = not <| datesOk model
+    , showVenueNameErrors = not <| venueNamePresent model
     , showStreetAddressErrors = not <| streetAddressPresent model
     , showCityErrors = not <| cityPresent model
     , showStateErrors = not <| statePresent model
@@ -971,6 +992,11 @@ showValidationErrors model =
 eventNamePresent : Model -> Bool
 eventNamePresent model =
     (Maybe.andThen .name model.event |> Maybe.withDefault "" |> String.length) > 0
+
+
+eventVenueName : Model -> Maybe String
+eventVenueName model =
+    Maybe.map .venue model.event |> Maybe.andThen .name
 
 
 eventAddress : Model -> Maybe Address
@@ -983,6 +1009,11 @@ streetAddressPresent model =
     String.length
         (Maybe.withDefault "" (eventAddress model |> Maybe.andThen .address1))
         > 0
+
+
+venueNamePresent : Model -> Bool
+venueNamePresent model =
+    String.length (Maybe.withDefault "" <| eventVenueName model) > 0
 
 
 cityPresent : Model -> Bool
@@ -1063,6 +1094,7 @@ invalidInput model =
             , contactNamePresent model
             , contactEmailPresent model
             , eventNamePresent model
+            , venueNamePresent model
             , streetAddressPresent model
             , cityPresent model
             , statePresent model
