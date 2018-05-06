@@ -126,9 +126,19 @@ RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     begin
+      wait_time =  0.5
+      attempts ||= 1
       DatabaseCleaner.clean_with(:truncation)
     rescue Sequel::DatabaseDisconnectError, Sequel::DatabaseConnectionError => e
       $stderr.puts "Database connection error: #{e}"
+      attempts += 1
+      if attempts <= 3
+        $stderr.puts "Sleeping for #{wait_time} seconds and retrying"
+        sleep wait_time
+        retry
+      else
+        $stderr.puts "Could not clean after #{attempts} attempts. Giving up."
+      end
     end
   end
 
