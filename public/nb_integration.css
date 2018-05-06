@@ -21,10 +21,11 @@
 
 .flex-outer > li {
   max-width: 1200px;
+  margin-bottom: 6px;
 }
 
-.flex-outer > li.create-event-button {
-  max-width: 800px;
+.flex-outer > li.section-end {
+  margin-bottom: 24px;
 }
 
 .flex-outer > li > label {
@@ -35,7 +36,25 @@
 .flex-outer > li > label + *,
 .flex-inner {
   flex: 1 0 220px;
-  max-width: 580px;
+}
+
+.flex-outer li button {
+  box-sizing: border-box;
+  margin-left: auto;
+  max-width: 150px;
+  padding: 8px 0px;
+  background: #353535;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  border-radius: 2px;
+  /*
+  border: none;
+  */
+}
+
+.flex-outer li.create-event-button-disabled button {
+  background: #A9A9A9;
 }
 
 .flex-outer > li > input {
@@ -44,6 +63,10 @@
   padding-right: 0;
 }
 
+.flex-outer > li > span.validation {
+  flex: 0 0 300px;
+  color: #f70f32;
+}
 .flex-outer > li > span.validation-errors {
   color: #f70f32;
 }
@@ -60,20 +83,3 @@
   padding-left: 15px;
 }
 
-
-.flex-outer li button {
-  margin-left: auto;
-  padding: 8px 16px;
-  background: #353535;
-  color: #fff;
-  text-transform: uppercase;
-  letter-spacing: .09em;
-  border-radius: 2px;
-  /*
-  border: none;
-  */
-}
-
-.flex-outer li.create-event-button-disabled button {
-  background: #A9A9A9;
-}

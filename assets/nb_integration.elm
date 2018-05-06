@@ -210,12 +210,13 @@ view model =
     div [ class "nb-integration-container" ]
         [ div [ class "event-form " ]
             [ ul [ class "flex-outer" ]
-                [ selectDay
+                [ li [] <| List.concat [ selectDay, [ span [ class <| validationClass False ] [] ] ]
                 , li []
                     [ label [ for "start-time" ] [ text "Start Time" ]
                     , selectTime StartTime (currentTimestamp model StartTime)
+                    , span [ class <| validationClass False ] []
                     ]
-                , li []
+                , li [ class "section-end" ]
                     [ label [ for "end-time" ] [ text "End Time" ]
                     , selectTime EndTime (currentTimestamp model EndTime)
                     , span
@@ -233,7 +234,7 @@ view model =
                         ]
                         [ text "Contact name must be present" ]
                     ]
-                , li []
+                , li [ class "section-end" ]
                     [ label [ for "contact-email" ] [ text "Contact Email" ]
                     , input [ id "contact-email", type_ "contact-email", placeholder "(Required)", onInput ContactEmail ] []
                     , span
@@ -251,13 +252,15 @@ view model =
                         ]
                         [ text "Event name must be present" ]
                     ]
-                , li []
+                , li [ class "section-end" ]
                     [ label [ for "event-intro" ] [ text "Event Intro" ]
                     , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
+                    , span [ class <| validationClass False ] []
                     ]
                 , li []
                     [ label [ for "event-venue-name" ] [ text "Venue Name" ]
                     , input [ id "event-venue-name", type_ "event-venue-name", onInput EventVenueName ] []
+                    , span [ class <| validationClass False ] []
                     ]
                 , li []
                     [ label [ for "event-venue-address1" ] [ text "Street Address" ]
@@ -286,11 +289,11 @@ view model =
                         ]
                         [ text "State must be present" ]
                     ]
-                , li [ style [ ( "visibility", "hidden" ) ] ]
-                    [ label [ for "event-venue-errors" ] []
-                    , span [] [ text "Event venue must be present" ]
+                , li [ class <| submitButtonClass model ]
+                    [ label [] []
+                    , button [ onClick SubmitEvent ] [ text "Submit Event" ]
+                    , span [ class <| validationClass False ] []
                     ]
-                , li [ class <| submitButtonClass model ] [ button [ onClick SubmitEvent ] [ text "Submit Event" ] ]
                 ]
             ]
         , div [ id "display-event", style [ ( "display", "none" ) ] ]
@@ -382,21 +385,20 @@ serializeTimestamp timestamp =
             ++ "-04:00"
 
 
-selectDay : Html Msg
+selectDay : List (Html Msg)
 selectDay =
-    li []
-        [ label [ for "date" ] [ text "Date" ]
-        , select
-            [ onInput Day ]
-            [ option [ value "2018-09-24" ] [ text "Mon 9/24" ]
-            , option [ value "2018-09-25" ] [ text "Tue 9/25" ]
-            , option [ value "2018-09-26" ] [ text "Wed 9/26" ]
-            , option [ value "2018-09-27" ] [ text "Thu 9/27" ]
-            , option [ value "2018-09-28" ] [ text "Fri 9/28" ]
-            , option [ value "2018-09-29" ] [ text "Sat 9/29" ]
-            , option [ value "2018-09-30" ] [ text "Sun 9/30" ]
-            ]
+    [ label [ for "date" ] [ text "Date" ]
+    , select
+        [ onInput Day ]
+        [ option [ value "2018-09-24" ] [ text "Mon 9/24" ]
+        , option [ value "2018-09-25" ] [ text "Tue 9/25" ]
+        , option [ value "2018-09-26" ] [ text "Wed 9/26" ]
+        , option [ value "2018-09-27" ] [ text "Thu 9/27" ]
+        , option [ value "2018-09-28" ] [ text "Fri 9/28" ]
+        , option [ value "2018-09-29" ] [ text "Sat 9/29" ]
+        , option [ value "2018-09-30" ] [ text "Sun 9/30" ]
         ]
+    ]
 
 
 selectTime : BorderTime -> EditingTimestamp -> Html Msg
