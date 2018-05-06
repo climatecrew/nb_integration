@@ -18,7 +18,7 @@ module DatabaseAccess
   end
 
   module_function def attempt(operation)
-    wait_time = 4
+    wait_time = 1
     max_attempts = 3
     attempts ||= 1
     yield
