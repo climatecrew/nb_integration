@@ -123,28 +123,26 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 
   DatabaseCleaner[:sequel].db = DatabaseAccess.database
+
   config.before(:suite) do
-    DatabaseCleaner.strategy = :transaction
-    begin
-      wait_time =  0.5
-      attempts ||= 1
+    # DatabaseCleaner.strategy = :transaction is faster
+    # but the CircleCI database sometimes restarts mid-transaction
+    if ENV['CIRCLECI'] = true
+      DatabaseCleaner.strategy = :truncation
+    else
+      DatabaseCleaner.strategy = :transaction
+    end
+
+    DatabaseAccess.attempt("before(:suite) clean") do
       DatabaseCleaner.clean_with(:truncation)
-    rescue Sequel::DatabaseDisconnectError, Sequel::DatabaseConnectionError => e
-      $stderr.puts "Database connection error: #{e}"
-      attempts += 1
-      if attempts <= 3
-        $stderr.puts "Sleeping for #{wait_time} seconds and retrying"
-        sleep wait_time
-        retry
-      else
-        $stderr.puts "Could not clean after #{attempts} attempts. Giving up."
-      end
     end
   end
 
   config.around(:each) do |example|
-    DatabaseCleaner.cleaning do
-      example.run
+    DatabaseAccess.attempt("example.run") do
+      DatabaseCleaner.cleaning do
+        example.run
+      end
     end
   end
 end
