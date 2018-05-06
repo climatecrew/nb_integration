@@ -125,7 +125,11 @@ RSpec.configure do |config|
   DatabaseCleaner[:sequel].db = DatabaseAccess.database
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
-    DatabaseCleaner.clean_with(:truncation)
+    begin
+      DatabaseCleaner.clean_with(:truncation)
+    rescue Sequel::DatabaseDisconnectError, Sequel::DatabaseConnectionError => e
+      $stderr.puts "Database connection error: #{e}"
+    end
   end
 
   config.around(:each) do |example|
