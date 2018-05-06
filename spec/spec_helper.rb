@@ -127,7 +127,7 @@ RSpec.configure do |config|
   config.before(:suite) do
     # DatabaseCleaner.strategy = :transaction is faster
     # but the CircleCI database sometimes restarts mid-transaction
-    if ENV['CIRCLECI'] = true
+    if ENV['CIRCLECI'] == "true"
       DatabaseCleaner.strategy = :truncation
     else
       DatabaseCleaner.strategy = :transaction
