@@ -13,6 +13,14 @@ desc "Run test suite"
 task :spec => :test
 
 namespace :db do
+  def prepare_db(env)
+    require "sequel"
+    Sequel.extension :migration
+    DotenvLoader.new(environment: env).load
+    require "helpers/database_access"
+    DatabaseAccess::DB
+  end
+
   [:development, :test].each do |env|
     namespace env do
       desc "Create #{env} database"
@@ -48,11 +56,7 @@ namespace :db do
   desc "Migrate database"
   task :migrate, [:env, :version] do |t, args|
     env = args[:env] || "development"
-    require "sequel"
-    Sequel.extension :migration
-    DotenvLoader.new(environment: env).load
-    require "helpers/database_access"
-    db = DatabaseAccess.database
+    db = prepare_db(env)
     if args[:version]
       puts "Migrating to version #{args[:version]}"
       Sequel::Migrator.run(db, "db/migrate", target: args[:version].to_i)

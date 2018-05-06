@@ -8,10 +8,6 @@ RSpec.describe DatabaseAccess do
     end
   end
 
-  it "provides a DB constant" do
-    expect(described_class::DB).to be
-  end
-
   it "sets DB to a connection" do
     connection = Sequel.connect(ENV['DATABASE_URL'])
     expect(described_class::DB.opts[:uri]).to eq(connection.opts[:uri])
