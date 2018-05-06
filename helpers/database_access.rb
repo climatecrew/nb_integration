@@ -1,4 +1,5 @@
 require 'sequel'
+require 'logger'
 
 module DatabaseAccess
   # this must be defined before setting DB constant below
@@ -13,26 +14,23 @@ module DatabaseAccess
     end
   end
 
-  module_function def database
-    DB
-  end
-
-  module_function def attempt(operation: "database operation")
-    wait_time = 1
-    max_attempts = 3
+  module_function def attempt(operation: "database operation", wait_time: 1, max_attempts: 3, logger: Logger.new(STDERR))
     attempts ||= 1
     yield
   rescue Sequel::DatabaseDisconnectError, Sequel::DatabaseConnectionError => e
-    if attempts <= max_attempts
+    if attempts < max_attempts
       attempts += 1
-      $stderr.puts "#{operation} encountered database connection error:\n#{e}"
-      $stderr.puts ""
-      $stderr.puts "Sleeping for #{wait_time}s and retrying #{operation}"
-      $stderr.puts "=" * 80
+      message = <<~MSG
+      #{operation} encountered database connection error:
+      #{e}
+      Sleeping for #{wait_time}s and retrying #{operation}
+      #{"=" * 80}
+      MSG
+      logger.warn(message)
       sleep wait_time
       retry
     else
-      $stderr.puts "#{operation} still unsuccessful after #{max_attempts} attempts. Giving up."
+      logger.warn("#{operation} still unsuccessful after #{max_attempts} attempts. Giving up.")
       raise e
     end
   end
