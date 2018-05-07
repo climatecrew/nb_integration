@@ -14,7 +14,7 @@ require "nb_integration"
 
 
 if !Startup.nb_configuration_valid?
-  message = "Configuration missing: NB_API_TOKEN and NB_SLUG must be set in ENV. Exiting."
+  message = "NationBuilder configuration missing. Exiting."
   Logger.new($stderr).fatal(message)
   exit CONFIGURATION_ERROR
 end
