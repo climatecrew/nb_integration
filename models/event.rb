@@ -1,7 +1,8 @@
 require "sequel"
 
-$:.unshift File.expand_path(File.dirname(__FILE__), "../helpers/")
-require "helpers/database_access"
+$:.unshift File.expand_path(File.dirname(__FILE__), "../models/")
+require "base_model"
 
 class Event < Sequel::Model
+  include BaseModel
 end
