@@ -22,6 +22,7 @@ class App < Roda
   plugin :all_verbs
   plugin :render
   plugin :public, gzip: true, default_mime: "text/html"
+  plugin :halt
 
   def event(event_index_response)
     data = JSON.parse(event_index_response.body)
@@ -83,44 +84,37 @@ class App < Roda
         {}
       end
 
-      @response_body = {}
       r.is "events" do
         begin
           slug = r.params["slug"]
-          unless slug.nil?
-            account = Account.first(nb_slug: slug)
-            if account.nil?
-              response.status =  422
-              @response_body = { errors: [{title: "nation slug '#{slug}' not recognized"}] }
-            else
-              r.post do
-                logger.info("Attempting to create event for nation #{slug}")
-                payload = r.params['data']
-                code, body = HandleEventCreation.new(logger, account, payload).call
-                response.status = code
-                @response_body = body
-              end
-
-              r.get do
-                response.status =  200
-                conditions = { nb_slug: slug }
-                if !r.params["author_nb_id"].nil?
-                  conditions[:author_nb_id] = r.params["author_nb_id"]
-                end
-                events = Event.where(conditions)
-                nb_events = events.map { |event| JSON.parse(event.nb_event) }
-                @response_body = { data: nb_events }
-              end
-            end
+          if slug.nil?
+            r.halt(422, { errors: [{title: "missing slug parameter"}] })
           else
-            response.status =  422
-            @response_body = { errors: [{title: "missing slug parameter"}] }
+            account = Account.first(nb_slug: slug)
+            r.halt(422, { errors: [{title: "nation slug '#{slug}' not recognized"}] }) if account.nil?
+          end
+
+          r.post do
+            logger.info("Attempting to create event for nation #{slug}")
+            payload = r.params['data']
+            code, body = HandleEventCreation.new(logger, account, payload).call
+            response.status = code
+            body
+          end
+
+          r.get do
+            response.status =  200
+            conditions = { nb_slug: slug }
+            conditions[:author_nb_id] = r.params["author_nb_id"] unless r.params["author_nb_id"].nil?
+
+            events = Event.where(conditions)
+            nb_events = events.map { |event| JSON.parse(event.nb_event) }
+            { data: nb_events }
           end
         rescue => error
           logger.warn(error)
           response.status = 500
         end
-        @response_body
       end
     end
   end
