@@ -42,16 +42,7 @@ class App < Roda
     # serve the app as an HTML page
     r.public
 
-    r.on "oauth" do
-      r.is "callback" do
-        result = HandleOAuthCallback.new(r).call
-        if result.errors.any?
-          logger.warn("Request to /oauth/callback failed: Params: #{r.params}. Errors: #{result.message}")
-        end
-        r.redirect("/install?flash[#{result.flash_type}]=#{CGI::escape(result.message)}")
-      end
-    end
-
+    # enable an administrator to install this app in their nation
     r.on "install" do
       r.is do
         r.get do
@@ -75,17 +66,43 @@ class App < Roda
       end
     end
 
-    r.on "api" do
-      response["Allow"] = "GET, HEAD, POST, PUT"
-      response["Access-Control-Allow-Origin"] = "*"
-      response["Access-Control-Allow-Headers"] = "Accept, Accept-Language, Content-Language, Content-Type"
-
-      r.options do
-        {}
+    # process OAuth callbacks from NationBuilder, primarily to store access tokens
+    r.on "oauth" do
+      r.is "callback" do
+        result = HandleOAuthCallback.new(r).call
+        if result.errors.any?
+          logger.warn("Request to /oauth/callback failed: Params: #{r.params}. Errors: #{result.message}")
+        end
+        r.redirect("/install?flash[#{result.flash_type}]=#{CGI::escape(result.message)}")
       end
+    end
 
-      r.is "events" do
-        begin
+    # JSON interface to this app's functionality
+    r.on "api" do
+      begin
+        response["Allow"] = "GET, HEAD, POST, PUT"
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Headers"] = "Accept, Accept-Language, Content-Language, Content-Type"
+
+        r.options do
+          {}
+        end
+
+        r.is "health" do
+          if r.params["raise_error"] == "true"
+            raise RuntimeError.new("Health check endpoint: raise test error")
+          else
+            {
+              data: {
+                id: 1,
+                type: "health_check",
+                attributes: { status: "OK" }
+              }
+            }
+          end
+        end
+
+        r.is "events" do
           slug = r.params["slug"]
           if slug.nil?
             r.halt(422, { errors: [{title: "missing slug parameter"}] })
@@ -103,18 +120,19 @@ class App < Roda
           end
 
           r.get do
-            response.status =  200
             conditions = { nb_slug: slug }
             conditions[:author_nb_id] = r.params["author_nb_id"] unless r.params["author_nb_id"].nil?
 
             events = Event.where(conditions)
-            nb_events = events.map { |event| JSON.parse(event.nb_event) }
-            { data: nb_events }
+
+            response.status =  200
+            { data: events.map { |event| JSON.parse(event.nb_event) } }
           end
-        rescue => error
-          logger.warn(error)
-          response.status = 500
         end
+      rescue => error
+        logger.warn(error)
+        response.status = 500
+        { errors: [{title: "An unexpected error has occurred."}] }
       end
     end
   end
