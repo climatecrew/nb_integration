@@ -39,7 +39,9 @@ class App < Roda
       render("home", locals: { flash: {} })
     end
 
-    # serve the app as an HTML page
+    # for testing serve client-app as a static HTML page from the public directory
+    # conversely when installed in a nation we expect the admin to
+    # embed a JavaScript snippet to pull the app into the page of their choice
     r.public
 
     # enable an administrator to install this app in their nation
