@@ -6,8 +6,9 @@ require "helpers/path_provider"
 require "helpers/client"
 require "helpers/error_presenter"
 require "helpers/app_configuration"
-require "helpers/request_oauth_access_token"
 require "helpers/nb_app_install"
+require "helpers/handle_oauth_callback"
+require "helpers/handle_event_creation"
 
 $:.unshift File.expand_path(File.dirname(__FILE__), "models/")
 require "models/account"
@@ -21,6 +22,7 @@ class App < Roda
   plugin :all_verbs
   plugin :render
   plugin :public, gzip: true, default_mime: "text/html"
+  plugin :halt
 
   def event(event_index_response)
     data = JSON.parse(event_index_response.body)
@@ -37,52 +39,12 @@ class App < Roda
       render("home", locals: { flash: {} })
     end
 
-    # serve the app as an HTML page
+    # for testing serve client-app as a static HTML page from the public directory
+    # conversely when installed in a nation we expect the admin to
+    # embed a JavaScript snippet to pull the app into the page of their choice
     r.public
 
-    r.on "oauth" do
-      r.is "callback" do
-        errors = []
-        if r.params["slug"].nil?
-          errors << "Missing slug parameter"
-        end
-
-        if r.params["code"].nil? && r.params["error"].nil?
-          errors << "Either code or error parameter must be given"
-        end
-
-        if errors.any?
-          message = errors.join(', ')
-          logger.warn("Unexpected request to /oauth/callback: #{r.params}. Errors: #{message}")
-          r.redirect("/install?flash[error]=#{CGI::escape(message)}")
-        else
-          if r.params["error"].nil?
-            token_response = RequestOAuthAccessToken.new(
-              slug: r.params["slug"],
-              code: r.params["code"]
-            ).call
-          else
-            base_message = "#{CGI::escape('App not installed.')}"
-            if r.params["error_description"].nil?
-              message = base_message
-            else
-              message = "#{base_message}+#{CGI::escape(r.params['error_description'])}"
-            end
-            r.redirect("/install?flash[notice]=#{message}")
-          end
-
-          if token_response.status != 200
-            message = "An error occurred when attempting to install this app in your nation. Please try again."
-            r.redirect("/install?flash[error]=#{CGI::escape(message)}")
-          else
-            token_response_body = JSON.parse(token_response.body)
-            Account.create(nb_slug: r.params["slug"], nb_access_token: token_response_body["access_token"])
-            r.redirect("/install?flash[notice]=Installation+successful")
-          end
-        end
-      end
-    end
-
+    # enable an administrator to install this app in their nation
     r.on "install" do
       r.is do
         r.get do
@@ -106,97 +68,73 @@ class App < Roda
       end
     end
 
-    r.on "api" do
-      response["Allow"] = "GET, HEAD, POST, PUT"
-      response["Access-Control-Allow-Origin"] = "*"
-      response["Access-Control-Allow-Headers"] = "Accept, Accept-Language, Content-Language, Content-Type"
-
-      r.options do
-        {}
-      end
-
-      @response_body = {}
-      r.is "events" do
-        begin
-          slug = r.params["slug"]
-          unless slug.nil?
-            account = Account.first(nb_slug: slug)
-            if account.nil?
-              response.status =  422
-              @response_body = { errors: [{title: "nation slug '#{slug}' not recognized"}] }
-            else
-              r.post do
-                logger.info("Attempting to create event for nation #{slug}")
-                response.status =  201
-                path_provider = PathProvider.new(slug: account.nb_slug,
-                                                 api_token: account.nb_access_token)
-                payload = r.params['data']
-                payload["event"]["status"] = "published"
-                payload["event"]["calendar_id"] = ENV["NB_CALENDAR_ID"].to_i
-                author_email = payload["event"]["author_email"]
-                payload["event"].delete("author_email")
-                logger.info("Creation URL: #{path_provider.create(:events)}")
-                logger.info("Sending payload:\n#{payload}")
-                nb_response = Client.create(path_provider: path_provider,
-                                            resource: :events,
-                                            payload: payload)
-                if nb_response.status.to_i >= 400
-                  logger.warn("Create Event: NationBuilder request failed. Status: #{nb_response.status} / Body: #{nb_response.body}")
-                  response.status = nb_response.status
-                                 @response_body = {
-                                   errors: [
-                                     ErrorPresenter.new(body: nb_response.body).transform.merge({ title: "Failed to create event" })
-                                   ]
-                                 }
-                else
-                  nb_event = begin
-                               JSON.parse(nb_response.body)
-                             rescue JSON::ParserError
-                               logger.warn("Create Event: Invalid JSON returned by NationBuilder: #{nb_response.body}")
-                               nil
-                             end
-
-                  if nb_event.nil?
-                    response.status = 500
-                    @response_body = { errors: [{ title: "Failed to create event" }] }
-                  else
-                    author_id = payload
-                      .fetch("event")
-                      .fetch("author_id")
-                    contact_email = payload
-                      .fetch("event")
-                      .fetch("contact")
-                      .fetch("email")
-                    Event.create(nb_slug: slug,
-                                 author_nb_id: author_id,
-                                 author_email: author_email,
-                                 contact_email: contact_email,
-                                 nb_event: nb_response.body)
-                    @response_body = { data: JSON.parse(nb_response.body) }
-                  end
-                end
-              end
-
-              r.get do
-                response.status =  200
-                conditions = { nb_slug: slug }
-                if !r.params["author_nb_id"].nil?
-                  conditions[:author_nb_id] = r.params["author_nb_id"]
-                end
-                events = Event.where(conditions)
-                nb_events = events.map { |event| JSON.parse(event.nb_event) }
-                @response_body = { data: nb_events }
-              end
-            end
-          else
-            response.status =  422
-            @response_body = { errors: [{title: "missing slug parameter"}] }
-          end
-        rescue => error
-          logger.warn(error)
-          response.status = 500
+    # process OAuth callbacks from NationBuilder, primarily to store access tokens
+    r.on "oauth" do
+      r.is "callback" do
+        result = HandleOAuthCallback.new(r).call
+        if result.errors.any?
+          logger.warn("Request to /oauth/callback failed: Params: #{r.params}. Errors: #{result.message}")
         end
-        @response_body
+        r.redirect("/install?flash[#{result.flash_type}]=#{CGI::escape(result.message)}")
+      end
+    end
+
+    # JSON interface to this app's functionality
+    r.on "api" do
+      begin
+        response["Allow"] = "GET, HEAD, POST, PUT"
+        response["Access-Control-Allow-Origin"] = "*"
+        response["Access-Control-Allow-Headers"] = "Accept, Accept-Language, Content-Language, Content-Type"
+
+        r.options do
+          {}
+        end
+
+        r.is "health" do
+          if r.params["raise_error"] == "true"
+            raise RuntimeError.new("Health check endpoint: raise test error")
+          else
+            {
+              data: {
+                id: 1,
+                type: "health_check",
+                attributes: { status: "OK" }
+              }
+            }
+          end
+        end
+
+        r.is "events" do
+          slug = r.params["slug"]
+          if slug.nil?
+            r.halt(422, { errors: [{title: "missing slug parameter"}] })
+          else
+            account = Account.first(nb_slug: slug)
+            r.halt(422, { errors: [{title: "nation slug '#{slug}' not recognized"}] }) if account.nil?
+          end
+
+          r.post do
+            logger.info("Attempting to create event for nation #{slug}")
+            payload = r.params['data']
+            code, body = HandleEventCreation.new(logger, account, payload).call
+            response.status = code
+            body
+          end
+
+          r.get do
+            conditions = { nb_slug: slug }
+            conditions[:author_nb_id] = r.params["author_nb_id"] unless r.params["author_nb_id"].nil?
+
+            events = Event.where(conditions)
+
+            response.status =  200
+            { data: events.map { |event| JSON.parse(event.nb_event) } }
+          end
+        end
+      rescue => error
+        logger.warn(error)
+        response.status = 500
+        { errors: [{title: "An unexpected error has occurred."}] }
       end
     end
   end
