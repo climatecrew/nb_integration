@@ -156,7 +156,7 @@ type alias Model =
     { apiResult : APIResult
     , authorID : Int
     , authorEmail : String
-    , event : Maybe Event
+    , event : Event
     , events : List Event
     , rootURL : String
     , slug : String
@@ -170,7 +170,7 @@ defaultModel flags =
     { apiResult = { errors = [], events = [], event = Nothing }
     , authorID = flags.authorID
     , authorEmail = flags.authorEmail
-    , event = Just defaultEvent
+    , event = defaultEvent
     , events = []
     , rootURL = flags.rootURL
     , slug = flags.slug
@@ -323,22 +323,12 @@ view model =
 
 currentTimestamp : Model -> BorderTime -> EditingTimestamp
 currentTimestamp model borderTime =
-    case model.event of
-        Just ev ->
-            case borderTime of
-                StartTime ->
-                    ev.startTimestamp
+    case borderTime of
+        StartTime ->
+            model.event.startTimestamp
 
-                EndTime ->
-                    ev.endTimestamp
-
-        Nothing ->
-            case borderTime of
-                StartTime ->
-                    defaultStartTimestamp
-
-                EndTime ->
-                    defaultEndTimestamp
+        EndTime ->
+            model.event.endTimestamp
 
 
 padTimePart : Int -> String
@@ -346,23 +336,18 @@ padTimePart num =
     String.padLeft 2 '0' <| toString num
 
 
-formatTimestamp : Maybe Event -> BorderTime -> String
-formatTimestamp mEvent borderTime =
-    case mEvent of
-        Just ev ->
-            let
-                timestamp =
-                    case borderTime of
-                        StartTime ->
-                            ev.startTimestamp
+formatTimestamp : Event -> BorderTime -> String
+formatTimestamp event borderTime =
+    let
+        timestamp =
+            case borderTime of
+                StartTime ->
+                    event.startTimestamp
 
-                        EndTime ->
-                            ev.endTimestamp
-            in
-                serializeTimestamp timestamp
-
-        Nothing ->
-            ""
+                EndTime ->
+                    event.endTimestamp
+    in
+        serializeTimestamp timestamp
 
 
 serializeTimestamp : EditingTimestamp -> String
@@ -586,55 +571,49 @@ update msg model =
                 updatedErrors =
                     showEventNameError model.validationErrors (String.length name == 0)
 
-                updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            Just { ev | name = name }
+                ev =
+                    model.event
 
-                        Nothing ->
-                            Just { defaultEvent | name = name }
+                updatedEvent =
+                    { ev | name = name }
             in
                 ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
 
         EventIntro intro ->
             let
-                updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            Just { ev | intro = intro }
+                ev =
+                    model.event
 
-                        Nothing ->
-                            Nothing
+                updatedEvent =
+                    { ev | intro = intro }
             in
                 ( { model | event = updatedEvent }, Cmd.none )
 
         EventVenueAddress1 address1 ->
             let
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            let
-                                currentVenue =
-                                    ev.venue
+                    let
+                        currentVenue =
+                            ev.venue
 
-                                currentAddress =
-                                    currentVenue.address
+                        currentAddress =
+                            currentVenue.address
 
-                                updatedAddress =
-                                    case currentAddress of
-                                        Just address ->
-                                            Just { address | address1 = Just address1 }
+                        updatedAddress =
+                            case currentAddress of
+                                Just address ->
+                                    Just { address | address1 = Just address1 }
 
-                                        Nothing ->
-                                            Just { defaultAddress | address1 = Just address1 }
+                                Nothing ->
+                                    Just { defaultAddress | address1 = Just address1 }
 
-                                updatedVenue =
-                                    { currentVenue | address = updatedAddress }
-                            in
-                                Just { ev | venue = updatedVenue }
-
-                        Nothing ->
-                            Nothing
+                        updatedVenue =
+                            { currentVenue | address = updatedAddress }
+                    in
+                        { ev | venue = updatedVenue }
 
                 updatedModel =
                     { model | event = updatedEvent }
@@ -646,31 +625,29 @@ update msg model =
 
         EventVenueCity city ->
             let
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            let
-                                currentVenue =
-                                    ev.venue
+                    let
+                        currentVenue =
+                            ev.venue
 
-                                currentAddress =
-                                    currentVenue.address
+                        currentAddress =
+                            currentVenue.address
 
-                                updatedAddress =
-                                    case currentAddress of
-                                        Just address ->
-                                            Just { address | city = Just city }
+                        updatedAddress =
+                            case currentAddress of
+                                Just address ->
+                                    Just { address | city = Just city }
 
-                                        Nothing ->
-                                            Just { defaultAddress | city = Just city }
+                                Nothing ->
+                                    Just { defaultAddress | city = Just city }
 
-                                updatedVenue =
-                                    { currentVenue | address = updatedAddress }
-                            in
-                                Just { ev | venue = updatedVenue }
-
-                        Nothing ->
-                            Nothing
+                        updatedVenue =
+                            { currentVenue | address = updatedAddress }
+                    in
+                        { ev | venue = updatedVenue }
 
                 updatedModel =
                     { model | event = updatedEvent }
@@ -682,31 +659,29 @@ update msg model =
 
         EventVenueState state ->
             let
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            let
-                                currentVenue =
-                                    ev.venue
+                    let
+                        currentVenue =
+                            ev.venue
 
-                                currentAddress =
-                                    currentVenue.address
+                        currentAddress =
+                            currentVenue.address
 
-                                updatedAddress =
-                                    case currentAddress of
-                                        Just address ->
-                                            Just { address | state = Just state }
+                        updatedAddress =
+                            case currentAddress of
+                                Just address ->
+                                    Just { address | state = Just state }
 
-                                        Nothing ->
-                                            Just { defaultAddress | state = Just state }
+                                Nothing ->
+                                    Just { defaultAddress | state = Just state }
 
-                                updatedVenue =
-                                    { currentVenue | address = updatedAddress }
-                            in
-                                Just { ev | venue = updatedVenue }
-
-                        Nothing ->
-                            Nothing
+                        updatedVenue =
+                            { currentVenue | address = updatedAddress }
+                    in
+                        { ev | venue = updatedVenue }
 
                 updatedModel =
                     { model | event = updatedEvent }
@@ -718,20 +693,18 @@ update msg model =
 
         EventVenueName name ->
             let
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            let
-                                currentVenue =
-                                    ev.venue
+                    let
+                        currentVenue =
+                            ev.venue
 
-                                updatedVenue =
-                                    { currentVenue | name = Just name }
-                            in
-                                Just { ev | venue = updatedVenue }
-
-                        Nothing ->
-                            Nothing
+                        updatedVenue =
+                            { currentVenue | name = Just name }
+                    in
+                        { ev | venue = updatedVenue }
 
                 updatedModel =
                     { model | event = updatedEvent }
@@ -746,20 +719,18 @@ update msg model =
                 updatedErrors =
                     showContactEmailError model.validationErrors (String.length email == 0)
 
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            let
-                                currentContact =
-                                    ev.contact
+                    let
+                        currentContact =
+                            ev.contact
 
-                                updatedContact =
-                                    { currentContact | email = Just email }
-                            in
-                                Just { ev | contact = updatedContact }
-
-                        Nothing ->
-                            Nothing
+                        updatedContact =
+                            { currentContact | email = Just email }
+                    in
+                        { ev | contact = updatedContact }
             in
                 ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
 
@@ -768,87 +739,80 @@ update msg model =
                 updatedErrors =
                     showContactNameError model.validationErrors (String.length name == 0)
 
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            let
-                                currentContact =
-                                    ev.contact
+                    let
+                        currentContact =
+                            ev.contact
 
-                                updatedContact =
-                                    { currentContact | name = Just name }
-                            in
-                                Just { ev | contact = updatedContact }
-
-                        Nothing ->
-                            Nothing
+                        updatedContact =
+                            { currentContact | name = Just name }
+                    in
+                        { ev | contact = updatedContact }
             in
                 ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
 
         Day day ->
             let
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            let
-                                currentStartTS =
-                                    ev.startTimestamp
+                    let
+                        currentStartTS =
+                            ev.startTimestamp
 
-                                currentEndTS =
-                                    ev.endTimestamp
+                        currentEndTS =
+                            ev.endTimestamp
 
-                                updatedStartTS =
-                                    { currentStartTS | ymd = day }
+                        updatedStartTS =
+                            { currentStartTS | ymd = day }
 
-                                updatedEndTS =
-                                    { currentEndTS | ymd = day }
-                            in
-                                Just
-                                    { ev
-                                        | startTimestamp = updatedStartTS
-                                        , endTimestamp = updatedEndTS
-                                    }
-
-                        Nothing ->
-                            Nothing
+                        updatedEndTS =
+                            { currentEndTS | ymd = day }
+                    in
+                        { ev
+                            | startTimestamp = updatedStartTS
+                            , endTimestamp = updatedEndTS
+                        }
             in
                 ( { model | event = updatedEvent }, Cmd.none )
 
         Hour borderTime hour ->
             let
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
+                    let
+                        currentTS =
+                            case borderTime of
+                                StartTime ->
+                                    ev.startTimestamp
+
+                                EndTime ->
+                                    ev.endTimestamp
+
+                        updatedTS =
                             let
-                                currentTS =
-                                    case borderTime of
-                                        StartTime ->
-                                            ev.startTimestamp
+                                updatedHour =
+                                    case String.toInt hour of
+                                        Ok hr ->
+                                            hr
 
-                                        EndTime ->
-                                            ev.endTimestamp
-
-                                updatedTS =
-                                    let
-                                        updatedHour =
-                                            case String.toInt hour of
-                                                Ok hr ->
-                                                    hr
-
-                                                Err err ->
-                                                    currentTS.hour
-                                    in
-                                        { currentTS | hour = updatedHour }
+                                        Err err ->
+                                            currentTS.hour
                             in
-                                case borderTime of
-                                    StartTime ->
-                                        Just { ev | startTimestamp = updatedTS }
+                                { currentTS | hour = updatedHour }
+                    in
+                        case borderTime of
+                            StartTime ->
+                                { ev | startTimestamp = updatedTS }
 
-                                    EndTime ->
-                                        Just { ev | endTimestamp = updatedTS }
-
-                        Nothing ->
-                            Nothing
+                            EndTime ->
+                                { ev | endTimestamp = updatedTS }
 
                 updatedModel =
                     { model | event = updatedEvent }
@@ -860,39 +824,37 @@ update msg model =
 
         Minute borderTime minute ->
             let
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
+                    let
+                        currentTS =
+                            case borderTime of
+                                StartTime ->
+                                    ev.startTimestamp
+
+                                EndTime ->
+                                    ev.endTimestamp
+
+                        updatedTS =
                             let
-                                currentTS =
-                                    case borderTime of
-                                        StartTime ->
-                                            ev.startTimestamp
+                                updatedMinute =
+                                    case String.toInt minute of
+                                        Ok min ->
+                                            min
 
-                                        EndTime ->
-                                            ev.endTimestamp
-
-                                updatedTS =
-                                    let
-                                        updatedMinute =
-                                            case String.toInt minute of
-                                                Ok min ->
-                                                    min
-
-                                                Err err ->
-                                                    currentTS.minute
-                                    in
-                                        { currentTS | minute = updatedMinute }
+                                        Err err ->
+                                            currentTS.minute
                             in
-                                case borderTime of
-                                    StartTime ->
-                                        Just { ev | startTimestamp = updatedTS }
+                                { currentTS | minute = updatedMinute }
+                    in
+                        case borderTime of
+                            StartTime ->
+                                { ev | startTimestamp = updatedTS }
 
-                                    EndTime ->
-                                        Just { ev | endTimestamp = updatedTS }
-
-                        Nothing ->
-                            Nothing
+                            EndTime ->
+                                { ev | endTimestamp = updatedTS }
 
                 updatedModel =
                     { model | event = updatedEvent }
@@ -904,30 +866,28 @@ update msg model =
 
         Meridiem borderTime meridiem ->
             let
+                ev =
+                    model.event
+
                 updatedEvent =
-                    case model.event of
-                        Just ev ->
-                            let
-                                currentTS =
-                                    case borderTime of
-                                        StartTime ->
-                                            ev.startTimestamp
+                    let
+                        currentTS =
+                            case borderTime of
+                                StartTime ->
+                                    ev.startTimestamp
 
-                                        EndTime ->
-                                            ev.endTimestamp
+                                EndTime ->
+                                    ev.endTimestamp
 
-                                updatedTS =
-                                    { currentTS | meridiem = meridiem }
-                            in
-                                case borderTime of
-                                    StartTime ->
-                                        Just { ev | startTimestamp = updatedTS }
+                        updatedTS =
+                            { currentTS | meridiem = meridiem }
+                    in
+                        case borderTime of
+                            StartTime ->
+                                { ev | startTimestamp = updatedTS }
 
-                                    EndTime ->
-                                        Just { ev | endTimestamp = updatedTS }
-
-                        Nothing ->
-                            Nothing
+                            EndTime ->
+                                { ev | endTimestamp = updatedTS }
 
                 updatedModel =
                     { model | event = updatedEvent }
@@ -960,7 +920,7 @@ update msg model =
             ( { model
                 | loading = False
                 , apiResult = apiResult
-                , event = apiResult.event
+                , event = Maybe.withDefault defaultEvent apiResult.event
                 , events =
                     case apiResult.event of
                         Just ev ->
@@ -991,17 +951,17 @@ showValidationErrors model =
 
 eventNamePresent : Model -> Bool
 eventNamePresent model =
-    (Maybe.map .name model.event |> Maybe.withDefault "" |> String.length) > 0
+    String.length model.event.name > 0
 
 
 eventVenueName : Model -> Maybe String
 eventVenueName model =
-    Maybe.map .venue model.event |> Maybe.andThen .name
+    model.event.venue.name
 
 
 eventAddress : Model -> Maybe Address
 eventAddress model =
-    Maybe.map .venue model.event |> Maybe.andThen .address
+    model.event.venue.address
 
 
 streetAddressPresent : Model -> Bool
@@ -1032,45 +992,12 @@ statePresent model =
 
 contactNamePresent : Model -> Bool
 contactNamePresent model =
-    let
-        cName =
-            case model.event of
-                Just ev ->
-                    Maybe.withDefault "" ev.contact.name
-
-                Nothing ->
-                    ""
-    in
-        String.length cName > 0
+    String.length (Maybe.withDefault "" model.event.contact.name) > 0
 
 
 contactEmailPresent : Model -> Bool
 contactEmailPresent model =
-    let
-        val =
-            case model.event of
-                Just ev ->
-                    Maybe.withDefault "" ev.contact.email
-
-                Nothing ->
-                    ""
-    in
-        String.length val > 0
-
-
-asDate : EditingTimestamp -> Result String Date
-asDate et =
-    Date.fromString (serializeTimestamp et)
-
-
-secondDate : EditingTimestamp -> Date -> Result String ( Date, Date )
-secondDate et firstDate =
-    case asDate et of
-        Ok date ->
-            Ok ( firstDate, date )
-
-        Err err ->
-            Err err
+    String.length (Maybe.withDefault "" model.event.contact.email) > 0
 
 
 lessThan : ( Date, Date ) -> Bool
@@ -1124,22 +1051,31 @@ validationVisibility showErrors =
 
 datesOk : Model -> Bool
 datesOk model =
-    case model.event of
-        Just ev ->
-            let
-                dates =
-                    asDate ev.startTimestamp
-                        |> andThen (secondDate ev.endTimestamp)
-            in
-                case dates of
-                    Ok ( sd, ed ) ->
-                        lessThan ( sd, ed )
+    let
+        dates =
+            andThen (secondDate model.event.endTimestamp) (asDate model.event.startTimestamp)
+    in
+        case dates of
+            Ok ( sd, ed ) ->
+                lessThan ( sd, ed )
 
-                    Err _ ->
-                        False
+            Err _ ->
+                False
 
-        Nothing ->
-            False
+
+asDate : EditingTimestamp -> Result String Date
+asDate et =
+    Date.fromString (serializeTimestamp et)
+
+
+secondDate : EditingTimestamp -> Date -> Result String ( Date, Date )
+secondDate et firstDate =
+    case asDate et of
+        Ok date ->
+            Ok ( firstDate, date )
+
+        Err err ->
+            Err err
 
 
 eventsURL : Model -> String
@@ -1200,33 +1136,33 @@ createEvent model =
 
 encodeEvent : Model -> Value
 encodeEvent model =
-    case model.event of
-        Nothing ->
-            object []
-
-        Just event ->
-            let
-                { id, name, intro, contact, startTimestamp, endTimestamp, venue } =
-                    event
-            in
-                object
-                    [ ( "data"
+    let
+        { id, name, intro, contact, startTimestamp, endTimestamp, venue } =
+            model.event
+    in
+        object
+            [ ( "data"
+              , object
+                    [ ( "event"
                       , object
-                            [ ( "event"
-                              , object
-                                    [ ( "name", JE.string name )
-                                    , ( "intro", JE.string intro )
-                                    , ( "contact", encodeContact contact )
-                                    , ( "start_time", JE.string <| serializeTimestamp startTimestamp )
-                                    , ( "end_time", JE.string <| serializeTimestamp endTimestamp )
-                                    , ( "author_id", JE.int <| model.authorID )
-                                    , ( "author_email", JE.string <| model.authorEmail )
-                                    , ( "venue", encodeVenue venue )
-                                    ]
+                            [ ( "name", JE.string name )
+                            , ( "intro"
+                              , if String.length intro > 0 then
+                                    JE.string intro
+                                else
+                                    JE.null
                               )
+                            , ( "contact", encodeContact contact )
+                            , ( "start_time", JE.string <| serializeTimestamp startTimestamp )
+                            , ( "end_time", JE.string <| serializeTimestamp endTimestamp )
+                            , ( "author_id", JE.int <| model.authorID )
+                            , ( "author_email", JE.string <| model.authorEmail )
+                            , ( "venue", encodeVenue venue )
                             ]
                       )
                     ]
+              )
+            ]
 
 
 encodeVenue : Venue -> Value
