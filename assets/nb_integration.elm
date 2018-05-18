@@ -4,7 +4,7 @@ import Html exposing (Html, programWithFlags, div, button, text, input, label, h
 import Html.Attributes exposing (class, type_, value, step, id, selected, style, for, disabled, placeholder)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (jsonBody)
-import Json.Decode exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
+import Json.Decode as JD exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
 import Json.Encode as JE exposing (Value, encode, object)
 import String exposing (join)
 import Dict exposing (Dict)
@@ -32,7 +32,7 @@ type Msg
 
 type alias Event =
     { id : Int
-    , intro : Maybe String
+    , intro : String
     , contact : Contact
     , name : Maybe String
     , startTimestamp : EditingTimestamp
@@ -44,7 +44,7 @@ type alias Event =
 defaultEvent : Event
 defaultEvent =
     { id = 0
-    , intro = Nothing
+    , intro = ""
     , contact = { email = Nothing, name = Nothing }
     , name = Nothing
     , startTimestamp = defaultStartTimestamp
@@ -601,7 +601,7 @@ update msg model =
                 updatedEvent =
                     case model.event of
                         Just ev ->
-                            Just { ev | intro = Just intro }
+                            Just { ev | intro = intro }
 
                         Nothing ->
                             Nothing
@@ -1215,7 +1215,7 @@ encodeEvent model =
                             [ ( "event"
                               , object
                                     [ ( "name", encodeMaybeString name )
-                                    , ( "intro", encodeMaybeString intro )
+                                    , ( "intro", JE.string intro )
                                     , ( "contact", encodeContact contact )
                                     , ( "start_time", JE.string <| serializeTimestamp startTimestamp )
                                     , ( "end_time", JE.string <| serializeTimestamp endTimestamp )
@@ -1319,12 +1319,12 @@ errorsDecoder =
     apiResultErrors <|
         field "errors" <|
             list <|
-                Json.Decode.map Error (field "title" string)
+                JD.map Error (field "title" string)
 
 
 eventDecoder =
     field "event" <|
-        Json.Decode.map7 Event
+        JD.map7 Event
             eventID
             eventIntro
             contact
@@ -1335,20 +1335,20 @@ eventDecoder =
 
 
 decodeVenue =
-    field "venue" <| Json.Decode.map2 Venue decodeVenueName decodeVenueAddress
+    field "venue" <| JD.map2 Venue decodeVenueName decodeVenueAddress
 
 
 decodeVenueName =
-    Json.Decode.maybe <| field "name" string
+    JD.maybe <| field "name" string
 
 
 decodeVenueAddress =
-    Json.Decode.maybe <|
+    JD.maybe <|
         field "address" <|
-            Json.Decode.map3 Address
-                (Json.Decode.maybe (field "address1" string))
-                (Json.Decode.maybe (field "city" string))
-                (Json.Decode.maybe (field "state" string))
+            JD.map3 Address
+                (JD.maybe (field "address1" string))
+                (JD.maybe (field "city" string))
+                (JD.maybe (field "state" string))
 
 
 decodeStartTimestamp =
@@ -1369,11 +1369,12 @@ eventName =
 
 eventIntro =
     field "intro" (nullable string)
+        |> JD.map (\m -> Maybe.withDefault "" m)
 
 
 contact =
     field "contact" <|
-        Json.Decode.map2 Contact contactName contactEmail
+        JD.map2 Contact contactName contactEmail
 
 
 contactName =
@@ -1384,16 +1385,16 @@ contactEmail =
     field "email" (nullable string)
 
 
-apiResultEvent : Json.Decode.Decoder Event -> Json.Decode.Decoder APIResult
+apiResultEvent : JD.Decoder Event -> JD.Decoder APIResult
 apiResultEvent event =
-    Json.Decode.map (\ev -> { errors = [], events = [ ev ], event = Just ev }) event
+    JD.map (\ev -> { errors = [], events = [ ev ], event = Just ev }) event
 
 
-apiResultEvents : Json.Decode.Decoder (List Event) -> Json.Decode.Decoder APIResult
+apiResultEvents : JD.Decoder (List Event) -> JD.Decoder APIResult
 apiResultEvents events =
-    Json.Decode.map (\evs -> { errors = [], events = evs, event = Nothing }) events
+    JD.map (\evs -> { errors = [], events = evs, event = Nothing }) events
 
 
-apiResultErrors : Json.Decode.Decoder (List Error) -> Json.Decode.Decoder APIResult
+apiResultErrors : JD.Decoder (List Error) -> JD.Decoder APIResult
 apiResultErrors errors =
-    Json.Decode.map (\errs -> { errors = errs, events = [], event = Nothing }) errors
+    JD.map (\errs -> { errors = errs, events = [], event = Nothing }) errors
