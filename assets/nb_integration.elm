@@ -34,7 +34,7 @@ type alias Event =
     { id : Int
     , intro : String
     , contact : Contact
-    , name : Maybe String
+    , name : String
     , startTimestamp : EditingTimestamp
     , endTimestamp : EditingTimestamp
     , venue : Venue
@@ -46,7 +46,7 @@ defaultEvent =
     { id = 0
     , intro = ""
     , contact = { email = Nothing, name = Nothing }
-    , name = Nothing
+    , name = ""
     , startTimestamp = defaultStartTimestamp
     , endTimestamp = defaultEndTimestamp
     , venue = defaultVenue
@@ -506,7 +506,7 @@ errorDisplay model =
 
 eventRow : Event -> Html Msg
 eventRow event =
-    tr [] [ td [] [ text <| Maybe.withDefault "" event.name ] ]
+    tr [] [ td [] [ text event.name ] ]
 
 
 errorRow : Error -> Html Msg
@@ -589,10 +589,10 @@ update msg model =
                 updatedEvent =
                     case model.event of
                         Just ev ->
-                            Just { ev | name = Just name }
+                            Just { ev | name = name }
 
                         Nothing ->
-                            Just { defaultEvent | name = Just name }
+                            Just { defaultEvent | name = name }
             in
                 ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
 
@@ -991,7 +991,7 @@ showValidationErrors model =
 
 eventNamePresent : Model -> Bool
 eventNamePresent model =
-    (Maybe.andThen .name model.event |> Maybe.withDefault "" |> String.length) > 0
+    (Maybe.map .name model.event |> Maybe.withDefault "" |> String.length) > 0
 
 
 eventVenueName : Model -> Maybe String
@@ -1214,7 +1214,7 @@ encodeEvent model =
                       , object
                             [ ( "event"
                               , object
-                                    [ ( "name", encodeMaybeString name )
+                                    [ ( "name", JE.string name )
                                     , ( "intro", JE.string intro )
                                     , ( "contact", encodeContact contact )
                                     , ( "start_time", JE.string <| serializeTimestamp startTimestamp )
@@ -1365,6 +1365,7 @@ eventID =
 
 eventName =
     field "name" (nullable string)
+        |> JD.map (\m -> Maybe.withDefault "" m)
 
 
 eventIntro =
