@@ -10,7 +10,7 @@ var NBIntegration = {
         }
 
         var script = document.createElement('script');
-        script.src = "/nb_integration.js";
+        script.src = "<%= app_base_url %>/nb_integration.js";
         script.onload = function() {
             Elm.Main.embed(domNode, {
                 authorEmail: authorEmail,
