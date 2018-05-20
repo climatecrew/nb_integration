@@ -180,7 +180,7 @@ defaultModel flags =
 
 
 type alias Flags =
-    { authorID : Int, authorEmail : String, access_token : String, rootURL : String, slug : String }
+    { authorID : Int, authorEmail : String, rootURL : String, slug : String }
 
 
 main : Program Flags Model Msg
