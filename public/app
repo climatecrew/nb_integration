@@ -18,10 +18,10 @@
 
     </head>
     <body>
-        <div id="event-interface"></div>
+        <div id="events-interface"></div>
         <script type="text/javascript">
             function renderEvents() {
-                var node = document.getElementById("event-interface");
+                var node = document.getElementById("events-interface");
                 var email = document.getElementById("email").textContent;
                 var currentUserID = parseInt(document.getElementById("current-user-id").textContent, 10);
 
@@ -29,6 +29,6 @@
             }
         </script>
 
-        <script async=true src="http://localhost:3000/embed/js?slug=skarger&callback=renderEvents"></script>
+        <script defer src="http://localhost:3000/embed/js?slug=skarger&callback=renderEvents"></script>
     </body>
 </html>
