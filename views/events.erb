@@ -1,0 +1,27 @@
+var NBIntegration = {
+    eventInterface: function (domNode, authorEmail, authorID) {
+        var slug = "<%= slug %>";
+
+        if (!slug) {
+            throw new Error("Nation not identified. You may need to pass slug.");
+        }
+        if (typeof <%= callback %> !== "function") {
+            throw new Error("'<%= callback %>' is not a function.");
+        }
+
+        var script = document.createElement('script');
+        script.src = "/nb_integration.js";
+        script.onload = function() {
+            Elm.Main.embed(domNode, {
+                authorEmail: authorEmail,
+                authorID : authorID,
+                rootURL: "<%= app_base_url %>",
+                slug: slug
+            });
+        }
+
+        document.head.appendChild(script);
+    }
+}
+
+<%= callback %>();

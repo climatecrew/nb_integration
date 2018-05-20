@@ -15,27 +15,20 @@
         </div>
 
         <link rel="stylesheet" href="nb_integration.css" />
-        <script src="nb_integration.js"></script>
 
     </head>
     <body>
         <div id="event-interface"></div>
         <script type="text/javascript">
-            var email = document.getElementById("email").textContent;
-            var access_token = "DEFAULT";
-            //var rootURL = "https://polar-temple-72955.herokuapp.com";
-            var rootURL = "http://localhost:3000";
-            var slug = "skarger";
-            var currentUserID = parseInt(document.getElementById("current-user-id").textContent, 10);
+            function renderEvents() {
+                var node = document.getElementById('event-interface');
+                var email = document.getElementById("email").textContent;
+                var currentUserID = parseInt(document.getElementById("current-user-id").textContent, 10);
 
-            var node = document.getElementById('event-interface');
-            Elm.Main.embed(node, {
-                authorEmail: email,
-                authorID : currentUserID,
-                access_token: access_token,
-                rootURL: rootURL,
-                slug: slug
-            })
+                NBIntegration.eventInterface(node, email, currentUserID);
+            }
         </script>
+
+        <script async=true src="/embed/js?slug=skarger&callback=renderEvents"></script>
     </body>
 </html>
