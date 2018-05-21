@@ -13,13 +13,11 @@
             <div id="email">event.creator@gmail.com</div>
             <div id="current-user-id">30</div>
         </div>
-
-        <link rel="stylesheet" href="nb_integration.css" />
-
     </head>
+
     <body>
         <div id="events-interface"></div>
-        <script type="text/javascript">
+        <script>
             function renderEvents() {
                 var node = document.getElementById("events-interface");
                 var email = document.getElementById("email").textContent;

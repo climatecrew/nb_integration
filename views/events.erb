@@ -9,6 +9,11 @@ var NBIntegration = {
             throw new Error("'<%= callback %>' is not a function.");
         }
 
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = "<%= app_base_url %>/nb_integration.css";
+        document.head.appendChild(link);
+
         var script = document.createElement('script');
         script.src = "<%= app_base_url %>/nb_integration.js";
         script.onload = function() {
