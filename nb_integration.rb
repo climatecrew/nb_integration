@@ -81,13 +81,11 @@ class App < Roda
 
     # load JavaScript app for embed on nation web page
     r.on "embed" do
-      r.is "js" do
-        slug = r.params["slug"]
-        callback = r.params["callback"]
+      slug = r.params["slug"]
+      callback = r.params["callback"]
 
-        response["Content-Type"] = "application/javascript"
-        render("events", locals: { slug: slug, callback: callback })
-      end
+      response["Content-Type"] = "application/javascript"
+      render("events", locals: { slug: slug, callback: callback })
     end
 
     # JSON interface to this app's functionality

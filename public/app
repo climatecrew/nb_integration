@@ -27,6 +27,6 @@
             }
         </script>
 
-        <script defer src="http://localhost:3000/embed/js?slug=skarger&callback=renderEvents"></script>
+        <script defer src="http://localhost:3000/embed?slug=skarger&callback=renderEvents"></script>
     </body>
 </html>
