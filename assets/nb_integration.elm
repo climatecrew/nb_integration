@@ -110,21 +110,10 @@ type BorderTime
     | EndTime
 
 
-type ResultPiece
-    = APIEvent Int String
-    | APIError String
-
-
-type alias APIResult =
-    { errors : List Error
-    , event : Maybe Event
-    , events : List Event
-    }
-
-
-defaultAPIResult : APIResult
-defaultAPIResult =
-    { errors = [], event = Nothing, events = [] }
+type APIResult
+    = APIErrors (List Error)
+    | APIEvent Event
+    | APIEvents (List Event)
 
 
 type alias ShowValidationErrors =
@@ -167,7 +156,7 @@ type alias Model =
 
 defaultModel : Flags -> Model
 defaultModel flags =
-    { apiResult = { errors = [], events = [], event = Nothing }
+    { apiResult = APIErrors []
     , authorID = flags.authorID
     , authorEmail = flags.authorEmail
     , event = defaultEvent
@@ -477,7 +466,12 @@ errorDisplay model =
     div [] <|
         let
             errors =
-                model.apiResult.errors
+                case model.apiResult of
+                    APIErrors errors ->
+                        errors
+
+                    _ ->
+                        []
         in
             if List.length errors > 0 then
                 [ h2 [] [ text "Errors" ]
@@ -911,26 +905,31 @@ update msg model =
                 )
 
         FetchEventsResult (Ok apiResult) ->
-            ( { model | loading = False, apiResult = apiResult, events = apiResult.events }, Cmd.none )
+            let
+                modelWithResult =
+                    { model | loading = False, apiResult = apiResult }
+            in
+                case apiResult of
+                    APIEvents events ->
+                        ( { modelWithResult | events = events }, Cmd.none )
+
+                    _ ->
+                        ( modelWithResult, Cmd.none )
 
         FetchEventsResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
 
         CreateEventResult (Ok apiResult) ->
-            ( { model
-                | loading = False
-                , apiResult = apiResult
-                , event = Maybe.withDefault defaultEvent apiResult.event
-                , events =
-                    case apiResult.event of
-                        Just ev ->
-                            ev :: model.events
+            let
+                modelWithResult =
+                    { model | loading = False, apiResult = apiResult }
+            in
+                case apiResult of
+                    APIEvent event ->
+                        ( { modelWithResult | event = event, events = event :: model.events }, Cmd.none )
 
-                        Nothing ->
-                            model.events
-              }
-            , Cmd.none
-            )
+                    _ ->
+                        ( modelWithResult, Cmd.none )
 
         CreateEventResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
@@ -1100,31 +1099,19 @@ handleAPIError model err =
                             { notLoadingModel | apiResult = apiResult }
 
                         Err _ ->
-                            { notLoadingModel | apiResult = { defaultAPIResult | errors = [ Error <| "Response failed: " ++ response.status.message ] } }
+                            { notLoadingModel | apiResult = APIErrors [ Error <| "Response failed: " ++ response.status.message ] }
 
             Http.BadPayload message response ->
-                { notLoadingModel
-                    | apiResult =
-                        { defaultAPIResult | errors = [ Error "Unexpected response from server" ] }
-                }
+                { notLoadingModel | apiResult = APIErrors [ Error "Unexpected response from server" ] }
 
             Http.BadUrl url ->
-                { notLoadingModel
-                    | apiResult =
-                        { defaultAPIResult | errors = [ Error <| "Invalid URL: " ++ url ] }
-                }
+                { notLoadingModel | apiResult = APIErrors [ Error <| "Invalid URL: " ++ url ] }
 
             Http.Timeout ->
-                { notLoadingModel
-                    | apiResult =
-                        { defaultAPIResult | errors = [ Error <| "Request timed out" ] }
-                }
+                { notLoadingModel | apiResult = APIErrors [ Error <| "Request timed out" ] }
 
             Http.NetworkError ->
-                { notLoadingModel
-                    | apiResult =
-                        { defaultAPIResult | errors = [ Error <| "Network Error" ] }
-                }
+                { notLoadingModel | apiResult = APIErrors [ Error <| "Network Error" ] }
 
 
 createEvent : Model -> Http.Request APIResult
@@ -1239,20 +1226,20 @@ getEvents model =
 
 
 dataEventsDecoder =
-    apiResultEvents <|
+    JD.map APIEvents <|
         field "data" <|
             list <|
                 eventDecoder
 
 
 dataEventDecoder =
-    apiResultEvent <|
+    JD.map APIEvent <|
         field "data" <|
             eventDecoder
 
 
 errorsDecoder =
-    apiResultErrors <|
+    JD.map APIErrors <|
         field "errors" <|
             list <|
                 JD.map Error (field "title" string)
@@ -1320,18 +1307,3 @@ contactName =
 
 contactEmail =
     field "email" (nullable string)
-
-
-apiResultEvent : JD.Decoder Event -> JD.Decoder APIResult
-apiResultEvent event =
-    JD.map (\ev -> { errors = [], events = [ ev ], event = Just ev }) event
-
-
-apiResultEvents : JD.Decoder (List Event) -> JD.Decoder APIResult
-apiResultEvents events =
-    JD.map (\evs -> { errors = [], events = evs, event = Nothing }) events
-
-
-apiResultErrors : JD.Decoder (List Error) -> JD.Decoder APIResult
-apiResultErrors errors =
-    JD.map (\errs -> { errors = errs, events = [], event = Nothing }) errors
