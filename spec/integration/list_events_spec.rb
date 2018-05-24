@@ -1,6 +1,4 @@
 require "support/rack_test_helper"
-require "models/account"
-require "models/event"
 
 RSpec.describe "GET /api/events" do
   include RackTestHelper

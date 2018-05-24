@@ -1,5 +1,3 @@
-require File.expand_path("../../helpers/error_presenter.rb", __FILE__)
-
 RSpec.describe ErrorPresenter do
   it "transforms an NB message field into a detail field" do
     nb_body = <<~JSON

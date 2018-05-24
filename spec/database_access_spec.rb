@@ -1,5 +1,4 @@
 require 'sequel'
-require File.expand_path("../../helpers/database_access.rb", __FILE__)
 
 RSpec.describe DatabaseAccess do
   let(:including_class) do

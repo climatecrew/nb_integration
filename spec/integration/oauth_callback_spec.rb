@@ -1,5 +1,4 @@
 require "support/rack_test_helper"
-require "helpers/app_configuration"
 
 RSpec.describe "GET /oauth/callback" do
   include RackTestHelper

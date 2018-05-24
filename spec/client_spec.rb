@@ -1,5 +1,3 @@
-require File.expand_path("../../helpers/client.rb", __FILE__)
-
 RSpec.describe Client do
   let(:resource) { :test_resource }
   let(:path_provider_klass) do
