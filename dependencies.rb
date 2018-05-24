@@ -1,0 +1,19 @@
+$:.unshift File.expand_path(File.dirname(__FILE__), "helpers/")
+# we need the environment variables set before requiring files
+# that reference them at a file level
+require "helpers/dotenv_loader"
+DotenvLoader.new.load
+
+require "helpers/constants"
+require "helpers/app_configuration"
+require "helpers/database_access.rb"
+require "helpers/path_provider"
+require "helpers/client"
+require "helpers/error_presenter"
+require "helpers/nb_app_install"
+require "helpers/handle_oauth_callback"
+require "helpers/handle_event_creation"
+
+$:.unshift File.expand_path(File.dirname(__FILE__), "models/")
+require "models/account"
+require "models/event"

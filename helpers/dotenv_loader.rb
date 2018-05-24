@@ -1,7 +1,7 @@
 require "logger"
 
 class DotenvLoader
-  def initialize(environment: :development)
+  def initialize(environment: ENV['APP_ENVIRONMENT']&.to_sym || :development)
     @environment = environment.to_sym
   end
 

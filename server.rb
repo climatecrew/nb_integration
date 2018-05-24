@@ -1,18 +1,8 @@
 require "roda"
 require "json"
 
-$:.unshift File.expand_path(File.dirname(__FILE__), "helpers/")
-require "helpers/path_provider"
-require "helpers/client"
-require "helpers/error_presenter"
-require "helpers/app_configuration"
-require "helpers/nb_app_install"
-require "helpers/handle_oauth_callback"
-require "helpers/handle_event_creation"
-
-$:.unshift File.expand_path(File.dirname(__FILE__), "models/")
-require "models/account"
-require "models/event"
+$:.unshift File.dirname(__FILE__)
+require "dependencies"
 
 class Server < Roda
   include AppConfiguration

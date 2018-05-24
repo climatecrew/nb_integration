@@ -21,13 +21,11 @@ require "sequel"
 require "warning"
 require 'webmock/rspec'
 
-# Set environment first for any setup that depends on it
-require File.expand_path("../../helpers/dotenv_loader.rb", __FILE__)
-DotenvLoader.new(environment: :test).load
-require File.expand_path("../../helpers/database_access.rb", __FILE__)
-
 # Prevent outbound network requests
 WebMock.disable_net_connect!(allow_localhost: true)
+
+ENV['APP_ENVIRONMENT'] = 'test'.freeze
+require File.expand_path("../../dependencies.rb", __FILE__)
 
 RSpec.configure do |config|
   # rspec-expectations config goes here. You can use an alternate
