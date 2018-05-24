@@ -10,7 +10,7 @@ DotenvLoader.new.load
 
 require "helpers/startup"
 require "helpers/constants"
-require "nb_integration"
+require "server"
 
 
 if !Startup.nb_configuration_valid?
@@ -20,4 +20,4 @@ if !Startup.nb_configuration_valid?
 end
 
 use Rack::Logger
-run App.freeze.app
+run Server.freeze.app

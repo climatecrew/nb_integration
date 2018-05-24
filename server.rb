@@ -14,7 +14,7 @@ $:.unshift File.expand_path(File.dirname(__FILE__), "models/")
 require "models/account"
 require "models/event"
 
-class App < Roda
+class Server < Roda
   include AppConfiguration
 
   plugin :json

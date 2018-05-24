@@ -1,7 +1,7 @@
 require "rack/test"
 require "logger"
 
-require File.expand_path("../../../nb_integration.rb", __FILE__)
+require File.expand_path("../../../server.rb", __FILE__)
 
 module RackTestHelper
   def self.included(mod)
@@ -9,7 +9,7 @@ module RackTestHelper
   end
 
   def app
-    App.app
+    Server.app
   end
 
   def test_rack_env
