@@ -11,6 +11,7 @@ require "helpers/path_provider"
 require "helpers/client"
 require "helpers/error_presenter"
 require "helpers/nb_app_install"
+require "helpers/request_oauth_access_token"
 require "helpers/handle_oauth_callback"
 require "helpers/handle_event_creation"
 

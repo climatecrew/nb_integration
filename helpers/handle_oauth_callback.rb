@@ -1,6 +1,3 @@
-$:.unshift File.expand_path(File.dirname(__FILE__), "../helpers")
-require "helpers/request_oauth_access_token"
-
 class HandleOAuthCallback
   def initialize(r)
     @r = r

@@ -1,5 +1,3 @@
-require "helpers/app_configuration"
-
 class NBAppInstall
   include AppConfiguration
 

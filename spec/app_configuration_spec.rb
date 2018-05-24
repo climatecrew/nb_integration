@@ -1,5 +1,4 @@
 require "logger"
-require File.expand_path("../../helpers/app_configuration.rb", __FILE__)
 
 RSpec.describe AppConfiguration do
   describe "nb_configuration_valid?" do
