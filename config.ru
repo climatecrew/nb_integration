@@ -13,7 +13,7 @@ require "helpers/constants"
 require "server"
 
 
-if !Startup.nb_configuration_valid?
+if !AppConfiguration.nb_configuration_valid?
   message = "NationBuilder configuration missing. Exiting."
   Logger.new($stderr).fatal(message)
   exit CONFIGURATION_ERROR

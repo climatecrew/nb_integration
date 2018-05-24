@@ -2,6 +2,7 @@ module AppConfiguration
   def nb_configuration_valid?
     ENV['NB_CLIENT_ID'].to_s.length > 0 && ENV['NB_CLIENT_SECRET'].to_s.length > 0
   end
+  module_function :nb_configuration_valid?
 
   def log_nb_configuration_error(logger)
     if ENV['NB_CLIENT_ID'].to_s.empty?
