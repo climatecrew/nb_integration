@@ -6,6 +6,7 @@ import Types exposing (..)
 import Views exposing (..)
 import Utilities exposing (..)
 import Networking exposing (..)
+import Validation exposing (..)
 
 
 main : Program Flags Model Msg
@@ -35,83 +36,6 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     mainView model
-
-
-showValidationErrors : Model -> ShowValidationErrors
-showValidationErrors model =
-    { showEventNameErrors = not <| eventNamePresent model
-    , showContactNameErrors = not <| contactNamePresent model
-    , showContactEmailErrors = not <| contactEmailPresent model
-    , showDateErrors = not <| datesOk model
-    , showVenueNameErrors = not <| venueNamePresent model
-    , showStreetAddressErrors = not <| streetAddressPresent model
-    , showCityErrors = not <| cityPresent model
-    , showStateErrors = not <| statePresent model
-    }
-
-
-showDateError : ShowValidationErrors -> Bool -> ShowValidationErrors
-showDateError validationErrors shouldShow =
-    if shouldShow then
-        { validationErrors | showDateErrors = True }
-    else
-        { validationErrors | showDateErrors = False }
-
-
-showEventNameError : ShowValidationErrors -> Bool -> ShowValidationErrors
-showEventNameError validationErrors shouldShow =
-    if shouldShow then
-        { validationErrors | showEventNameErrors = True }
-    else
-        { validationErrors | showEventNameErrors = False }
-
-
-showContactNameError : ShowValidationErrors -> Bool -> ShowValidationErrors
-showContactNameError validationErrors shouldShow =
-    if shouldShow then
-        { validationErrors | showContactNameErrors = True }
-    else
-        { validationErrors | showContactNameErrors = False }
-
-
-showContactEmailError : ShowValidationErrors -> Bool -> ShowValidationErrors
-showContactEmailError validationErrors shouldShow =
-    if shouldShow then
-        { validationErrors | showContactEmailErrors = True }
-    else
-        { validationErrors | showContactEmailErrors = False }
-
-
-showVenueNameError : ShowValidationErrors -> Bool -> ShowValidationErrors
-showVenueNameError validationErrors shouldShow =
-    if shouldShow then
-        { validationErrors | showVenueNameErrors = True }
-    else
-        { validationErrors | showVenueNameErrors = False }
-
-
-showStreetAddressError : ShowValidationErrors -> Bool -> ShowValidationErrors
-showStreetAddressError validationErrors shouldShow =
-    if shouldShow then
-        { validationErrors | showStreetAddressErrors = True }
-    else
-        { validationErrors | showStreetAddressErrors = False }
-
-
-showCityError : ShowValidationErrors -> Bool -> ShowValidationErrors
-showCityError validationErrors shouldShow =
-    if shouldShow then
-        { validationErrors | showCityErrors = True }
-    else
-        { validationErrors | showCityErrors = False }
-
-
-showStateError : ShowValidationErrors -> Bool -> ShowValidationErrors
-showStateError validationErrors shouldShow =
-    if shouldShow then
-        { validationErrors | showStateErrors = True }
-    else
-        { validationErrors | showStateErrors = False }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
