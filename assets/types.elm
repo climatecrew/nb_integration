@@ -159,5 +159,15 @@ defaultModel flags =
     }
 
 
+currentTimestamp : Model -> BorderTime -> EditingTimestamp
+currentTimestamp model borderTime =
+    case borderTime of
+        StartTime ->
+            model.event.startTimestamp
+
+        EndTime ->
+            model.event.endTimestamp
+
+
 type alias Flags =
     { authorID : Int, authorEmail : String, rootURL : String, slug : String }

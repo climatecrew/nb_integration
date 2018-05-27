@@ -6,6 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Date exposing (Date)
 import Result exposing (Result, andThen)
 import Types exposing (..)
+import Utilities exposing (..)
 
 
 mainView : Model -> Html Msg
@@ -123,21 +124,6 @@ mainView model =
         ]
 
 
-currentTimestamp : Model -> BorderTime -> EditingTimestamp
-currentTimestamp model borderTime =
-    case borderTime of
-        StartTime ->
-            model.event.startTimestamp
-
-        EndTime ->
-            model.event.endTimestamp
-
-
-padTimePart : Int -> String
-padTimePart num =
-    String.padLeft 2 '0' <| toString num
-
-
 formatTimestamp : Event -> BorderTime -> String
 formatTimestamp event borderTime =
     let
@@ -150,32 +136,6 @@ formatTimestamp event borderTime =
                     event.endTimestamp
     in
         serializeTimestamp timestamp
-
-
-serializeTimestamp : EditingTimestamp -> String
-serializeTimestamp timestamp =
-    let
-        hour24 =
-            case timestamp.meridiem of
-                "AM" ->
-                    if timestamp.hour == 12 then
-                        0
-                    else
-                        timestamp.hour
-
-                otherwise ->
-                    if timestamp.hour == 12 then
-                        timestamp.hour
-                    else
-                        timestamp.hour + 12
-    in
-        timestamp.ymd
-            ++ "T"
-            ++ padTimePart hour24
-            ++ ":"
-            ++ padTimePart timestamp.minute
-            ++ ":00"
-            ++ "-04:00"
 
 
 selectDay : List (Html Msg)

@@ -6,6 +6,7 @@ import Json.Decode as JD exposing (field, dict, list, string, array, int, oneOf,
 import Json.Encode as JE exposing (Value, encode, object)
 import Types exposing (..)
 import Views exposing (..)
+import Utilities exposing (..)
 
 
 main : Program Flags Model Msg
