@@ -37,6 +37,19 @@ view model =
     mainView model
 
 
+showValidationErrors : Model -> ShowValidationErrors
+showValidationErrors model =
+    { showEventNameErrors = not <| eventNamePresent model
+    , showContactNameErrors = not <| contactNamePresent model
+    , showContactEmailErrors = not <| contactEmailPresent model
+    , showDateErrors = not <| datesOk model
+    , showVenueNameErrors = not <| venueNamePresent model
+    , showStreetAddressErrors = not <| streetAddressPresent model
+    , showCityErrors = not <| cityPresent model
+    , showStateErrors = not <| statePresent model
+    }
+
+
 showDateError : ShowValidationErrors -> Bool -> ShowValidationErrors
 showDateError validationErrors shouldShow =
     if shouldShow then
@@ -477,16 +490,3 @@ update msg model =
 
         CreateEventResult (Err err) ->
             ( handleAPIError model err, Cmd.none )
-
-
-showValidationErrors : Model -> ShowValidationErrors
-showValidationErrors model =
-    { showEventNameErrors = not <| eventNamePresent model
-    , showContactNameErrors = not <| contactNamePresent model
-    , showContactEmailErrors = not <| contactEmailPresent model
-    , showDateErrors = not <| datesOk model
-    , showVenueNameErrors = not <| venueNamePresent model
-    , showStreetAddressErrors = not <| streetAddressPresent model
-    , showCityErrors = not <| cityPresent model
-    , showStateErrors = not <| statePresent model
-    }
