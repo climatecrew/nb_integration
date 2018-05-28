@@ -38,15 +38,26 @@ jobs:
             bundle install --jobs=4 --retry=3 --path vendor/bundle
 
       - run:
+          name: install sysconfcpus to speed up Elm compiler
+          command: |
+            - if [ ! -d libsysconfcpus ]; then git clone https://github.com/obmarg/libsysconfcpus.git; fi
+            - cd libsysconfcpus && ./configure && make && sudo make install
+
+      - run:
           name: install client dependencies
           command: |
             yarn global add elm
             yarn global add elm-test
+            PATH="$PATH:`yarn global bin`" elm package install
+            PATH="cd tests && $PATH:`yarn global bin`" elm package install
 
       - save_cache:
           paths:
             - ./vendor/bundle
-            - ./node_modules
+            - /home/circleci/.config/yarn/global/node_modules
+            - ./elm-stuff
+            - ./tests/elm-stuff
+            - libsysconfcpus
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}
         
       # Database setup
@@ -79,7 +90,7 @@ jobs:
       - run:
           name: run client tests
           command: |
-            PATH="$PATH:`yarn global bin`" elm-test
+            sysconfucpus -n 2 yarn test
 
   deploy:
     docker:
