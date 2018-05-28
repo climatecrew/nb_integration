@@ -28,7 +28,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v2-dependencies-{{ checksum "Gemfile.lock" }}-{{ checkum "elm-package.json" }}-{{ checkum "tests/elm-package.json" }}
+          - v2-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
           # fallback to using the latest cache if no exact match is found
           - v2-dependencies-
 
@@ -61,7 +61,7 @@ jobs:
             - /home/circleci/libsysconfcpus
             - ./elm-stuff
             - ./tests/elm-stuff
-          key: v2-dependencies-{{ checksum "Gemfile.lock" }}-{{ checkum "elm-package.json" }}-{{ checkum "tests/elm-package.json" }}
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
         
       # Database setup
       - run:
