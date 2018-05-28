@@ -33,6 +33,17 @@ jobs:
           - v1-dependencies-
 
       - run:
+          name: install client dependencies
+          command: |
+            yarn global add elm
+            yarn global add elm-test
+
+      - run:
+          name: run client tests
+          command: |
+            elm-test
+
+      - run:
           name: install server dependencies
           command: |
             bundle install --jobs=4 --retry=3 --path vendor/bundle
@@ -68,17 +79,6 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
-
-      - run:
-          name: install client dependencies
-          command: |
-            yarn global add elm
-
-
-      - run:
-          name: run client tests
-          command: |
-            elm-test
 
   deploy:
     docker:
