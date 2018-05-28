@@ -28,9 +28,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}
           # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          #- v1-dependencies-
 
       - run:
           name: install server dependencies
@@ -58,12 +58,8 @@ jobs:
       - save_cache:
           paths:
             - ./vendor/bundle
-            - /home/circleci/.config/yarn/global/node_modules
-            - /home/circleci/.yarn
-            - ./elm-stuff
-            - ./tests/elm-stuff
             - /home/circleci/libsysconfcpus
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
         
       # Database setup
       - run:
