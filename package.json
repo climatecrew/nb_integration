@@ -13,11 +13,12 @@
     "elm": "^0.18.0"
   },
   "scripts": {
-    "test": "PATH=\"$PATH:`yarn global bin`\" elm-test",
-    "postinstall": "elm-package install -y && elm-make assets/Main.elm --output public/nb_integration.js",
+    "test": "elm-test",
+    "postinstall": "yarn run elm-package install -y && yarn run elm-make assets/Main.elm --output public/nb_integration.js",
     "heroku-postbuild": "gzip -f public/nb_integration.js"
   },
   "devDependencies": {
+    "elm-test": "^0.18.12",
     "markdown-toc": "^1.2.0"
   }
 }

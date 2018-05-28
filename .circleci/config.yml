@@ -28,7 +28,7 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
@@ -50,18 +50,17 @@ jobs:
       - run:
           name: install client dependencies
           command: |
-            yarn global add elm
-            yarn global add elm-test
-            PATH="$PATH:`yarn global bin`" elm package install -y
-            PATH="cd tests && $PATH:`yarn global bin`" elm package install -y
+            yarn install
+            cd tests && yarn run elm package install -y
 
       - save_cache:
           paths:
             - ./vendor/bundle
             - /home/circleci/libsysconfcpus
+            - ./node_modules
             - ./elm-stuff
             - ./tests/elm-stuff
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
         
       # Database setup
       - run:
