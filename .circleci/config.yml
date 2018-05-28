@@ -40,8 +40,12 @@ jobs:
       - run:
           name: install sysconfcpus to speed up Elm compiler
           command: |
-            - if [ ! -d libsysconfcpus ]; then git clone https://github.com/obmarg/libsysconfcpus.git; fi
-            - cd libsysconfcpus && ./configure && make && sudo make install
+            if [ ! -d /home/circleci/libsysconfcpus ];
+            then
+              cd /home/circleci
+              git clone https://github.com/obmarg/libsysconfcpus.git
+            fi
+            cd /home/circleci/libsysconfcpus && ./configure && make && sudo make install
 
       - run:
           name: install client dependencies
@@ -57,7 +61,7 @@ jobs:
             - /home/circleci/.config/yarn/global/node_modules
             - ./elm-stuff
             - ./tests/elm-stuff
-            - libsysconfcpus
+            - /home/circleci/libsysconfcpus
           key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}
         
       # Database setup
