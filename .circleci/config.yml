@@ -51,7 +51,7 @@ jobs:
       # run tests!
       # we exclude integration specs as long as we only have one container
       - run:
-          name: run tests
+          name: run server tests
           command: |
             mkdir /tmp/test-results
             TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)"
@@ -68,6 +68,11 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
+
+      - run:
+          name: run client tests
+          command: |
+            elm-test
 
   deploy:
     docker:
