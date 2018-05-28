@@ -6,9 +6,6 @@
   "repository": "git@github.com:climatecrew/nb_integration.git",
   "author": "Stephen Karger <stephen.karger@gmail.com>",
   "license": "MIT",
-  "engines": {
-    "node": "9.10.1"
-  },
   "dependencies": {
     "elm": "^0.18.0"
   },
