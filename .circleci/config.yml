@@ -41,7 +41,7 @@ jobs:
       - run:
           name: run client tests
           command: |
-            elm-test
+            PATH="$PATH:`yarn global bin`" elm-test
 
       - run:
           name: install server dependencies
