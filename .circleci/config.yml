@@ -52,8 +52,8 @@ jobs:
           command: |
             yarn global add elm
             yarn global add elm-test
-            PATH="$PATH:`yarn global bin`" elm package install
-            PATH="cd tests && $PATH:`yarn global bin`" elm package install
+            PATH="$PATH:`yarn global bin`" elm package install -y
+            PATH="cd tests && $PATH:`yarn global bin`" elm package install -y
 
       - save_cache:
           paths:
