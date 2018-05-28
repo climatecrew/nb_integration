@@ -94,7 +94,7 @@ jobs:
       - run:
           name: run client tests
           command: |
-            sysconfucpus -n 2 yarn test
+            sysconfcpus -n 2 yarn test
 
   deploy:
     docker:
