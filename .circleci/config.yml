@@ -50,8 +50,8 @@ jobs:
       - run:
           name: install client dependencies
           command: |
-            yarn install
-            cd tests && yarn run elm package install -y
+            sysconfcpus -n 2 yarn install
+            cd tests && sysconfcpus -n 2 yarn run elm package install -y
 
       - save_cache:
           paths:
