@@ -179,6 +179,8 @@ Install dependencies:
 
 ```
 yarn install
+
+yarn global add elm-test
 ```
 
 # Documentation
