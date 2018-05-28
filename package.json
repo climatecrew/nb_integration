@@ -13,7 +13,7 @@
     "elm": "^0.18.0"
   },
   "scripts": {
-    "postinstall": "elm-package install -y && elm-make assets/main.elm --output public/nb_integration.js",
+    "postinstall": "elm-package install -y && elm-make assets/Main.elm --output public/nb_integration.js",
     "heroku-postbuild": "gzip -f public/nb_integration.js"
   },
   "devDependencies": {
