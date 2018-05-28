@@ -28,20 +28,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}
+          - v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
-
-      - run:
-          name: install client dependencies
-          command: |
-            yarn global add elm
-            yarn global add elm-test
-
-      - run:
-          name: run client tests
-          command: |
-            PATH="$PATH:`yarn global bin`" elm-test
 
       - run:
           name: install server dependencies
@@ -65,7 +54,7 @@ jobs:
           name: run server tests
           command: |
             mkdir /tmp/test-results
-            TEST_FILES="$(circleci tests glob "spec/**/*_spec.rb" | circleci tests split --split-by=timings)"
+            TEST_FILES="$(circleci tests glob \"spec/**/*_spec.rb\" | circleci tests split --split-by=timings)"
             
             bundle exec rspec --format progress \
                             --format RspecJunitFormatter \
@@ -79,6 +68,17 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
+
+      - run:
+          name: install client dependencies
+          command: |
+            yarn global add elm
+            yarn global add elm-test
+
+      - run:
+          name: run client tests
+          command: |
+            PATH="$PATH:`yarn global bin`" elm-test
 
   deploy:
     docker:
