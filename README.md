@@ -183,6 +183,22 @@ yarn install
 yarn global add elm-test
 ```
 
+### Development
+
+Make changes to .elm files, and compile:
+
+```
+yarn
+```
+
+View at [http://localhost:3000/app](http://localhost:3000/app). The client is intended to be embedded on a NationBuilder website page, but for testing we directly serve a basic page with the client.
+
+### Run tests
+
+```
+elm-test
+```
+
 # Documentation
 
 If you update this README, update the table of contents by running:
