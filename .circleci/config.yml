@@ -72,9 +72,7 @@ jobs:
       - run:
           name: install client dependencies
           command: |
-            npm install -g elm
-            npm install -g elm-test
-            elm-package install
+            yarn global add elm
 
 
       - run:
