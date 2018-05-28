@@ -33,7 +33,7 @@ jobs:
           - v1-dependencies-
 
       - run:
-          name: install dependencies
+          name: install server dependencies
           command: |
             bundle install --jobs=4 --retry=3 --path vendor/bundle
 
@@ -68,6 +68,14 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
+
+      - run:
+          name: install client dependencies
+          command: |
+            npm install -g elm
+            npm install -g elm-test
+            elm-package install
+
 
       - run:
           name: run client tests
