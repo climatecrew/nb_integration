@@ -37,10 +37,17 @@ jobs:
           command: |
             bundle install --jobs=4 --retry=3 --path vendor/bundle
 
+      - run:
+          name: install client dependencies
+          command: |
+            yarn global add elm
+            yarn global add elm-test
+
       - save_cache:
           paths:
             - ./vendor/bundle
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}
+            - ./node_modules
+          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}
         
       # Database setup
       - run:
@@ -68,12 +75,6 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
-
-      - run:
-          name: install client dependencies
-          command: |
-            yarn global add elm
-            yarn global add elm-test
 
       - run:
           name: run client tests
