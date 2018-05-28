@@ -25,17 +25,29 @@ jobs:
     steps:
       - checkout
 
-      # Download and cache dependencies
+      # Download and cache server dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          - v1-server-dependencies-{{ checksum "Gemfile.lock" }}
           # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-
+          - v1-server-dependencies-
 
       - run:
           name: install server dependencies
           command: |
             bundle install --jobs=4 --retry=3 --path vendor/bundle
+
+      - save_cache:
+          paths:
+            - ./vendor/bundle
+          key: v1-server-dependencies-{{ checksum "Gemfile.lock" }}
+
+      # Download and cache client dependencies
+      - restore_cache:
+          keys:
+          - v1-client-dependencies-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-client-dependencies-
 
       - run:
           name: install sysconfcpus to speed up Elm compiler
@@ -55,21 +67,20 @@ jobs:
 
       - save_cache:
           paths:
-            - ./vendor/bundle
             - /home/circleci/libsysconfcpus
             - ./node_modules
             - ./elm-stuff
             - ./tests/elm-stuff
-          key: v1-dependencies-{{ checksum "Gemfile.lock" }}-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
+          key: v1-client-dependencies-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "tests/elm-package.json" }}
         
+
       # Database setup
       - run:
           command: bundle exec rake db:test:migrate
           environment:
             DATABASE_URL: "postgres://localhost:5432/nb_integration_test"
 
-      # run tests!
-      # we exclude integration specs as long as we only have one container
+      # Run tests!
       - run:
           name: run server tests
           command: |
@@ -88,6 +99,7 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: test-results
+
 
       - run:
           name: run client tests
