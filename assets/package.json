@@ -11,7 +11,7 @@
   },
   "scripts": {
     "test": "elm-test",
-    "postinstall": "yarn run elm-package install -y && yarn run elm-make assets/Main.elm --output public/nb_integration.js",
+    "postinstall": "yarn run elm-package install -y && yarn run elm-make Main.elm --output ../public/nb_integration.js",
     "heroku-postbuild": "gzip -f public/nb_integration.js"
   },
   "devDependencies": {

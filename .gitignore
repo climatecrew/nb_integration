@@ -61,7 +61,7 @@ elm-stuff
 # elm-repl generated files
 repl-temp-*
 
-node_modules/*
+**/node_modules/*
 
 yarn-error.log
 
