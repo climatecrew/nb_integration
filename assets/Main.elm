@@ -7,6 +7,8 @@ import Views exposing (..)
 import Utilities exposing (..)
 import Networking exposing (..)
 import Validation exposing (..)
+import Update exposing (..)
+import EditingTimestamp exposing (startTime)
 
 
 main : Program Flags Model Msg
@@ -23,7 +25,7 @@ init : Flags -> ( Model, Cmd Msg )
 init flags =
     let
         model =
-            defaultModel flags
+            initialModel flags
     in
         ( model, Http.send FetchEventsResult (getEvents model) )
 
@@ -43,16 +45,13 @@ update msg model =
     case msg of
         EventName name ->
             let
-                updatedErrors =
-                    showEventNameError model.validationErrors (String.length name == 0)
+                um1 =
+                    setError model "event.name" (String.length name == 0)
 
-                ev =
-                    model.event
-
-                updatedEvent =
-                    { ev | name = name }
+                um =
+                    updateEventName um1 name
             in
-                ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
+                ( um, Cmd.none )
 
         EventIntro intro ->
             let
@@ -62,7 +61,7 @@ update msg model =
                 updatedEvent =
                     { ev | intro = intro }
             in
-                ( { model | event = updatedEvent }, Cmd.none )
+                ( updateModelEvent model updatedEvent, Cmd.none )
 
         EventVenueAddress1 address1 ->
             let
@@ -90,13 +89,13 @@ update msg model =
                     in
                         { ev | venue = updatedVenue }
 
-                updatedModel =
+                um1 =
                     { model | event = updatedEvent }
 
-                updatedErrors =
-                    showStreetAddressError model.validationErrors (not <| streetAddressPresent updatedModel)
+                updatedModel =
+                    setError um1 "venue.street_address" (not <| streetAddressPresent um1)
             in
-                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
+                ( updatedModel, Cmd.none )
 
         EventVenueCity city ->
             let
@@ -124,13 +123,13 @@ update msg model =
                     in
                         { ev | venue = updatedVenue }
 
-                updatedModel =
+                um1 =
                     { model | event = updatedEvent }
 
-                updatedErrors =
-                    showCityError model.validationErrors (not <| cityPresent updatedModel)
+                updatedModel =
+                    setError um1 "venue.city" (not <| cityPresent um1)
             in
-                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
+                ( updatedModel, Cmd.none )
 
         EventVenueState state ->
             let
@@ -158,13 +157,13 @@ update msg model =
                     in
                         { ev | venue = updatedVenue }
 
-                updatedModel =
+                um1 =
                     { model | event = updatedEvent }
 
-                updatedErrors =
-                    showStateError model.validationErrors (not <| statePresent updatedModel)
+                updatedModel =
+                    setError um1 "venue.state" (not <| statePresent um1)
             in
-                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
+                ( updatedModel, Cmd.none )
 
         EventVenueName name ->
             let
@@ -181,19 +180,16 @@ update msg model =
                     in
                         { ev | venue = updatedVenue }
 
-                updatedModel =
+                um1 =
                     { model | event = updatedEvent }
 
-                updatedErrors =
-                    showVenueNameError model.validationErrors (not <| venueNamePresent updatedModel)
+                updatedModel =
+                    setError um1 "venue.name" (not <| venueNamePresent um1)
             in
-                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
+                ( updatedModel, Cmd.none )
 
         ContactEmail email ->
             let
-                updatedErrors =
-                    showContactEmailError model.validationErrors (String.length email == 0)
-
                 ev =
                     model.event
 
@@ -206,14 +202,17 @@ update msg model =
                             { currentContact | email = Just email }
                     in
                         { ev | contact = updatedContact }
+
+                um1 =
+                    { model | event = updatedEvent }
+
+                updatedModel =
+                    setError um1 "contact.email" (String.length email == 0)
             in
-                ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
+                ( updatedModel, Cmd.none )
 
         ContactName name ->
             let
-                updatedErrors =
-                    showContactNameError model.validationErrors (String.length name == 0)
-
                 ev =
                     model.event
 
@@ -226,8 +225,14 @@ update msg model =
                             { currentContact | name = Just name }
                     in
                         { ev | contact = updatedContact }
+
+                um1 =
+                    { model | event = updatedEvent }
+
+                updatedModel =
+                    setError um1 "contact.name" (String.length name == 0)
             in
-                ( { model | event = updatedEvent, validationErrors = updatedErrors }, Cmd.none )
+                ( updatedModel, Cmd.none )
 
         Day day ->
             let
@@ -263,12 +268,10 @@ update msg model =
                 updatedEvent =
                     let
                         currentTS =
-                            case borderTime of
-                                StartTime ->
-                                    ev.startTimestamp
-
-                                EndTime ->
-                                    ev.endTimestamp
+                            if borderTime == startTime then
+                                ev.startTimestamp
+                            else
+                                ev.endTimestamp
 
                         updatedTS =
                             let
@@ -282,20 +285,18 @@ update msg model =
                             in
                                 { currentTS | hour = updatedHour }
                     in
-                        case borderTime of
-                            StartTime ->
-                                { ev | startTimestamp = updatedTS }
+                        if borderTime == startTime then
+                            { ev | startTimestamp = updatedTS }
+                        else
+                            { ev | endTimestamp = updatedTS }
 
-                            EndTime ->
-                                { ev | endTimestamp = updatedTS }
-
-                updatedModel =
+                um1 =
                     { model | event = updatedEvent }
 
-                updatedErrors =
-                    showDateError model.validationErrors (not <| datesOk updatedModel)
+                updatedModel =
+                    setError um1 "date" (not <| datesOk um1)
             in
-                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
+                ( updatedModel, Cmd.none )
 
         Minute borderTime minute ->
             let
@@ -305,12 +306,10 @@ update msg model =
                 updatedEvent =
                     let
                         currentTS =
-                            case borderTime of
-                                StartTime ->
-                                    ev.startTimestamp
-
-                                EndTime ->
-                                    ev.endTimestamp
+                            if borderTime == startTime then
+                                ev.startTimestamp
+                            else
+                                ev.endTimestamp
 
                         updatedTS =
                             let
@@ -324,20 +323,18 @@ update msg model =
                             in
                                 { currentTS | minute = updatedMinute }
                     in
-                        case borderTime of
-                            StartTime ->
-                                { ev | startTimestamp = updatedTS }
+                        if borderTime == startTime then
+                            { ev | startTimestamp = updatedTS }
+                        else
+                            { ev | endTimestamp = updatedTS }
 
-                            EndTime ->
-                                { ev | endTimestamp = updatedTS }
-
-                updatedModel =
+                um1 =
                     { model | event = updatedEvent }
 
-                updatedErrors =
-                    showDateError model.validationErrors (not <| datesOk updatedModel)
+                updatedModel =
+                    setError um1 "date" (not <| datesOk um1)
             in
-                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
+                ( updatedModel, Cmd.none )
 
         Meridiem borderTime meridiem ->
             let
@@ -347,30 +344,26 @@ update msg model =
                 updatedEvent =
                     let
                         currentTS =
-                            case borderTime of
-                                StartTime ->
-                                    ev.startTimestamp
-
-                                EndTime ->
-                                    ev.endTimestamp
+                            if borderTime == startTime then
+                                ev.startTimestamp
+                            else
+                                ev.endTimestamp
 
                         updatedTS =
                             { currentTS | meridiem = meridiem }
                     in
-                        case borderTime of
-                            StartTime ->
-                                { ev | startTimestamp = updatedTS }
+                        if borderTime == startTime then
+                            { ev | startTimestamp = updatedTS }
+                        else
+                            { ev | endTimestamp = updatedTS }
 
-                            EndTime ->
-                                { ev | endTimestamp = updatedTS }
-
-                updatedModel =
+                um1 =
                     { model | event = updatedEvent }
 
-                updatedErrors =
-                    showDateError model.validationErrors (not <| datesOk updatedModel)
+                updatedModel =
+                    setError um1 "date" (not <| datesOk um1)
             in
-                ( { updatedModel | validationErrors = updatedErrors }, Cmd.none )
+                ( updatedModel, Cmd.none )
 
         SubmitEvent ->
             if invalidInput model then

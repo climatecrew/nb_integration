@@ -1,6 +1,6 @@
 module Utilities exposing (..)
 
-import Types exposing (..)
+import EditingTimestamp exposing (EditingTimestamp)
 
 
 serializeTimestamp : EditingTimestamp -> String

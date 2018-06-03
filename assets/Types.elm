@@ -1,6 +1,8 @@
 module Types exposing (..)
 
 import Http
+import Dict exposing (Dict)
+import EditingTimestamp exposing (EditingTimestamp, BorderTime, getTimestamp, defaultStartTimestamp, defaultEndTimestamp)
 
 
 type Msg
@@ -19,6 +21,79 @@ type Msg
     | Hour BorderTime String
     | Minute BorderTime String
     | Meridiem BorderTime String
+
+
+type alias Model =
+    { apiResult : APIResult
+    , authorID : Int
+    , authorEmail : String
+    , event : Event
+    , events : List Event
+    , rootURL : String
+    , slug : String
+    , loading : Bool
+    , validationErrors : ValidationErrors
+    }
+
+
+initialModel : Flags -> Model
+initialModel flags =
+    { defaultModel | rootURL = flags.rootURL, slug = flags.slug }
+
+
+defaultModel : Model
+defaultModel =
+    let
+        flags =
+            defaultFlags
+    in
+        { apiResult = APIErrors []
+        , authorID = flags.authorID
+        , authorEmail = flags.authorEmail
+        , event = defaultEvent
+        , events = []
+        , rootURL = flags.rootURL
+        , slug = flags.slug
+        , loading = True
+        , validationErrors = defaultValidationErrors
+        }
+
+
+type alias ValidationErrors =
+    Dict String Bool
+
+
+defaultValidationErrors : ValidationErrors
+defaultValidationErrors =
+    Dict.fromList
+        [ ( "event.name", False )
+        , ( "contact.name", False )
+        , ( "contact.email", False )
+        , ( "date", False )
+        , ( "venue.name", False )
+        , ( "venue.street_address", False )
+        , ( "venue.city", False )
+        , ( "venue.state", False )
+        ]
+
+
+getError : Model -> String -> Bool
+getError model errorKey =
+    case Dict.get errorKey model.validationErrors of
+        Nothing ->
+            False
+
+        Just isError ->
+            isError
+
+
+setError : Model -> String -> Bool -> Model
+setError model errorKey value =
+    let
+        updatedErrors =
+            Dict.update errorKey (\_ -> Just value) model.validationErrors
+    in
+        { model | validationErrors = updatedErrors }
 
 
 type alias Event =
@@ -78,27 +153,8 @@ type alias Contact =
     }
 
 
-type alias EditingTimestamp =
-    { border : BorderTime, ymd : String, hour : Int, minute : Int, meridiem : String }
-
-
-defaultStartTimestamp : EditingTimestamp
-defaultStartTimestamp =
-    { border = StartTime, ymd = "2018-09-03", hour = 1, minute = 0, meridiem = "PM" }
-
-
-defaultEndTimestamp : EditingTimestamp
-defaultEndTimestamp =
-    { border = EndTime, ymd = "2018-09-03", hour = 4, minute = 0, meridiem = "PM" }
-
-
 type alias Error =
     { title : String }
-
-
-type BorderTime
-    = StartTime
-    | EndTime
 
 
 type APIResult
@@ -107,67 +163,19 @@ type APIResult
     | APIEvents (List Event)
 
 
-type alias ShowValidationErrors =
-    { showEventNameErrors : Bool
-    , showContactNameErrors : Bool
-    , showContactEmailErrors : Bool
-    , showDateErrors : Bool
-    , showVenueNameErrors : Bool
-    , showStreetAddressErrors : Bool
-    , showCityErrors : Bool
-    , showStateErrors : Bool
-    }
-
-
-defaultShowValidationErrors : ShowValidationErrors
-defaultShowValidationErrors =
-    { showEventNameErrors = False
-    , showContactNameErrors = False
-    , showContactEmailErrors = False
-    , showDateErrors = False
-    , showVenueNameErrors = False
-    , showStreetAddressErrors = False
-    , showCityErrors = False
-    , showStateErrors = False
-    }
-
-
-type alias Model =
-    { apiResult : APIResult
-    , authorID : Int
-    , authorEmail : String
-    , event : Event
-    , events : List Event
-    , rootURL : String
-    , slug : String
-    , loading : Bool
-    , validationErrors : ShowValidationErrors
-    }
-
-
-defaultModel : Flags -> Model
-defaultModel flags =
-    { apiResult = APIErrors []
-    , authorID = flags.authorID
-    , authorEmail = flags.authorEmail
-    , event = defaultEvent
-    , events = []
-    , rootURL = flags.rootURL
-    , slug = flags.slug
-    , loading = True
-    , validationErrors = defaultShowValidationErrors
-    }
-
-
 currentTimestamp : Model -> BorderTime -> EditingTimestamp
 currentTimestamp model borderTime =
-    case borderTime of
-        StartTime ->
-            model.event.startTimestamp
-
-        EndTime ->
-            model.event.endTimestamp
+    getTimestamp model.event borderTime
 
 
 type alias Flags =
     { authorID : Int, authorEmail : String, rootURL : String, slug : String }
+
+
+defaultFlags : Flags
+defaultFlags =
+    { authorID = 0
+    , authorEmail = "author@example.com"
+    , rootURL = "https://example.com"
+    , slug = "example_slug"
+    }

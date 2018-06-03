@@ -4,7 +4,7 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 import Utilities exposing (..)
-import Types exposing (EditingTimestamp, BorderTime(..))
+import EditingTimestamp exposing (EditingTimestamp, BorderTime(..))
 
 
 suite : Test

@@ -4,6 +4,7 @@ import Html exposing (Html, div, button, text, input, label, h2, table, tr, td, 
 import Html.Attributes exposing (class, type_, value, step, id, selected, style, for, disabled, placeholder)
 import Html.Events exposing (onClick, onInput)
 import Types exposing (..)
+import EditingTimestamp exposing (EditingTimestamp, BorderTime, startTime, endTime)
 import Utilities exposing (..)
 import Validation exposing (..)
 
@@ -17,15 +18,15 @@ mainView model =
                 [ li [] <| List.concat [ selectDay, [ span [ class <| validationClass False ] [] ] ]
                 , li []
                     [ label [ for "start-time" ] [ text "Start Time" ]
-                    , selectTime StartTime (currentTimestamp model StartTime)
+                    , selectTime startTime (currentTimestamp model startTime)
                     , span [ class <| validationClass False ] []
                     ]
                 , li []
                     [ label [ for "end-time" ] [ text "End Time" ]
-                    , selectTime EndTime (currentTimestamp model EndTime)
+                    , selectTime endTime (currentTimestamp model endTime)
                     , span
-                        [ class <| validationClass model.validationErrors.showDateErrors
-                        , style [ ( "visibility", validationVisibility model.validationErrors.showDateErrors ) ]
+                        [ class <| validationClass <| getError model "date"
+                        , style [ ( "visibility", validationVisibility <| getError model "date" ) ]
                         ]
                         [ text "End Time must be after Start Time" ]
                     ]
@@ -33,8 +34,8 @@ mainView model =
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
                     , input [ id "contact-name", type_ "contact-name", placeholder "Required", onInput ContactName ] []
                     , span
-                        [ class <| validationClass model.validationErrors.showContactNameErrors
-                        , style [ ( "visibility", validationVisibility model.validationErrors.showContactNameErrors ) ]
+                        [ class <| validationClass <| getError model "conact.name"
+                        , style [ ( "visibility", validationVisibility <| getError model "contact.name" ) ]
                         ]
                         [ text "Contact name must be present" ]
                     ]
@@ -42,8 +43,8 @@ mainView model =
                     [ label [ for "contact-email" ] [ text "Contact Email" ]
                     , input [ id "contact-email", type_ "contact-email", placeholder "Required", onInput ContactEmail ] []
                     , span
-                        [ class <| validationClass model.validationErrors.showContactEmailErrors
-                        , style [ ( "visibility", validationVisibility model.validationErrors.showContactEmailErrors ) ]
+                        [ class <| validationClass <| getError model "contact.email"
+                        , style [ ( "visibility", validationVisibility <| getError model "contact.email" ) ]
                         ]
                         [ text "Contact email must be present" ]
                     ]
@@ -51,8 +52,8 @@ mainView model =
                     [ label [ for "event-name" ] [ text "Event Name" ]
                     , input [ id "event-name", type_ "event-name", placeholder "Required", onInput EventName ] []
                     , span
-                        [ class <| validationClass model.validationErrors.showEventNameErrors
-                        , style [ ( "visibility", validationVisibility model.validationErrors.showEventNameErrors ) ]
+                        [ class <| validationClass <| getError model "event.name"
+                        , style [ ( "visibility", validationVisibility <| getError model "event.name" ) ]
                         ]
                         [ text "Event name must be present" ]
                     ]
@@ -65,8 +66,8 @@ mainView model =
                     [ label [ for "event-venue-name" ] [ text "Venue Name" ]
                     , input [ id "event-venue-name", type_ "event-venue-name", placeholder "Required", onInput EventVenueName ] []
                     , span
-                        [ class <| validationClass model.validationErrors.showVenueNameErrors
-                        , style [ ( "visibility", validationVisibility model.validationErrors.showVenueNameErrors ) ]
+                        [ class <| validationClass <| getError model "venue.name"
+                        , style [ ( "visibility", validationVisibility <| getError model "venue.name" ) ]
                         ]
                         [ text "Venue name must be present" ]
                     ]
@@ -74,8 +75,8 @@ mainView model =
                     [ label [ for "event-venue-address1" ] [ text "Street Address" ]
                     , input [ id "event-venue-address1", type_ "event-venue-address1", placeholder "Required", onInput EventVenueAddress1 ] []
                     , span
-                        [ class <| validationClass model.validationErrors.showStreetAddressErrors
-                        , style [ ( "visibility", validationVisibility model.validationErrors.showStreetAddressErrors ) ]
+                        [ class <| validationClass <| getError model "venue.street_address"
+                        , style [ ( "visibility", validationVisibility <| getError model "venue.street_address" ) ]
                         ]
                         [ text "Street address must be present" ]
                     ]
@@ -83,8 +84,8 @@ mainView model =
                     [ label [ for "event-venue-city" ] [ text "City" ]
                     , input [ id "event-venue-city", type_ "event-venue-city", placeholder "Required", onInput EventVenueCity ] []
                     , span
-                        [ class <| validationClass model.validationErrors.showCityErrors
-                        , style [ ( "visibility", validationVisibility model.validationErrors.showCityErrors ) ]
+                        [ class <| validationClass <| getError model "venue.city"
+                        , style [ ( "visibility", validationVisibility <| getError model "venue.city" ) ]
                         ]
                         [ text "City must be present" ]
                     ]
@@ -92,8 +93,8 @@ mainView model =
                     [ label [ for "event-venue-state" ] [ text "State" ]
                     , input [ id "event-venue-state", type_ "event-venue-state", placeholder "Required", onInput EventVenueState ] []
                     , span
-                        [ class <| validationClass model.validationErrors.showStateErrors
-                        , style [ ( "visibility", validationVisibility model.validationErrors.showStateErrors ) ]
+                        [ class <| validationClass <| getError model "venue.state"
+                        , style [ ( "visibility", validationVisibility <| getError model "venue.state" ) ]
                         ]
                         [ text "State must be present" ]
                     ]
@@ -105,8 +106,8 @@ mainView model =
                 ]
             ]
         , div [ id "display-event", style [ ( "display", "none" ) ] ]
-            [ div [] [ text <| "Start Time: " ++ formatTimestamp model.event StartTime ]
-            , div [] [ text <| "End Time: " ++ formatTimestamp model.event EndTime ]
+            [ div [] [ text <| "Start Time: " ++ formatTimestamp model.event.startTimestamp ]
+            , div [] [ text <| "End Time: " ++ formatTimestamp model.event.endTimestamp ]
             , div []
                 [ text <|
                     "Start Time < End Time: "
@@ -123,18 +124,9 @@ mainView model =
         ]
 
 
-formatTimestamp : Event -> BorderTime -> String
-formatTimestamp event borderTime =
-    let
-        timestamp =
-            case borderTime of
-                StartTime ->
-                    event.startTimestamp
-
-                EndTime ->
-                    event.endTimestamp
-    in
-        serializeTimestamp timestamp
+formatTimestamp : EditingTimestamp -> String
+formatTimestamp timestamp =
+    serializeTimestamp timestamp
 
 
 selectDay : List (Html Msg)
@@ -157,18 +149,16 @@ selectTime : BorderTime -> EditingTimestamp -> Html Msg
 selectTime borderTime timestamp =
     let
         ( hour, minute, meridiem ) =
-            case borderTime of
-                StartTime ->
-                    ( [ id "startHour", onInput (Hour StartTime) ]
-                    , [ id "startMinute", onInput (Minute StartTime) ]
-                    , [ id "startMeridiem", onInput (Meridiem StartTime) ]
-                    )
-
-                EndTime ->
-                    ( [ id "endHour", onInput (Hour EndTime) ]
-                    , [ id "endMinute", onInput (Minute EndTime) ]
-                    , [ id "endMeridiem", onInput (Meridiem EndTime) ]
-                    )
+            if borderTime == startTime then
+                ( [ id "startHour", onInput (Hour startTime) ]
+                , [ id "startMinute", onInput (Minute startTime) ]
+                , [ id "startMeridiem", onInput (Meridiem startTime) ]
+                )
+            else
+                ( [ id "endHour", onInput (Hour endTime) ]
+                , [ id "endMinute", onInput (Minute endTime) ]
+                , [ id "endMeridiem", onInput (Meridiem endTime) ]
+                )
 
         hourSelected =
             \value -> value == (padTimePart timestamp.hour)
