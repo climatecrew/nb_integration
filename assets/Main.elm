@@ -47,14 +47,7 @@ update msg model =
             ( updateEventName model name, Cmd.none )
 
         EventIntro intro ->
-            let
-                ev =
-                    model.event
-
-                updatedEvent =
-                    { ev | intro = intro }
-            in
-                ( updateModelEvent model updatedEvent, Cmd.none )
+            (updateEventIntro model intro, Cmd.none)
 
         EventVenueAddress1 address1 ->
             let

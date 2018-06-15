@@ -22,3 +22,11 @@ updateEventName model name =
                 setError m "event.name" (String.length name == 0)
     in
         newModel
+
+updateEventIntro : Model -> String -> Model
+updateEventIntro model intro =
+    let
+        { event } =
+            model
+    in
+        updateModelEvent model { event | intro = intro }
