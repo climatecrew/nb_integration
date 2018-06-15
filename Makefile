@@ -9,10 +9,10 @@ server-test:
 	rake
 
 client:
-	cd assets && yarn
+	yarn
 
 client-test-packages:
 	cd assets/tests && yarn run elm-package install -y
 
 client-test:
-	cd assets && yarn test
+	yarn test
