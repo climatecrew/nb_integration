@@ -54,4 +54,19 @@ suite =
                     in
                         Expect.equal (getError newModel "event.name") True
             ]
+        , describe "Update.updateEventIntro"
+            [ test "sets the model event intro" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newEvent =
+                            { defaultEvent | intro = "Welcome to The Rock" }
+
+                        newModel =
+                            updateEventIntro model "Welcome to The Rock"
+                    in
+                        Expect.equal newModel.event newEvent
+            ]
         ]
