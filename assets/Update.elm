@@ -29,8 +29,5 @@ updateEventIntro model intro =
     let
         { event } =
             model
-
-        newModel =
-            updateModelEvent model { event | intro = intro }
     in
-        newModel
+        updateModelEvent model { event | intro = intro }
