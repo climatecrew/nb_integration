@@ -14,7 +14,11 @@ updateEventName model name =
         { event } =
             model
 
-        newEvent =
-            { event | name = name }
+        newModel =
+            let
+                m =
+                    updateModelEvent model { event | name = name }
+            in
+                setError m "event.name" (String.length name == 0)
     in
-        { model | event = newEvent }
+        newModel

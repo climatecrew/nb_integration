@@ -44,14 +44,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         EventName name ->
-            let
-                um1 =
-                    setError model "event.name" (String.length name == 0)
-
-                um =
-                    updateEventName um1 name
-            in
-                ( um, Cmd.none )
+            ( updateEventName model name, Cmd.none )
 
         EventIntro intro ->
             let

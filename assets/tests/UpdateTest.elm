@@ -5,6 +5,7 @@ import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 import Types exposing (..)
 import Update exposing (..)
+import Dict
 
 
 suite : Test
@@ -39,5 +40,18 @@ suite =
                             updateEventName model "A new name"
                     in
                         Expect.equal newModel.event.name "A new name"
+            , test "sets error if event name is empty" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newErrors =
+                            Dict.update "event.name" (\_ -> Just True) defaultValidationErrors
+
+                        newModel =
+                            updateEventName model ""
+                    in
+                        Expect.equal (getError newModel "event.name") True
             ]
         ]
