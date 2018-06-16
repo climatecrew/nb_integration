@@ -1,10 +1,11 @@
 module Update exposing (..)
 
 import Types exposing (..)
+import Validation exposing (eventNamePresent, venueNamePresent)
 
 
-updateModelEvent : Model -> Event -> Model
-updateModelEvent model newEvent =
+updateEvent : Model -> Event -> Model
+updateEvent model newEvent =
     { model | event = newEvent }
 
 
@@ -17,9 +18,9 @@ updateEventName model name =
         newModel =
             let
                 m =
-                    updateModelEvent model { event | name = name }
+                    updateEvent model { event | name = name }
             in
-                setError m "event.name" (String.length name == 0)
+                setError m "event.name" (not <| eventNamePresent m)
     in
         newModel
 
@@ -30,4 +31,35 @@ updateEventIntro model intro =
         { event } =
             model
     in
-        updateModelEvent model { event | intro = intro }
+        updateEvent model { event | intro = intro }
+
+
+updateEventVenue : Model -> Venue -> Model
+updateEventVenue model venue =
+    let
+        { event } =
+            model
+
+        newEvent =
+            { event | venue = venue }
+    in
+        { model | event = newEvent }
+
+
+updateEventVenueName : Model -> Maybe String -> Model
+updateEventVenueName model name =
+    let
+        { venue } =
+            model.event
+
+        newVenue =
+            { venue | name = name }
+
+        newModel =
+            let
+                m =
+                    updateEventVenue model newVenue
+            in
+                setError m "venue.name" (not <| venueNamePresent m)
+    in
+        newModel

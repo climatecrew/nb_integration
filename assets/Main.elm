@@ -152,27 +152,7 @@ update msg model =
                 ( updatedModel, Cmd.none )
 
         EventVenueName name ->
-            let
-                ev =
-                    model.event
-
-                updatedEvent =
-                    let
-                        currentVenue =
-                            ev.venue
-
-                        updatedVenue =
-                            { currentVenue | name = Just name }
-                    in
-                        { ev | venue = updatedVenue }
-
-                um1 =
-                    { model | event = updatedEvent }
-
-                updatedModel =
-                    setError um1 "venue.name" (not <| venueNamePresent um1)
-            in
-                ( updatedModel, Cmd.none )
+            ( updateEventVenueName model <| Just name, Cmd.none )
 
         ContactEmail email ->
             let
