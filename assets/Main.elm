@@ -156,21 +156,14 @@ update msg model =
 
         ContactEmail email ->
             let
-                ev =
-                    model.event
+                { contact } =
+                    model
 
-                updatedEvent =
-                    let
-                        currentContact =
-                            ev.contact
-
-                        updatedContact =
-                            { currentContact | email = Just email }
-                    in
-                        { ev | contact = updatedContact }
+                updatedContact =
+                    { contact | email = Just email }
 
                 um1 =
-                    { model | event = updatedEvent }
+                    { model | contact = updatedContact }
 
                 updatedModel =
                     setError um1 "contact.email" (String.length email == 0)
@@ -179,21 +172,14 @@ update msg model =
 
         ContactName name ->
             let
-                ev =
-                    model.event
+                { contact } =
+                    model
 
-                updatedEvent =
-                    let
-                        currentContact =
-                            ev.contact
-
-                        updatedContact =
-                            { currentContact | name = Just name }
-                    in
-                        { ev | contact = updatedContact }
+                updatedContact =
+                    { contact | name = Just name }
 
                 um1 =
-                    { model | event = updatedEvent }
+                    { model | contact = updatedContact }
 
                 updatedModel =
                     setError um1 "contact.name" (String.length name == 0)

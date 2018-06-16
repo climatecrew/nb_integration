@@ -65,12 +65,12 @@ statePresent model =
 
 contactNamePresent : Model -> Bool
 contactNamePresent model =
-    String.length (Maybe.withDefault "" model.event.contact.name) > 0
+    String.length (Maybe.withDefault "" model.contact.name) > 0
 
 
 contactEmailPresent : Model -> Bool
 contactEmailPresent model =
-    String.length (Maybe.withDefault "" model.event.contact.email) > 0
+    String.length (Maybe.withDefault "" model.contact.email) > 0
 
 
 invalidInput : Model -> Bool

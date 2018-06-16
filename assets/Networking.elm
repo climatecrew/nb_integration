@@ -55,8 +55,11 @@ createEvent model =
 encodeEvent : Model -> Value
 encodeEvent model =
     let
-        { id, name, intro, contact, startTimestamp, endTimestamp, venue } =
+        { id, name, intro, startTimestamp, endTimestamp, venue } =
             model.event
+
+        { contact } =
+            model
     in
         object
             [ ( "data"
@@ -178,10 +181,9 @@ errorsDecoder =
 
 eventDecoder =
     field "event" <|
-        JD.map7 Event
+        JD.map6 Event
             eventID
             eventIntro
-            contact
             eventName
             decodeStartTimestamp
             decodeEndTimestamp
@@ -225,16 +227,3 @@ eventName =
 eventIntro =
     field "intro" (nullable string)
         |> JD.map (\m -> Maybe.withDefault "" m)
-
-
-contact =
-    field "contact" <|
-        JD.map2 Contact contactName contactEmail
-
-
-contactName =
-    field "name" (nullable string)
-
-
-contactEmail =
-    field "email" (nullable string)

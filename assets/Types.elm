@@ -29,6 +29,7 @@ type alias Model =
     , authorEmail : String
     , event : Event
     , events : List Event
+    , contact : Contact
     , rootURL : String
     , slug : String
     , loading : Bool
@@ -52,6 +53,7 @@ defaultModel =
         , authorEmail = flags.authorEmail
         , event = defaultEvent
         , events = []
+        , contact = defaultContact
         , rootURL = flags.rootURL
         , slug = flags.slug
         , loading = True
@@ -99,7 +101,6 @@ setError model errorKey value =
 type alias Event =
     { id : Int
     , intro : String
-    , contact : Contact
     , name : String
     , startTimestamp : EditingTimestamp
     , endTimestamp : EditingTimestamp
@@ -111,7 +112,6 @@ defaultEvent : Event
 defaultEvent =
     { id = 0
     , intro = ""
-    , contact = { email = Nothing, name = Nothing }
     , name = ""
     , startTimestamp = defaultStartTimestamp
     , endTimestamp = defaultEndTimestamp
@@ -151,6 +151,11 @@ type alias Contact =
     { name : Maybe String
     , email : Maybe String
     }
+
+
+defaultContact : Contact
+defaultContact =
+    { email = Nothing, name = Nothing }
 
 
 type alias Error =
