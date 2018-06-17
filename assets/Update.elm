@@ -87,3 +87,27 @@ updateEventVenueAddress model address =
             setError m2 "venue.state" (not <| statePresent m2)
     in
         newModel
+
+
+updateEventVenueStreetAddress : Model -> Maybe String -> Model
+updateEventVenueStreetAddress model streetAddress =
+    let
+        address =
+            startingAddress model
+
+        newAddress =
+            { address | address1 = streetAddress }
+    in
+        updateEventVenueAddress model <| Just newAddress
+
+
+startingAddress : Model -> Address
+startingAddress model =
+    let
+        { venue } =
+            model.event
+
+        { address } =
+            venue
+    in
+        Maybe.withDefault defaultAddress address

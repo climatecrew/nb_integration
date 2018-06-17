@@ -223,4 +223,19 @@ suite =
                     in
                         Expect.equal (getError newModel "venue.state") True
             ]
+        , describe "Update.updateEventVenueStreetAddress"
+            [ test "sets the model event venue street address" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | address1 = Just "123 Main St." }
+
+                        newModel =
+                            updateEventVenueStreetAddress model <| Just "123 Main St."
+                    in
+                        Expect.equal newModel.event.venue.address <| Just newAddress
+            ]
         ]

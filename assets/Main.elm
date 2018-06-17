@@ -50,20 +50,7 @@ update msg model =
             ( updateEventIntro model intro, Cmd.none )
 
         EventVenueAddress1 address1 ->
-            let
-                { venue } =
-                    model.event
-
-                { address } =
-                    venue
-
-                newAddress =
-                    Maybe.map (\a -> { a | address1 = Just address1 }) address
-
-                updatedModel =
-                    updateEventVenueAddress model newAddress
-            in
-                ( updatedModel, Cmd.none )
+            ( updateEventVenueStreetAddress model <| Just address1, Cmd.none )
 
         EventVenueCity city ->
             let
