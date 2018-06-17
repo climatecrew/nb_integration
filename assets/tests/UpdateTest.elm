@@ -238,4 +238,34 @@ suite =
                     in
                         Expect.equal newModel.event.venue.address <| Just newAddress
             ]
+        , describe "Update.updateEventVenueCity"
+            [ test "sets the model event venue city" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | city = Just "Boston" }
+
+                        newModel =
+                            updateEventVenueCity model <| Just "Boston"
+                    in
+                        Expect.equal newModel.event.venue.address <| Just newAddress
+            ]
+        , describe "Update.updateEventVenueState"
+            [ test "sets the model event venue state" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | state = Just "MA" }
+
+                        newModel =
+                            updateEventVenueState model <| Just "MA"
+                    in
+                        Expect.equal newModel.event.venue.address <| Just newAddress
+            ]
         ]

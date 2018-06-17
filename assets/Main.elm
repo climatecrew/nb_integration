@@ -53,72 +53,10 @@ update msg model =
             ( updateEventVenueStreetAddress model <| Just address1, Cmd.none )
 
         EventVenueCity city ->
-            let
-                ev =
-                    model.event
-
-                updatedEvent =
-                    let
-                        currentVenue =
-                            ev.venue
-
-                        currentAddress =
-                            currentVenue.address
-
-                        updatedAddress =
-                            case currentAddress of
-                                Just address ->
-                                    Just { address | city = Just city }
-
-                                Nothing ->
-                                    Just { defaultAddress | city = Just city }
-
-                        updatedVenue =
-                            { currentVenue | address = updatedAddress }
-                    in
-                        { ev | venue = updatedVenue }
-
-                um1 =
-                    { model | event = updatedEvent }
-
-                updatedModel =
-                    setError um1 "venue.city" (not <| cityPresent um1)
-            in
-                ( updatedModel, Cmd.none )
+            ( updateEventVenueCity model <| Just city, Cmd.none )
 
         EventVenueState state ->
-            let
-                ev =
-                    model.event
-
-                updatedEvent =
-                    let
-                        currentVenue =
-                            ev.venue
-
-                        currentAddress =
-                            currentVenue.address
-
-                        updatedAddress =
-                            case currentAddress of
-                                Just address ->
-                                    Just { address | state = Just state }
-
-                                Nothing ->
-                                    Just { defaultAddress | state = Just state }
-
-                        updatedVenue =
-                            { currentVenue | address = updatedAddress }
-                    in
-                        { ev | venue = updatedVenue }
-
-                um1 =
-                    { model | event = updatedEvent }
-
-                updatedModel =
-                    setError um1 "venue.state" (not <| statePresent um1)
-            in
-                ( updatedModel, Cmd.none )
+            ( updateEventVenueState model <| Just state, Cmd.none )
 
         EventVenueName name ->
             ( updateEventVenueName model <| Just name, Cmd.none )

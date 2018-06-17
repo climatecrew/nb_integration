@@ -101,6 +101,30 @@ updateEventVenueStreetAddress model streetAddress =
         updateEventVenueAddress model <| Just newAddress
 
 
+updateEventVenueCity : Model -> Maybe String -> Model
+updateEventVenueCity model city =
+    let
+        address =
+            startingAddress model
+
+        newAddress =
+            { address | city = city }
+    in
+        updateEventVenueAddress model <| Just newAddress
+
+
+updateEventVenueState : Model -> Maybe String -> Model
+updateEventVenueState model state =
+    let
+        address =
+            startingAddress model
+
+        newAddress =
+            { address | state = state }
+    in
+        updateEventVenueAddress model <| Just newAddress
+
+
 startingAddress : Model -> Address
 startingAddress model =
     let
