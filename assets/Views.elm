@@ -15,10 +15,11 @@ mainView model =
         [ class "nb-integration-container" ]
         [ div [ class "event-form " ]
             [ ul [ class "flex-outer" ]
-                [ li [] <| List.concat [ selectDay, [ span [ class <| validationClass False ] [] ] ]
+                [ li [] <| List.concat [ selectDay, [ emptyValidationView ] ]
                 , li []
                     [ label [ for "start-time" ] [ text "Start Time" ]
                     , selectTime startTime (currentTimestamp model startTime)
+                    , emptyValidationView
                     ]
                 , li []
                     [ label [ for "end-time" ] [ text "End Time" ]
@@ -55,7 +56,7 @@ mainView model =
                 , li []
                     [ label [ for "event-intro" ] [ text "Event Intro" ]
                     , input [ id "event-intro", type_ "event-intro", onInput EventIntro ] []
-                    , span [ class <| validationClass False ] []
+                    , emptyValidationView
                     ]
                 , li [ class "section-start" ]
                     [ label [ for "event-venue-name" ] [ text "Venue Name" ]
@@ -96,7 +97,7 @@ mainView model =
                 , li [ class <| submitButtonClass model ]
                     [ label [] []
                     , button [ onClick SubmitEvent ] [ text "Submit Event" ]
-                    , span [ class <| validationClass False ] []
+                    , emptyValidationView
                     ]
                 ]
             ]
@@ -286,3 +287,8 @@ dateErrorView model =
 showDateError : Model -> Bool
 showDateError model =
     getError model "date"
+
+
+emptyValidationView : Html Msg
+emptyValidationView =
+    span [ class <| validationClass False ] []
