@@ -19,16 +19,11 @@ mainView model =
                 , li []
                     [ label [ for "start-time" ] [ text "Start Time" ]
                     , selectTime startTime (currentTimestamp model startTime)
-                    , span [ class <| validationClass False ] []
                     ]
                 , li []
                     [ label [ for "end-time" ] [ text "End Time" ]
                     , selectTime endTime (currentTimestamp model endTime)
-                    , span
-                        [ class <| validationClass <| getError model "date"
-                        , style [ ( "visibility", validationVisibility <| getError model "date" ) ]
-                        ]
-                        [ text "End Time must be after Start Time" ]
+                    , dateErrorView model
                     ]
                 , li [ class "section-start" ]
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
@@ -277,3 +272,17 @@ validationVisibility showErrors =
         "visible"
     else
         "hidden"
+
+
+dateErrorView : Model -> Html Msg
+dateErrorView model =
+    span
+        [ class <| validationClass <| getError model "date"
+        , style [ ( "visibility", validationVisibility <| showDateError model ) ]
+        ]
+        [ text "End Time must be after Start Time" ]
+
+
+showDateError : Model -> Bool
+showDateError model =
+    getError model "date"
