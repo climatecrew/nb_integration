@@ -51,35 +51,17 @@ update msg model =
 
         EventVenueAddress1 address1 ->
             let
-                ev =
+                { venue } =
                     model.event
 
-                updatedEvent =
-                    let
-                        currentVenue =
-                            ev.venue
+                { address } =
+                    venue
 
-                        currentAddress =
-                            currentVenue.address
-
-                        updatedAddress =
-                            case currentAddress of
-                                Just address ->
-                                    Just { address | address1 = Just address1 }
-
-                                Nothing ->
-                                    Just { defaultAddress | address1 = Just address1 }
-
-                        updatedVenue =
-                            { currentVenue | address = updatedAddress }
-                    in
-                        { ev | venue = updatedVenue }
-
-                um1 =
-                    { model | event = updatedEvent }
+                newAddress =
+                    Maybe.map (\a -> { a | address1 = Just address1 }) address
 
                 updatedModel =
-                    setError um1 "venue.street_address" (not <| streetAddressPresent um1)
+                    updateEventVenueAddress model newAddress
             in
                 ( updatedModel, Cmd.none )
 

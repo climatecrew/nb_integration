@@ -112,4 +112,115 @@ suite =
                     in
                         Expect.equal (getError newModel "venue.name") True
             ]
+        , describe "Update.updateEventVenueAddress"
+            [ test "sets the model event venue address" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | address1 = Just "123 Main St." }
+
+                        newModel =
+                            updateEventVenueAddress model <| Just newAddress
+                    in
+                        Expect.equal newModel.event.venue.address <| Just newAddress
+            , test "sets error if street_address is an empty string" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | address1 = Just "" }
+
+                        newErrors =
+                            Dict.update "venue.street_address" (\_ -> Just True) defaultValidationErrors
+
+                        newModel =
+                            updateEventVenueAddress model <| Just newAddress
+                    in
+                        Expect.equal (getError newModel "venue.street_address") True
+            , test "sets error if street_address is a Nothing" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | address1 = Nothing }
+
+                        newErrors =
+                            Dict.update "venue.street_address" (\_ -> Just True) defaultValidationErrors
+
+                        newModel =
+                            updateEventVenueAddress model Nothing
+                    in
+                        Expect.equal (getError newModel "venue.street_address") True
+            , test "sets error if city is an empty string" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | city = Just "" }
+
+                        newErrors =
+                            Dict.update "venue.city" (\_ -> Just True) defaultValidationErrors
+
+                        newModel =
+                            updateEventVenueAddress model <| Just newAddress
+                    in
+                        Expect.equal (getError newModel "venue.city") True
+            , test "sets error if city is a Nothing" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | city = Nothing }
+
+                        newErrors =
+                            Dict.update "venue.city" (\_ -> Just True) defaultValidationErrors
+
+                        newModel =
+                            updateEventVenueAddress model Nothing
+                    in
+                        Expect.equal (getError newModel "venue.city") True
+            , test "sets error if state is an empty string" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | state = Just "" }
+
+                        newErrors =
+                            Dict.update "venue.state" (\_ -> Just True) defaultValidationErrors
+
+                        newModel =
+                            updateEventVenueAddress model <| Just newAddress
+                    in
+                        Expect.equal (getError newModel "venue.state") True
+            , test "sets error if state is a Nothing" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | state = Nothing }
+
+                        newErrors =
+                            Dict.update "venue.state" (\_ -> Just True) defaultValidationErrors
+
+                        newModel =
+                            updateEventVenueAddress model Nothing
+                    in
+                        Expect.equal (getError newModel "venue.state") True
+            ]
         ]
