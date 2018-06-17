@@ -11,14 +11,14 @@ import EditingTimestamp exposing (EditingTimestamp)
 showValidationErrors : Model -> ValidationErrors
 showValidationErrors model =
     Dict.fromList
-        [ ( "event.name", not <| eventNamePresent model )
-        , ( "contact.name", not <| contactNamePresent model )
-        , ( "contact.email", not <| contactEmailPresent model )
-        , ( "date", not <| datesOk model )
-        , ( "venue.name", not <| venueNamePresent model )
-        , ( "venue.street_address", not <| streetAddressPresent model )
-        , ( "venue.city", not <| cityPresent model )
-        , ( "venue.state", not <| statePresent model )
+        [ ( "event.name", { valid = not <| eventNamePresent model, touched = False } )
+        , ( "contact.name", { valid = not <| contactNamePresent model, touched = False } )
+        , ( "contact.email", { valid = not <| contactEmailPresent model, touched = False } )
+        , ( "date", { valid = not <| datesOk model, touched = False } )
+        , ( "venue.name", { valid = not <| venueNamePresent model, touched = False } )
+        , ( "venue.street_address", { valid = not <| streetAddressPresent model, touched = False } )
+        , ( "venue.city", { valid = not <| cityPresent model, touched = False } )
+        , ( "venue.state", { valid = not <| statePresent model, touched = False } )
         ]
 
 

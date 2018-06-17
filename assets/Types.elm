@@ -62,21 +62,27 @@ defaultModel =
 
 
 type alias ValidationErrors =
-    Dict String Bool
+    Dict String Validation
 
 
 defaultValidationErrors : ValidationErrors
 defaultValidationErrors =
     Dict.fromList
-        [ ( "event.name", False )
-        , ( "contact.name", False )
-        , ( "contact.email", False )
-        , ( "date", False )
-        , ( "venue.name", False )
-        , ( "venue.street_address", False )
-        , ( "venue.city", False )
-        , ( "venue.state", False )
+        [ ( "event.name", { valid = False, touched = False } )
+        , ( "contact.name", { valid = False, touched = False } )
+        , ( "contact.email", { valid = False, touched = False } )
+        , ( "date", { valid = False, touched = False } )
+        , ( "venue.name", { valid = False, touched = False } )
+        , ( "venue.street_address", { valid = False, touched = False } )
+        , ( "venue.city", { valid = False, touched = False } )
+        , ( "venue.state", { valid = False, touched = False } )
         ]
+
+
+type alias Validation =
+    { valid : Bool
+    , touched : Bool
+    }
 
 
 getError : Model -> String -> Bool
@@ -85,15 +91,19 @@ getError model errorKey =
         Nothing ->
             False
 
-        Just isError ->
-            isError
+        Just validation ->
+            (not validation.valid) && validation.touched
 
 
 setError : Model -> String -> Bool -> Model
 setError model errorKey value =
     let
+        updater =
+            \validation ->
+                Just <| Maybe.withDefault { valid = value, touched = False } validation
+
         updatedErrors =
-            Dict.update errorKey (\_ -> Just value) model.validationErrors
+            Dict.update errorKey updater model.validationErrors
     in
         { model | validationErrors = updatedErrors }
 
