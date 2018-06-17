@@ -108,6 +108,18 @@ setError model errorKey value =
         { model | validationErrors = updatedErrors }
 
 
+touchValidation : Model -> String -> Bool -> Model
+touchValidation model errorKey value =
+    let
+        updater =
+            \_ -> Just { valid = value, touched = True }
+
+        updatedErrors =
+            Dict.update errorKey updater model.validationErrors
+    in
+        { model | validationErrors = updatedErrors }
+
+
 type alias Event =
     { id : Int
     , intro : String

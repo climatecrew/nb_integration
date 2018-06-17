@@ -60,7 +60,7 @@ updateEventVenueName model name =
                 m =
                     updateEventVenue model newVenue
             in
-                setError m "venue.name" (not <| venueNamePresent m)
+                touchValidation m "venue.name" (venueNamePresent m)
     in
         newModel
 
