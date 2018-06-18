@@ -1,7 +1,7 @@
 module Update exposing (..)
 
 import Types exposing (..)
-import Validation exposing (eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
+import Validation exposing (setError, touchValidation, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
 
 
 updateEvent : Model -> Event -> Model

@@ -1,4 +1,4 @@
-module Validation exposing (validationErrors, invalidInput, datesOk, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
+module Validation exposing (validationErrors, getError, setError, touchValidation, invalidInput, datesOk, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
 
 import Dict exposing (Dict)
 import Date exposing (Date)
@@ -20,6 +20,41 @@ validationErrors model =
         , ( "venue.city", { valid = cityPresent model, touched = False } )
         , ( "venue.state", { valid = statePresent model, touched = False } )
         ]
+
+
+getError : Model -> String -> Bool
+getError model errorKey =
+    case Dict.get errorKey model.validationErrors of
+        Nothing ->
+            False
+
+        Just validation ->
+            (not validation.valid) && (validation.touched || model.submitButtonPressed)
+
+
+setError : Model -> String -> Bool -> Model
+setError model errorKey value =
+    let
+        updater =
+            \validation ->
+                Just <| Maybe.withDefault { valid = value, touched = False } validation
+
+        updatedErrors =
+            Dict.update errorKey updater model.validationErrors
+    in
+        { model | validationErrors = updatedErrors }
+
+
+touchValidation : Model -> String -> Bool -> Model
+touchValidation model errorKey value =
+    let
+        updater =
+            \_ -> Just { valid = value, touched = True }
+
+        updatedErrors =
+            Dict.update errorKey updater model.validationErrors
+    in
+        { model | validationErrors = updatedErrors }
 
 
 eventNamePresent : Model -> Bool
