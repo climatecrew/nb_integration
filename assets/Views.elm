@@ -30,8 +30,8 @@ mainView model =
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
                     , input [ id "contact-name", type_ "contact-name", placeholder "Required", onInput ContactName ] []
                     , span
-                        [ class <| validationClass <| getError model "conact.name"
-                        , style [ ( "visibility", validationVisibility <| getError model "contact.name" ) ]
+                        [ class <| validationClass <| getViewError model "conact.name"
+                        , style [ ( "visibility", validationVisibility <| getViewError model "contact.name" ) ]
                         ]
                         [ text "Contact name must be present" ]
                     ]
@@ -39,8 +39,8 @@ mainView model =
                     [ label [ for "contact-email" ] [ text "Contact Email" ]
                     , input [ id "contact-email", type_ "contact-email", placeholder "Required", onInput ContactEmail ] []
                     , span
-                        [ class <| validationClass <| getError model "contact.email"
-                        , style [ ( "visibility", validationVisibility <| getError model "contact.email" ) ]
+                        [ class <| validationClass <| getViewError model "contact.email"
+                        , style [ ( "visibility", validationVisibility <| getViewError model "contact.email" ) ]
                         ]
                         [ text "Contact email must be present" ]
                     ]
@@ -48,8 +48,8 @@ mainView model =
                     [ label [ for "event-name" ] [ text "Event Name" ]
                     , input [ id "event-name", type_ "event-name", placeholder "Required", onInput EventName ] []
                     , span
-                        [ class <| validationClass <| getError model "event.name"
-                        , style [ ( "visibility", validationVisibility <| getError model "event.name" ) ]
+                        [ class <| validationClass <| getViewError model "event.name"
+                        , style [ ( "visibility", validationVisibility <| getViewError model "event.name" ) ]
                         ]
                         [ text "Event name must be present" ]
                     ]
@@ -62,8 +62,8 @@ mainView model =
                     [ label [ for "event-venue-name" ] [ text "Venue Name" ]
                     , input [ id "event-venue-name", type_ "event-venue-name", placeholder "Required", onInput EventVenueName ] []
                     , span
-                        [ class <| validationClass <| getError model "venue.name"
-                        , style [ ( "visibility", validationVisibility <| getError model "venue.name" ) ]
+                        [ class <| validationClass <| getViewError model "venue.name"
+                        , style [ ( "visibility", validationVisibility <| getViewError model "venue.name" ) ]
                         ]
                         [ text "Venue name must be present" ]
                     ]
@@ -71,8 +71,8 @@ mainView model =
                     [ label [ for "event-venue-address1" ] [ text "Street Address" ]
                     , input [ id "event-venue-address1", type_ "event-venue-address1", placeholder "Required", onInput EventVenueAddress1 ] []
                     , span
-                        [ class <| validationClass <| getError model "venue.street_address"
-                        , style [ ( "visibility", validationVisibility <| getError model "venue.street_address" ) ]
+                        [ class <| validationClass <| getViewError model "venue.street_address"
+                        , style [ ( "visibility", validationVisibility <| getViewError model "venue.street_address" ) ]
                         ]
                         [ text "Street address must be present" ]
                     ]
@@ -80,8 +80,8 @@ mainView model =
                     [ label [ for "event-venue-city" ] [ text "City" ]
                     , input [ id "event-venue-city", type_ "event-venue-city", placeholder "Required", onInput EventVenueCity ] []
                     , span
-                        [ class <| validationClass <| getError model "venue.city"
-                        , style [ ( "visibility", validationVisibility <| getError model "venue.city" ) ]
+                        [ class <| validationClass <| getViewError model "venue.city"
+                        , style [ ( "visibility", validationVisibility <| getViewError model "venue.city" ) ]
                         ]
                         [ text "City must be present" ]
                     ]
@@ -89,8 +89,8 @@ mainView model =
                     [ label [ for "event-venue-state" ] [ text "State" ]
                     , input [ id "event-venue-state", type_ "event-venue-state", placeholder "Required", onInput EventVenueState ] []
                     , span
-                        [ class <| validationClass <| getError model "venue.state"
-                        , style [ ( "visibility", validationVisibility <| getError model "venue.state" ) ]
+                        [ class <| validationClass <| getViewError model "venue.state"
+                        , style [ ( "visibility", validationVisibility <| getViewError model "venue.state" ) ]
                         ]
                         [ text "State must be present" ]
                     ]
@@ -278,7 +278,7 @@ validationVisibility showErrors =
 dateErrorView : Model -> Html Msg
 dateErrorView model =
     span
-        [ class <| validationClass <| getError model "date"
+        [ class <| validationClass <| showDateError model
         , style [ ( "visibility", validationVisibility <| showDateError model ) ]
         ]
         [ text "End Time must be after Start Time" ]
@@ -286,7 +286,7 @@ dateErrorView model =
 
 showDateError : Model -> Bool
 showDateError model =
-    getError model "date"
+    getViewError model "date"
 
 
 emptyValidationView : Html Msg

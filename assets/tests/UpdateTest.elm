@@ -5,6 +5,7 @@ import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 import Types exposing (..)
 import Update exposing (..)
+import Validation exposing (validationErrors, getError, setValid)
 import Dict
 
 

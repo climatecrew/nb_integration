@@ -1,7 +1,7 @@
 module Update exposing (..)
 
 import Types exposing (..)
-import Validation exposing (setError, touchValidation, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
+import Validation exposing (setValid, touchValidation, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
 
 
 updateEvent : Model -> Event -> Model
@@ -20,7 +20,7 @@ updateEventName model name =
                 m =
                     updateEvent model { event | name = name }
             in
-                setError m "event.name" (not <| eventNamePresent m)
+                setValid m "event.name" <| eventNamePresent m
     in
         newModel
 
@@ -78,13 +78,13 @@ updateEventVenueAddress model address =
             updateEventVenue model newVenue
 
         m1 =
-            setError m0 "venue.street_address" (not <| streetAddressPresent m0)
+            setValid m0 "venue.street_address" <| streetAddressPresent m0
 
         m2 =
-            setError m1 "venue.city" (not <| cityPresent m1)
+            setValid m1 "venue.city" <| cityPresent m1
 
         newModel =
-            setError m2 "venue.state" (not <| statePresent m2)
+            setValid m2 "venue.state" <| statePresent m2
     in
         newModel
 

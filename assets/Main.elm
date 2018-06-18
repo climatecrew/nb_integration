@@ -82,7 +82,7 @@ update msg model =
                     { model | contact = updatedContact }
 
                 updatedModel =
-                    setError um1 "contact.email" (String.length email == 0)
+                    setValid um1 "contact.email" (String.length email >= 0)
             in
                 ( updatedModel, Cmd.none )
 
@@ -98,7 +98,7 @@ update msg model =
                     { model | contact = updatedContact }
 
                 updatedModel =
-                    setError um1 "contact.name" (String.length name == 0)
+                    setValid um1 "contact.name" (String.length name >= 0)
             in
                 ( updatedModel, Cmd.none )
 
@@ -162,7 +162,7 @@ update msg model =
                     { model | event = updatedEvent }
 
                 updatedModel =
-                    setError um1 "date" (not <| datesOk um1)
+                    setValid um1 "date" (datesOk um1)
             in
                 ( updatedModel, Cmd.none )
 
@@ -200,7 +200,7 @@ update msg model =
                     { model | event = updatedEvent }
 
                 updatedModel =
-                    setError um1 "date" (not <| datesOk um1)
+                    setValid um1 "date" (datesOk um1)
             in
                 ( updatedModel, Cmd.none )
 
@@ -229,7 +229,7 @@ update msg model =
                     { model | event = updatedEvent }
 
                 updatedModel =
-                    setError um1 "date" (not <| datesOk um1)
+                    setValid um1 "date" (datesOk um1)
             in
                 ( updatedModel, Cmd.none )
 

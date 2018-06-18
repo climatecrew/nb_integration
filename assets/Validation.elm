@@ -1,4 +1,4 @@
-module Validation exposing (validationErrors, getError, setError, touchValidation, invalidInput, datesOk, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
+module Validation exposing (validationErrors, getError, getViewError, setValid, touchValidation, invalidInput, datesOk, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
 
 import Dict exposing (Dict)
 import Date exposing (Date)
@@ -22,8 +22,8 @@ validationErrors model =
         ]
 
 
-getError : Model -> String -> Bool
-getError model errorKey =
+getViewError : Model -> String -> Bool
+getViewError model errorKey =
     case Dict.get errorKey model.validationErrors of
         Nothing ->
             False
@@ -32,8 +32,18 @@ getError model errorKey =
             (not validation.valid) && (validation.touched || model.submitButtonPressed)
 
 
-setError : Model -> String -> Bool -> Model
-setError model errorKey value =
+getError : Model -> String -> Bool
+getError model errorKey =
+    case Dict.get errorKey model.validationErrors of
+        Nothing ->
+            False
+
+        Just validation ->
+            not validation.valid
+
+
+setValid : Model -> String -> Bool -> Model
+setValid model errorKey value =
     let
         updater =
             \validation ->
