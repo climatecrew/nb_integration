@@ -1,4 +1,4 @@
-module Validation exposing (..)
+module Validation exposing (validationErrors, invalidInput, datesOk, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
 
 import Dict exposing (Dict)
 import Date exposing (Date)
@@ -8,17 +8,17 @@ import Types exposing (Model, ValidationErrors, Address)
 import EditingTimestamp exposing (EditingTimestamp)
 
 
-showValidationErrors : Model -> ValidationErrors
-showValidationErrors model =
+validationErrors : Model -> ValidationErrors
+validationErrors model =
     Dict.fromList
-        [ ( "event.name", { valid = not <| eventNamePresent model, touched = False } )
-        , ( "contact.name", { valid = not <| contactNamePresent model, touched = False } )
-        , ( "contact.email", { valid = not <| contactEmailPresent model, touched = False } )
-        , ( "date", { valid = not <| datesOk model, touched = False } )
-        , ( "venue.name", { valid = not <| venueNamePresent model, touched = False } )
-        , ( "venue.street_address", { valid = not <| streetAddressPresent model, touched = False } )
-        , ( "venue.city", { valid = not <| cityPresent model, touched = False } )
-        , ( "venue.state", { valid = not <| statePresent model, touched = False } )
+        [ ( "event.name", { valid = eventNamePresent model, touched = False } )
+        , ( "contact.name", { valid = contactNamePresent model, touched = False } )
+        , ( "contact.email", { valid = contactEmailPresent model, touched = False } )
+        , ( "date", { valid = datesOk model, touched = False } )
+        , ( "venue.name", { valid = venueNamePresent model, touched = False } )
+        , ( "venue.street_address", { valid = streetAddressPresent model, touched = False } )
+        , ( "venue.city", { valid = cityPresent model, touched = False } )
+        , ( "venue.state", { valid = statePresent model, touched = False } )
         ]
 
 

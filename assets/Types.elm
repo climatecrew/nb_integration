@@ -34,12 +34,8 @@ type alias Model =
     , slug : String
     , loading : Bool
     , validationErrors : ValidationErrors
+    , submitButtonPressed : Bool
     }
-
-
-initialModel : Flags -> Model
-initialModel flags =
-    { defaultModel | rootURL = flags.rootURL, slug = flags.slug }
 
 
 defaultModel : Model
@@ -57,26 +53,18 @@ defaultModel =
         , rootURL = flags.rootURL
         , slug = flags.slug
         , loading = True
-        , validationErrors = defaultValidationErrors
+        , validationErrors = Dict.empty
+        , submitButtonPressed = False
         }
+
+
+markEventSubmitted : Model -> Model
+markEventSubmitted model =
+    { model | submitButtonPressed = True }
 
 
 type alias ValidationErrors =
     Dict String Validation
-
-
-defaultValidationErrors : ValidationErrors
-defaultValidationErrors =
-    Dict.fromList
-        [ ( "event.name", { valid = False, touched = False } )
-        , ( "contact.name", { valid = False, touched = False } )
-        , ( "contact.email", { valid = False, touched = False } )
-        , ( "date", { valid = False, touched = False } )
-        , ( "venue.name", { valid = False, touched = False } )
-        , ( "venue.street_address", { valid = False, touched = False } )
-        , ( "venue.city", { valid = False, touched = False } )
-        , ( "venue.state", { valid = False, touched = False } )
-        ]
 
 
 type alias Validation =
@@ -92,7 +80,7 @@ getError model errorKey =
             False
 
         Just validation ->
-            (not validation.valid) && validation.touched
+            (not validation.valid) && (validation.touched || model.submitButtonPressed)
 
 
 setError : Model -> String -> Bool -> Model

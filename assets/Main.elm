@@ -30,6 +30,15 @@ init flags =
         ( model, Http.send FetchEventsResult (getEvents model) )
 
 
+initialModel : Flags -> Model
+initialModel flags =
+    { defaultModel
+        | rootURL = flags.rootURL
+        , slug = flags.slug
+        , validationErrors = validationErrors defaultModel
+    }
+
+
 subscriptions : Model -> Sub msg
 subscriptions model =
     Sub.none
@@ -225,17 +234,16 @@ update msg model =
                 ( updatedModel, Cmd.none )
 
         SubmitEvent ->
-            if invalidInput model then
-                ( { model | validationErrors = showValidationErrors model }
-                , Cmd.none
-                )
-            else
-                ( { model
-                    | validationErrors = showValidationErrors model
-                    , loading = True
-                  }
-                , Http.send CreateEventResult (createEvent model)
-                )
+            let
+                newModel =
+                    markEventSubmitted model
+            in
+                if invalidInput newModel then
+                    ( newModel, Cmd.none )
+                else
+                    ( { newModel | loading = True }
+                    , Http.send CreateEventResult (createEvent newModel)
+                    )
 
         FetchEventsResult (Ok apiResult) ->
             let

@@ -46,9 +46,6 @@ suite =
                         model =
                             defaultModel
 
-                        newErrors =
-                            Dict.update "event.name" (\_ -> Just True) defaultValidationErrors
-
                         newModel =
                             updateEventName model ""
                     in
@@ -104,9 +101,6 @@ suite =
                         model =
                             defaultModel
 
-                        newErrors =
-                            Dict.update "venue.name" (\_ -> Just True) defaultValidationErrors
-
                         newModel =
                             updateEventVenueName model <| Just ""
                     in
@@ -135,9 +129,6 @@ suite =
                         newAddress =
                             { defaultAddress | address1 = Just "" }
 
-                        newErrors =
-                            Dict.update "venue.street_address" (\_ -> Just True) defaultValidationErrors
-
                         newModel =
                             updateEventVenueAddress model <| Just newAddress
                     in
@@ -150,9 +141,6 @@ suite =
 
                         newAddress =
                             { defaultAddress | address1 = Nothing }
-
-                        newErrors =
-                            Dict.update "venue.street_address" (\_ -> Just True) defaultValidationErrors
 
                         newModel =
                             updateEventVenueAddress model Nothing
@@ -167,9 +155,6 @@ suite =
                         newAddress =
                             { defaultAddress | city = Just "" }
 
-                        newErrors =
-                            Dict.update "venue.city" (\_ -> Just True) defaultValidationErrors
-
                         newModel =
                             updateEventVenueAddress model <| Just newAddress
                     in
@@ -182,9 +167,6 @@ suite =
 
                         newAddress =
                             { defaultAddress | city = Nothing }
-
-                        newErrors =
-                            Dict.update "venue.city" (\_ -> Just True) defaultValidationErrors
 
                         newModel =
                             updateEventVenueAddress model Nothing
@@ -199,9 +181,6 @@ suite =
                         newAddress =
                             { defaultAddress | state = Just "" }
 
-                        newErrors =
-                            Dict.update "venue.state" (\_ -> Just True) defaultValidationErrors
-
                         newModel =
                             updateEventVenueAddress model <| Just newAddress
                     in
@@ -214,9 +193,6 @@ suite =
 
                         newAddress =
                             { defaultAddress | state = Nothing }
-
-                        newErrors =
-                            Dict.update "venue.state" (\_ -> Just True) defaultValidationErrors
 
                         newModel =
                             updateEventVenueAddress model Nothing
