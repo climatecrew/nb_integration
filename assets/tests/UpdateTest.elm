@@ -121,84 +121,6 @@ suite =
                             updateEventVenueAddress model <| Just newAddress
                     in
                         Expect.equal newModel.event.venue.address <| Just newAddress
-            , test "sets error if street_address is an empty string" <|
-                \_ ->
-                    let
-                        model =
-                            defaultModel
-
-                        newAddress =
-                            { defaultAddress | address1 = Just "" }
-
-                        newModel =
-                            updateEventVenueAddress model <| Just newAddress
-                    in
-                        Expect.equal (getError newModel "venue.street_address") True
-            , test "sets error if street_address is a Nothing" <|
-                \_ ->
-                    let
-                        model =
-                            defaultModel
-
-                        newAddress =
-                            { defaultAddress | address1 = Nothing }
-
-                        newModel =
-                            updateEventVenueAddress model Nothing
-                    in
-                        Expect.equal (getError newModel "venue.street_address") True
-            , test "sets error if city is an empty string" <|
-                \_ ->
-                    let
-                        model =
-                            defaultModel
-
-                        newAddress =
-                            { defaultAddress | city = Just "" }
-
-                        newModel =
-                            updateEventVenueAddress model <| Just newAddress
-                    in
-                        Expect.equal (getError newModel "venue.city") True
-            , test "sets error if city is a Nothing" <|
-                \_ ->
-                    let
-                        model =
-                            defaultModel
-
-                        newAddress =
-                            { defaultAddress | city = Nothing }
-
-                        newModel =
-                            updateEventVenueAddress model Nothing
-                    in
-                        Expect.equal (getError newModel "venue.city") True
-            , test "sets error if state is an empty string" <|
-                \_ ->
-                    let
-                        model =
-                            defaultModel
-
-                        newAddress =
-                            { defaultAddress | state = Just "" }
-
-                        newModel =
-                            updateEventVenueAddress model <| Just newAddress
-                    in
-                        Expect.equal (getError newModel "venue.state") True
-            , test "sets error if state is a Nothing" <|
-                \_ ->
-                    let
-                        model =
-                            defaultModel
-
-                        newAddress =
-                            { defaultAddress | state = Nothing }
-
-                        newModel =
-                            updateEventVenueAddress model Nothing
-                    in
-                        Expect.equal (getError newModel "venue.state") True
             ]
         , describe "Update.updateEventVenueStreetAddress"
             [ test "sets the model event venue street address" <|
@@ -214,6 +136,16 @@ suite =
                             updateEventVenueStreetAddress model <| Just "123 Main St."
                     in
                         Expect.equal newModel.event.venue.address <| Just newAddress
+            , test "sets error if street_address is an empty string" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newModel =
+                            updateEventVenueStreetAddress model <| Just ""
+                    in
+                        Expect.equal (getError newModel "venue.street_address") True
             ]
         , describe "Update.updateEventVenueCity"
             [ test "sets the model event venue city" <|
@@ -229,6 +161,29 @@ suite =
                             updateEventVenueCity model <| Just "Boston"
                     in
                         Expect.equal newModel.event.venue.address <| Just newAddress
+            , test "sets error if city is an empty string" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newModel =
+                            updateEventVenueCity model <| Just ""
+                    in
+                        Expect.equal (getError newModel "venue.city") True
+            , test "sets error if city is a Nothing" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | city = Nothing }
+
+                        newModel =
+                            updateEventVenueCity model Nothing
+                    in
+                        Expect.equal (getError newModel "venue.city") True
             ]
         , describe "Update.updateEventVenueState"
             [ test "sets the model event venue state" <|
@@ -244,5 +199,28 @@ suite =
                             updateEventVenueState model <| Just "MA"
                     in
                         Expect.equal newModel.event.venue.address <| Just newAddress
+            , test "sets error if state is an empty string" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newModel =
+                            updateEventVenueState model <| Just ""
+                    in
+                        Expect.equal (getError newModel "venue.state") True
+            , test "sets error if state is a Nothing" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newAddress =
+                            { defaultAddress | state = Nothing }
+
+                        newModel =
+                            updateEventVenueState model Nothing
+                    in
+                        Expect.equal (getError newModel "venue.state") True
             ]
         ]

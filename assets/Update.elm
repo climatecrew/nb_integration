@@ -20,7 +20,7 @@ updateEventName model name =
                 m =
                     updateEvent model { event | name = name }
             in
-                setValid m "event.name" <| eventNamePresent m
+                touchValidation m "event.name" <| eventNamePresent m
     in
         newModel
 
@@ -74,17 +74,8 @@ updateEventVenueAddress model address =
         newVenue =
             { venue | address = address }
 
-        m0 =
-            updateEventVenue model newVenue
-
-        m1 =
-            setValid m0 "venue.street_address" <| streetAddressPresent m0
-
-        m2 =
-            setValid m1 "venue.city" <| cityPresent m1
-
         newModel =
-            setValid m2 "venue.state" <| statePresent m2
+            updateEventVenue model newVenue
     in
         newModel
 
@@ -97,8 +88,14 @@ updateEventVenueStreetAddress model streetAddress =
 
         newAddress =
             { address | address1 = streetAddress }
+
+        m0 =
+            updateEventVenueAddress model <| Just newAddress
+
+        newModel =
+            touchValidation m0 "venue.street_address" <| streetAddressPresent m0
     in
-        updateEventVenueAddress model <| Just newAddress
+        newModel
 
 
 updateEventVenueCity : Model -> Maybe String -> Model
@@ -109,8 +106,14 @@ updateEventVenueCity model city =
 
         newAddress =
             { address | city = city }
+
+        m0 =
+            updateEventVenueAddress model <| Just newAddress
+
+        newModel =
+            touchValidation m0 "venue.city" <| cityPresent m0
     in
-        updateEventVenueAddress model <| Just newAddress
+        newModel
 
 
 updateEventVenueState : Model -> Maybe String -> Model
@@ -121,8 +124,14 @@ updateEventVenueState model state =
 
         newAddress =
             { address | state = state }
+
+        m0 =
+            updateEventVenueAddress model <| Just newAddress
+
+        newModel =
+            touchValidation m0 "venue.state" <| statePresent m0
     in
-        updateEventVenueAddress model <| Just newAddress
+        newModel
 
 
 startingAddress : Model -> Address
