@@ -7,6 +7,7 @@ module Validation
         , touchValidation
         , invalidInput
         , contactNamePresent
+        , contactEmailPresent
         , datesOk
         , eventNamePresent
         , venueNamePresent

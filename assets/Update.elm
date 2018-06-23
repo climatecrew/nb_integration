@@ -6,6 +6,7 @@ import Validation
         ( setValid
         , touchValidation
         , contactNamePresent
+        , contactEmailPresent
         , eventNamePresent
         , venueNamePresent
         , streetAddressPresent
@@ -29,6 +30,25 @@ updateContactName model name =
                     { model | contact = newContact }
             in
                 touchValidation m "contact.name" <| contactNamePresent m
+    in
+        newModel
+
+
+updateContactEmail : Model -> Maybe String -> Model
+updateContactEmail model email =
+    let
+        { contact } =
+            model
+
+        newContact =
+            { contact | email = email }
+
+        newModel =
+            let
+                m =
+                    { model | contact = newContact }
+            in
+                touchValidation m "contact.email" <| contactEmailPresent m
     in
         newModel
 

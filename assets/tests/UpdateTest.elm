@@ -255,4 +255,36 @@ suite =
                     in
                         Expect.equal (getError newModel "contact.name") True
             ]
+        , describe "Update.updateContactEmail"
+            [ test "sets the model contact email" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newModel =
+                            updateContactEmail model <| Just "A email"
+                    in
+                        Expect.equal newModel.contact.email <| Just "A email"
+            , test "sets error if email is an empty string" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newModel =
+                            updateContactEmail model <| Just ""
+                    in
+                        Expect.equal (getError newModel "contact.email") True
+            , test "sets error if email is a Nothing" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newModel =
+                            updateContactEmail model <| Nothing
+                    in
+                        Expect.equal (getError newModel "contact.email") True
+            ]
         ]

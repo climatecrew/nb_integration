@@ -71,20 +71,7 @@ update msg model =
             ( updateEventVenueName model <| Just name, Cmd.none )
 
         ContactEmail email ->
-            let
-                { contact } =
-                    model
-
-                updatedContact =
-                    { contact | email = Just email }
-
-                um1 =
-                    { model | contact = updatedContact }
-
-                updatedModel =
-                    setValid um1 "contact.email" (String.length email >= 0)
-            in
-                ( updatedModel, Cmd.none )
+            ( updateContactEmail model <| Just email, Cmd.none )
 
         ContactName name ->
             ( updateContactName model <| Just name, Cmd.none )
