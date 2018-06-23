@@ -223,4 +223,36 @@ suite =
                     in
                         Expect.equal (getError newModel "venue.state") True
             ]
+        , describe "Update.updateContactName"
+            [ test "sets the model contact name" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newModel =
+                            updateContactName model <| Just "A name"
+                    in
+                        Expect.equal newModel.contact.name <| Just "A name"
+            , test "sets error if name is an empty string" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newModel =
+                            updateContactName model <| Just ""
+                    in
+                        Expect.equal (getError newModel "contact.name") True
+            , test "sets error if name is a Nothing" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        newModel =
+                            updateContactName model <| Nothing
+                    in
+                        Expect.equal (getError newModel "contact.name") True
+            ]
         ]

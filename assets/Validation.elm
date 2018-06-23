@@ -1,4 +1,19 @@
-module Validation exposing (validationErrors, getError, getViewError, setValid, touchValidation, invalidInput, datesOk, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
+module Validation
+    exposing
+        ( validationErrors
+        , getError
+        , getViewError
+        , setValid
+        , touchValidation
+        , invalidInput
+        , contactNamePresent
+        , datesOk
+        , eventNamePresent
+        , venueNamePresent
+        , streetAddressPresent
+        , cityPresent
+        , statePresent
+        )
 
 import Dict exposing (Dict)
 import Date exposing (Date)

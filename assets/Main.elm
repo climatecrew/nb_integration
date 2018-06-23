@@ -87,20 +87,7 @@ update msg model =
                 ( updatedModel, Cmd.none )
 
         ContactName name ->
-            let
-                { contact } =
-                    model
-
-                updatedContact =
-                    { contact | name = Just name }
-
-                um1 =
-                    { model | contact = updatedContact }
-
-                updatedModel =
-                    setValid um1 "contact.name" (String.length name >= 0)
-            in
-                ( updatedModel, Cmd.none )
+            ( updateContactName model <| Just name, Cmd.none )
 
         Day day ->
             let

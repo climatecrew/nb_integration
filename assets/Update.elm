@@ -1,7 +1,36 @@
 module Update exposing (..)
 
 import Types exposing (..)
-import Validation exposing (setValid, touchValidation, eventNamePresent, venueNamePresent, streetAddressPresent, cityPresent, statePresent)
+import Validation
+    exposing
+        ( setValid
+        , touchValidation
+        , contactNamePresent
+        , eventNamePresent
+        , venueNamePresent
+        , streetAddressPresent
+        , cityPresent
+        , statePresent
+        )
+
+
+updateContactName : Model -> Maybe String -> Model
+updateContactName model name =
+    let
+        { contact } =
+            model
+
+        newContact =
+            { contact | name = name }
+
+        newModel =
+            let
+                m =
+                    { model | contact = newContact }
+            in
+                touchValidation m "contact.name" <| contactNamePresent m
+    in
+        newModel
 
 
 updateEvent : Model -> Event -> Model
