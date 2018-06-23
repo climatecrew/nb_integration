@@ -30,7 +30,7 @@ mainView model =
                     [ label [ for "contact-name" ] [ text "Contact Name" ]
                     , input [ id "contact-name", type_ "contact-name", placeholder "Required", onInput ContactName ] []
                     , span
-                        [ class <| validationClass <| getViewError model "conact.name"
+                        [ class <| validationClass <| getViewError model "contact.name"
                         , style [ ( "visibility", validationVisibility <| getViewError model "contact.name" ) ]
                         ]
                         [ text "Contact name must be present" ]
