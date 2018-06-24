@@ -287,4 +287,31 @@ suite =
                     in
                         Expect.equal (getError newModel "contact.email") True
             ]
+        , describe "Update.updateEventDay"
+            [ test "sets the model event day" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        { startTimestamp, endTimestamp } =
+                            model.event
+
+                        newStartTimestamp =
+                            { startTimestamp | ymd = "2018-09-25" }
+
+                        newEndTimestamp =
+                            { endTimestamp | ymd = "2018-09-25" }
+
+                        event =
+                            model.event
+
+                        newEvent =
+                            { event | startTimestamp = newStartTimestamp, endTimestamp = newEndTimestamp }
+
+                        newModel =
+                            updateEventDay model "2018-09-25"
+                    in
+                        Expect.equal newModel.event newEvent
+            ]
         ]

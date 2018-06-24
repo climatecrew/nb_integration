@@ -77,30 +77,7 @@ update msg model =
             ( updateContactName model <| Just name, Cmd.none )
 
         Day day ->
-            let
-                ev =
-                    model.event
-
-                updatedEvent =
-                    let
-                        currentStartTS =
-                            ev.startTimestamp
-
-                        currentEndTS =
-                            ev.endTimestamp
-
-                        updatedStartTS =
-                            { currentStartTS | ymd = day }
-
-                        updatedEndTS =
-                            { currentEndTS | ymd = day }
-                    in
-                        { ev
-                            | startTimestamp = updatedStartTS
-                            , endTimestamp = updatedEndTS
-                        }
-            in
-                ( { model | event = updatedEvent }, Cmd.none )
+            ( updateEventDay model day, Cmd.none )
 
         Hour borderTime hour ->
             let

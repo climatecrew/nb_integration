@@ -58,6 +58,25 @@ updateEvent model newEvent =
     { model | event = newEvent }
 
 
+updateEventDay : Model -> String -> Model
+updateEventDay model ymd =
+    let
+        { event } =
+            model
+
+        { startTimestamp, endTimestamp } =
+            event
+
+        updatedStartTS =
+            { startTimestamp | ymd = ymd }
+
+        updatedEndTS =
+            { endTimestamp | ymd = ymd }
+    in
+        updateEvent model
+            { event | startTimestamp = updatedStartTS, endTimestamp = updatedEndTS }
+
+
 updateEventName : Model -> String -> Model
 updateEventName model name =
     let
