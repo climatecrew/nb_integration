@@ -136,7 +136,7 @@ update msg model =
                     { model | event = updatedEvent }
 
                 updatedModel =
-                    setValid um1 "date" (datesOk um1)
+                    touchValidation um1 "date" (datesOk um1)
             in
                 ( updatedModel, Cmd.none )
 
@@ -174,7 +174,7 @@ update msg model =
                     { model | event = updatedEvent }
 
                 updatedModel =
-                    setValid um1 "date" (datesOk um1)
+                    touchValidation um1 "date" (datesOk um1)
             in
                 ( updatedModel, Cmd.none )
 
@@ -203,7 +203,7 @@ update msg model =
                     { model | event = updatedEvent }
 
                 updatedModel =
-                    setValid um1 "date" (datesOk um1)
+                    touchValidation um1 "date" (datesOk um1)
             in
                 ( updatedModel, Cmd.none )
 
