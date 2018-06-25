@@ -1,12 +1,14 @@
 module Update exposing (..)
 
 import Types exposing (..)
+import EditingTimestamp exposing (EditingTimestamp, BorderTime, startTime, endTime)
 import Validation
     exposing
         ( setValid
         , touchValidation
         , contactNamePresent
         , contactEmailPresent
+        , datesOk
         , eventNamePresent
         , venueNamePresent
         , streetAddressPresent
@@ -75,6 +77,56 @@ updateEventDay model ymd =
     in
         updateEvent model
             { event | startTimestamp = updatedStartTS, endTimestamp = updatedEndTS }
+
+
+updateEventHour : Model -> BorderTime -> String -> Model
+updateEventHour model borderTime hour =
+    let
+        { event } =
+            model
+
+        updatedEvent =
+            let
+                currentTS =
+                    extractTimestamp event borderTime
+
+                updatedTS =
+                    let
+                        updatedHour =
+                            case String.toInt hour of
+                                Ok hr ->
+                                    hr
+
+                                Err err ->
+                                    currentTS.hour
+                    in
+                        { currentTS | hour = updatedHour }
+            in
+                updateTimestamp event borderTime updatedTS
+
+        um1 =
+            updateEvent model updatedEvent
+
+        updatedModel =
+            touchValidation um1 "date" (datesOk um1)
+    in
+        updatedModel
+
+
+extractTimestamp : Event -> BorderTime -> EditingTimestamp
+extractTimestamp event borderTime =
+    if borderTime == startTime then
+        event.startTimestamp
+    else
+        event.endTimestamp
+
+
+updateTimestamp : Event -> BorderTime -> EditingTimestamp -> Event
+updateTimestamp event borderTime timestamp =
+    if borderTime == startTime then
+        { event | startTimestamp = timestamp }
+    else
+        { event | endTimestamp = timestamp }
 
 
 updateEventName : Model -> String -> Model

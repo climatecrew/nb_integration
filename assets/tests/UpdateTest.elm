@@ -4,6 +4,7 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 import Types exposing (..)
+import EditingTimestamp exposing (startTime, endTime)
 import Update exposing (..)
 import Validation exposing (validationErrors, getError, setValid)
 import Dict
@@ -311,6 +312,33 @@ suite =
 
                         newModel =
                             updateEventDay model "2018-09-25"
+                    in
+                        Expect.equal newModel.event newEvent
+            ]
+        , describe "Update.updateEventHour"
+            [ test "sets the model event start hour" <|
+                \_ ->
+                    let
+                        model =
+                            defaultModel
+
+                        { startTimestamp, endTimestamp } =
+                            model.event
+
+                        newStartTimestamp =
+                            { startTimestamp | hour = 5 }
+
+                        newEndTimestamp =
+                            endTimestamp
+
+                        event =
+                            model.event
+
+                        newEvent =
+                            { event | startTimestamp = newStartTimestamp, endTimestamp = newEndTimestamp }
+
+                        newModel =
+                            updateEventHour model startTime "5"
                     in
                         Expect.equal newModel.event newEvent
             ]

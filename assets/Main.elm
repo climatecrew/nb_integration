@@ -80,42 +80,7 @@ update msg model =
             ( updateEventDay model day, Cmd.none )
 
         Hour borderTime hour ->
-            let
-                ev =
-                    model.event
-
-                updatedEvent =
-                    let
-                        currentTS =
-                            if borderTime == startTime then
-                                ev.startTimestamp
-                            else
-                                ev.endTimestamp
-
-                        updatedTS =
-                            let
-                                updatedHour =
-                                    case String.toInt hour of
-                                        Ok hr ->
-                                            hr
-
-                                        Err err ->
-                                            currentTS.hour
-                            in
-                                { currentTS | hour = updatedHour }
-                    in
-                        if borderTime == startTime then
-                            { ev | startTimestamp = updatedTS }
-                        else
-                            { ev | endTimestamp = updatedTS }
-
-                um1 =
-                    { model | event = updatedEvent }
-
-                updatedModel =
-                    touchValidation um1 "date" (datesOk um1)
-            in
-                ( updatedModel, Cmd.none )
+            ( updateEventHour model borderTime hour, Cmd.none )
 
         Minute borderTime minute ->
             let
