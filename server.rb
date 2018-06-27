@@ -69,13 +69,17 @@ class Server < Roda
       end
     end
 
+    r.on "app" do
+      render("app")
+    end
+
     # load JavaScript app for embed on nation web page
     r.on "embed" do
       slug = r.params["slug"]
       callback = r.params["callback"]
 
       response["Content-Type"] = "application/javascript"
-      render("events", locals: { slug: slug, callback: callback })
+      render("contact_me", locals: { slug: slug, callback: callback })
     end
 
     # JSON interface to this app's functionality

@@ -1,0 +1,45 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Main</title>
+        <style>
+            html,head,body { padding:0; margin:0; }
+
+            body { font-family: calibri, helvetica, arial, sans-serif; }
+        </style>
+
+        <div id="event-creator", style="display: none;">
+            <div id="email">event.creator@gmail.com</div>
+            <div id="current-user-id">30</div>
+        </div>
+    </head>
+
+    <body>
+        <div id="interface"></div>
+        <script>
+            function renderInterface() {
+                var node = document.getElementById("interface");
+
+                var email = null;
+                var emailElement = document.getElementById("email")
+                if (emailElement) {
+                    email = emailElement.textContent;
+                }
+
+                var currentUserID = null;
+                var currentUserIDElement = document.getElementById("current-user-id");
+                if (currentUserIDElement) {
+                    const id = parseInt(currentUserIDElement.textContent, 10);
+                    if (id !== NaN) {
+                        currentUserID = id;
+                    }
+                }
+
+                NBIntegration.contactMeInterface(node, email, currentUserID);
+            }
+        </script>
+
+        <script defer src="<%= app_base_url %>/embed?slug=skarger&callback=renderInterface"></script>
+    </body>
+</html>

@@ -1,0 +1,32 @@
+var NBIntegration = {
+    contactMeInterface: function (domNode, nbEmail, nbID) {
+        var slug = "<%= slug %>";
+
+        if (!slug) {
+            throw new Error("Nation not identified. You may need to pass slug.");
+        }
+        if (typeof <%= callback %> !== "function") {
+            throw new Error("'<%= callback %>' is not a function.");
+        }
+
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.href = "<%= app_base_url %>/nb_integration.css";
+        document.head.appendChild(link);
+
+        var script = document.createElement('script');
+        script.src = "<%= app_base_url %>/nb_integration.js";
+        script.onload = function() {
+            Elm.Main.embed(domNode, {
+                nbEmail: nbEmail,
+                nbID: nbID,
+                rootURL: "<%= app_base_url %>",
+                slug: slug
+            });
+        }
+
+        document.head.appendChild(script);
+    }
+}
+
+<%= callback %>();

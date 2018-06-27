@@ -1,20 +1,19 @@
 module Main exposing (..)
 
 import Html exposing (programWithFlags)
-import Types exposing (Model, Msg, Flags)
-import EventCreator
+import ContactMe
 
 
-main : Program Flags Model Msg
+main : Program ContactMe.Flags ContactMe.Model ContactMe.Msg
 main =
     programWithFlags
-        { init = EventCreator.init
-        , update = EventCreator.update
+        { init = ContactMe.init
+        , update = ContactMe.update
         , subscriptions = subscriptions
-        , view = EventCreator.view
+        , view = ContactMe.view
         }
 
 
-subscriptions : Model -> Sub msg
+subscriptions : ContactMe.Model -> Sub msg
 subscriptions model =
     Sub.none
