@@ -1,6 +1,6 @@
 module ContactMe exposing (Model, Msg, Flags, init, view, update)
 
-import Html exposing (Html, div, span, text, ul, li, input, label)
+import Html exposing (Html, div, span, text, ul, li, input, label, button)
 import Html.Attributes exposing (id, class, placeholder, style, type_, for)
 import Html.Events exposing (onClick, onInput)
 
@@ -10,6 +10,7 @@ type Msg
     | LastName String
     | Email String
     | Phone String
+    | SubmitForm
 
 
 type alias Model =
@@ -85,6 +86,11 @@ mainView model =
                     , input [ id "phone", type_ "phone", onInput Phone ] []
                     , emptyValidationView
                     ]
+                , li [ class <| submitButtonClass model ]
+                    [ label [] []
+                    , button [ onClick SubmitForm ] [ text "Submit" ]
+                    , emptyValidationView
+                    ]
                 ]
             ]
         ]
@@ -114,6 +120,19 @@ validationClass showErrors =
 emptyValidationView : Html Msg
 emptyValidationView =
     span [ class <| validationClass False ] []
+
+
+submitButtonClass : Model -> String
+submitButtonClass model =
+    if invalidInput model then
+        "create-event-button create-event-button-disabled"
+    else
+        "create-event-button"
+
+
+invalidInput : Model -> Bool
+invalidInput model =
+    False
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
