@@ -54,17 +54,26 @@ mainView model =
         [ div [ class "form" ]
             [ ul [ class "flex-outer" ]
                 [ li [ class "section-start" ]
-                    [ label [ for "contact-name" ] [ text "First Name" ]
-                    , input [ id "contact-name", type_ "contact-name", placeholder "Required", onInput FirstName ] []
+                    [ label [ for "first-name" ] [ text "First Name" ]
+                    , input [ id "first-name", type_ "last-name", placeholder "Required", onInput FirstName ] []
                     , span
                         [ class <| validationClass <| getViewError model "contact.first_name"
-                        , style [ ( "visibility", validationVisibility <| getViewError model "contact.name" ) ]
+                        , style [ ( "visibility", validationVisibility <| getViewError model "contact.first_name" ) ]
                         ]
                         [ text "First name must be present" ]
                     ]
                 , li []
-                    [ label [ for "contact-email" ] [ text "Email" ]
-                    , input [ id "contact-email", type_ "contact-email", placeholder "Required", onInput Email ] []
+                    [ label [ for "last-name" ] [ text "Last Name" ]
+                    , input [ id "last-name", type_ "last-name", placeholder "Required", onInput LastName ] []
+                    , span
+                        [ class <| validationClass <| getViewError model "contact.last_name"
+                        , style [ ( "visibility", validationVisibility <| getViewError model "contact.last_name" ) ]
+                        ]
+                        [ text "Last name must be present" ]
+                    ]
+                , li []
+                    [ label [ for "email" ] [ text "Email" ]
+                    , input [ id "email", type_ "email", placeholder "Required", onInput Email ] []
                     , span
                         [ class <| validationClass <| getViewError model "contact.email"
                         , style [ ( "visibility", validationVisibility <| getViewError model "contact.email" ) ]
