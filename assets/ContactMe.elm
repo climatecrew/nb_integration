@@ -80,6 +80,11 @@ mainView model =
                         ]
                         [ text "Email must be present" ]
                     ]
+                , li []
+                    [ label [ for "phone" ] [ text "Phone" ]
+                    , input [ id "phone", type_ "phone", onInput Phone ] []
+                    , emptyValidationView
+                    ]
                 ]
             ]
         ]
@@ -104,6 +109,11 @@ validationClass showErrors =
         "validation validation-errors"
     else
         "validation"
+
+
+emptyValidationView : Html Msg
+emptyValidationView =
+    span [ class <| validationClass False ] []
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
