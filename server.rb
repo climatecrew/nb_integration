@@ -107,6 +107,20 @@ class Server < Roda
           end
         end
 
+        r.is "contact_requests" do
+          slug = r.params["slug"]
+          if slug.nil?
+            r.halt(422, { errors: [{title: "missing slug parameter"}] })
+          else
+            account = Account.first(nb_slug: slug)
+            r.halt(422, { errors: [{title: "nation slug '#{slug}' not recognized"}] }) if account.nil?
+          end
+
+          r.post do
+            logger.info("Attempting to create contact_request for nation #{slug}")
+          end
+        end
+
         r.is "events" do
           slug = r.params["slug"]
           if slug.nil?
