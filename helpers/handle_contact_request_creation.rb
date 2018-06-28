@@ -10,11 +10,19 @@ class HandleContactRequestCreation
   def call
     path_provider = PathProvider.new(slug: account.nb_slug,
                                      api_token: account.nb_access_token)
+    person_id = payload["person"].delete("id")
     forwarded_payload = prepare_payload(payload)
     logger.info("Sending payload:\n#{forwarded_payload}")
-    nb_response = Client.create(path_provider: path_provider,
-                                resource: :people,
-                                payload: forwarded_payload)
+    nb_response = if person_id
+                    Client.update(path_provider: path_provider,
+                                  resource: :people,
+                                  id: person_id,
+                                  payload: forwarded_payload)
+                  else
+                    Client.create(path_provider: path_provider,
+                                  resource: :people,
+                                  payload: forwarded_payload)
+                  end
     if nb_response.status.to_i >= 400
       code, body = on_failure(nb_response)
     else
