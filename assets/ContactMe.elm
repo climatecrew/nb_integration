@@ -27,6 +27,7 @@ type alias Model =
     , personID : Maybe Int
     , rootURL : String
     , slug : String
+    , loading : Bool
     }
 
 
@@ -57,6 +58,7 @@ initialModel flags =
     , personID = flags.nbID
     , rootURL = flags.rootURL
     , slug = flags.slug
+    , loading = False
     }
 
 
@@ -124,8 +126,15 @@ mainView model =
                     ]
                 ]
             ]
+            , loadingSpinner model
         ]
 
+loadingSpinner : Model -> Html Msg
+loadingSpinner model =
+    if model.loading then
+        div [ class "loader" ] []
+    else
+        div [] []
 
 getViewError : Model -> String -> Bool
 getViewError model errorKey =
@@ -185,10 +194,10 @@ update msg model =
             ( { model | notes = notes }, Cmd.none )
 
         SubmitForm ->
-            ( model, Http.send SubmitFormResult (createContactRequest model) )
+            ( { model | loading = True }, Http.send SubmitFormResult (createContactRequest model) )
 
         SubmitFormResult result ->
-            ( model, Cmd.none )
+            ( { model | loading = False }, Cmd.none )
 
 
 contactRequestsURL : Model -> String
