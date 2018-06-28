@@ -1,7 +1,7 @@
 module ContactMe exposing (Model, Msg, Flags, init, view, update)
 
-import Html exposing (Html, div, span, text, ul, li, input, label, button)
-import Html.Attributes exposing (id, class, placeholder, style, type_, for)
+import Html exposing (Html, div, span, text, ul, li, input, textarea, label, button)
+import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as JD exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
@@ -13,6 +13,7 @@ type Msg
     | LastName String
     | Email String
     | Phone String
+    | Notes String
     | SubmitForm
     | SubmitFormResult (Result Http.Error APIResult)
 
@@ -22,6 +23,7 @@ type alias Model =
     , last_name : String
     , email : String
     , phone : String
+    , notes : String
     , rootURL : String
     , slug : String
     }
@@ -50,6 +52,7 @@ initialModel flags =
     , last_name = ""
     , email = ""
     , phone = ""
+    , notes = ""
     , rootURL = flags.rootURL
     , slug = flags.slug
     }
@@ -105,6 +108,11 @@ mainView model =
                 , li []
                     [ label [ for "phone" ] [ text "Phone" ]
                     , input [ id "phone", type_ "phone", onInput Phone ] []
+                    , emptyValidationView
+                    ]
+                , li []
+                    [ label [ for "notes" ] [ text "Notes" ]
+                    , textarea [ id "notes", rows 5, onInput Notes ] []
                     , emptyValidationView
                     ]
                 , li [ class <| submitButtonClass model ]
@@ -171,6 +179,9 @@ update msg model =
         Phone phone ->
             ( { model | phone = phone }, Cmd.none )
 
+        Notes notes ->
+            ( { model | notes = notes }, Cmd.none )
+
         SubmitForm ->
             ( model, Http.send SubmitFormResult (createContactRequest model) )
 
@@ -204,6 +215,9 @@ encodeContactRequest model =
 
         phone =
             JE.string model.phone
+
+        notes =
+            JE.string model.notes
     in
         object
             [ ( "data"
@@ -216,6 +230,7 @@ encodeContactRequest model =
                             , ( "phone", phone )
                             ]
                       )
+                      , ( "notes", notes )
                     ]
               )
             ]
