@@ -85,7 +85,7 @@ RSpec.describe "POST /api/contact_requests" do
     end
     let(:client_update_body) { JSON.generate(hash_update_body) }
 
-    let(:forwarded_person) do
+    let(:forwarded_create_person) do
       base_body = hash_create_body["data"]
       {
         "person" => base_body["person"].merge(
@@ -95,9 +95,18 @@ RSpec.describe "POST /api/contact_requests" do
       }
     end
 
+    let(:forwarded_update_person) do
+      {
+        "person" => {
+          "parent_id" => ENV["NB_POINT_PERSON_ID"].to_i,
+          "tags" => ["Prep Week September 2018"]
+        }
+      }
+    end
+
     let(:nb_person_body) do
       {
-        "person" => forwarded_person["person"].merge("id" => nb_user_id)
+        "person" => forwarded_create_person["person"].merge("id" => nb_user_id)
       }
     end
 
@@ -107,31 +116,31 @@ RSpec.describe "POST /api/contact_requests" do
 
     context "when the user does not exist in NationBuilder yet" do
       it "makes a create request to NationBuilder with the formatted payload" do
-        stub_request(:post, post_url).with(body: forwarded_person)
+        stub_request(:post, post_url).with(body: forwarded_create_person)
 
         post "/api/contact_requests?slug=#{slug}", client_create_body, api_test_rack_env
 
         expect(a_request(:post, post_url)
-          .with("body": forwarded_person))
+          .with("body": forwarded_create_person))
           .to have_been_made.once
       end
     end
 
     context "when the user already exists in NationBuilder" do
       it "makes an update request to NationBuilder with the formatted payload" do
-        stub_request(:put, put_url).with(body: forwarded_person)
+        stub_request(:put, put_url).with(body: forwarded_update_person)
 
         post "/api/contact_requests?slug=#{slug}", client_update_body, api_test_rack_env
 
         expect(a_request(:put, put_url)
-          .with("body": forwarded_person))
+          .with("body": forwarded_update_person))
           .to have_been_made.once
       end
     end
 
     context "when the NationBuilder request succeeds" do
       it "writes the created contact_request to the DB" do
-        stub_request(:post, post_url).with(body: forwarded_person)
+        stub_request(:post, post_url).with(body: forwarded_create_person)
           .to_return(body: JSON.generate(nb_person_body))
 
         post "/api/contact_requests?slug=#{slug}", client_create_body, api_test_rack_env
@@ -144,7 +153,7 @@ RSpec.describe "POST /api/contact_requests" do
       end
 
       it "returns 201 and the person payload" do
-        stub_request(:post, post_url).with(body: forwarded_person)
+        stub_request(:post, post_url).with(body: forwarded_create_person)
           .to_return(body: JSON.generate(nb_person_body))
 
         post "/api/contact_requests?slug=#{slug}", client_create_body, api_test_rack_env
@@ -158,7 +167,7 @@ RSpec.describe "POST /api/contact_requests" do
 
     context "when the NationBuilder request fails" do
       it "returns an error message" do
-        stub_request(:post, post_url).with(body: forwarded_person )
+        stub_request(:post, post_url).with(body: forwarded_create_person )
           .to_return(status: 404, body: "{}")
 
         post "/api/contact_requests?slug=#{slug}", client_create_body, api_test_rack_env
@@ -170,7 +179,7 @@ RSpec.describe "POST /api/contact_requests" do
       end
 
       it "handles non-JSON responses from NationBuilder" do
-        stub_request(:post, post_url).with(body: forwarded_person )
+        stub_request(:post, post_url).with(body: forwarded_create_person )
           .to_return(status: 200, body: "<html><body>Gateway Timeout</body></html>")
 
         post "/api/contact_requests?slug=#{slug}", client_create_body, api_test_rack_env

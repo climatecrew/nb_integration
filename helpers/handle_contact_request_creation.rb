@@ -11,7 +11,11 @@ class HandleContactRequestCreation
     path_provider = PathProvider.new(slug: account.nb_slug,
                                      api_token: account.nb_access_token)
     person_id = payload["person"].delete("id")
-    forwarded_payload = prepare_payload(payload)
+    forwarded_payload = if person_id
+                          prepare_payload(payload, :update)
+                        else
+                          prepare_payload(payload, :create)
+                        end
     logger.info("Sending payload:\n#{forwarded_payload}")
     nb_response = if person_id
                     Client.update(path_provider: path_provider,
@@ -33,9 +37,19 @@ class HandleContactRequestCreation
 
   private
 
-  def prepare_payload(payload)
-    payload["person"]["tags"] = ["Prep Week September 2018"]
-    payload["person"]["parent_id"] = AppConfiguration.app_point_person_id.to_i
+  def prepare_payload(payload, request_type)
+    if request_type == :update
+      payload = {
+        "person" => {
+          "tags" => ["Prep Week September 2018"],
+          "parent_id" => AppConfiguration.app_point_person_id.to_i
+        }
+      }
+    else
+      payload["person"]["tags"] = ["Prep Week September 2018"]
+      payload["person"]["parent_id"] = AppConfiguration.app_point_person_id.to_i
+    end
+
     payload
   end
 
