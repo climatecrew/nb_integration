@@ -232,7 +232,7 @@ encodeContactRequest model =
               , object
                     [ ( "person"
                       , object
-                            [ ( "person_id",  person_id )
+                            [ ( "id",  person_id )
                             , ( "first_name", first_name )
                             , ( "last_name", last_name )
                             , ( "email", email )
