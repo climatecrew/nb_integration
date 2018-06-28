@@ -3,6 +3,9 @@ module ContactMe exposing (Model, Msg, Flags, init, view, update)
 import Html exposing (Html, div, span, text, ul, li, input, label, button)
 import Html.Attributes exposing (id, class, placeholder, style, type_, for)
 import Html.Events exposing (onClick, onInput)
+import Http
+import Json.Decode as JD exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
+import Json.Encode as JE exposing (Value, encode, object)
 
 
 type Msg
@@ -11,6 +14,7 @@ type Msg
     | Email String
     | Phone String
     | SubmitForm
+    | SubmitFormResult (Result Http.Error APIResult)
 
 
 type alias Model =
@@ -18,7 +22,22 @@ type alias Model =
     , last_name : String
     , email : String
     , phone : String
+    , rootURL : String
+    , slug : String
     }
+
+
+type APIResult
+    = APIErrors (List Error)
+    | APIContactRequest ContactRequest
+
+
+type alias ContactRequest =
+    String
+
+
+type alias Error =
+    { title : String }
 
 
 type alias Flags =
@@ -31,6 +50,8 @@ initialModel flags =
     , last_name = ""
     , email = ""
     , phone = ""
+    , rootURL = flags.rootURL
+    , slug = flags.slug
     }
 
 
@@ -137,4 +158,81 @@ invalidInput model =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        FirstName first_name ->
+            ( { model | first_name = first_name }, Cmd.none )
+
+        LastName last_name ->
+            ( { model | last_name = last_name }, Cmd.none )
+
+        Email email ->
+            ( { model | email = email }, Cmd.none )
+
+        Phone phone ->
+            ( { model | phone = phone }, Cmd.none )
+
+        SubmitForm ->
+            ( model, Http.send SubmitFormResult (createContactRequest model) )
+
+        SubmitFormResult result ->
+            ( model, Cmd.none )
+
+
+contactRequestsURL : Model -> String
+contactRequestsURL model =
+    model.rootURL ++ "/api/contact_requests?slug=" ++ model.slug
+
+
+createContactRequest : Model -> Http.Request APIResult
+createContactRequest model =
+    Http.post (contactRequestsURL model)
+        (Http.jsonBody <| encodeContactRequest model)
+        (oneOf [ dataContactRequestDecoder, errorsDecoder ])
+
+
+encodeContactRequest : Model -> Value
+encodeContactRequest model =
+    let
+        first_name =
+            JE.string model.first_name
+
+        last_name =
+            JE.string model.last_name
+
+        email =
+            JE.string model.email
+
+        phone =
+            JE.string model.phone
+    in
+        object
+            [ ( "data"
+              , object
+                    [ ( "person"
+                      , object
+                            [ ( "first_name", first_name )
+                            , ( "last_name", last_name )
+                            , ( "email", email )
+                            , ( "phone", phone )
+                            ]
+                      )
+                    ]
+              )
+            ]
+
+
+errorsDecoder =
+    JD.map APIErrors <|
+        field "errors" <|
+            list <|
+                JD.map Error (field "title" string)
+
+
+dataContactRequestDecoder =
+    JD.map APIContactRequest <|
+        field "data" <|
+            contactRequestDecoder
+
+
+contactRequestDecoder =
+    field "person" <| succeed "TEMP"
