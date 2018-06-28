@@ -58,6 +58,9 @@
   box-sizing: border-box;
   padding-left: 0;
   padding-right: 0;
+
+  /* prevent NationBuilder theme styles from setting font-style */
+  font-style: normal;
 }
 
 .flex-outer > li > span.validation {
