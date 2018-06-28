@@ -31,7 +31,7 @@
                 var currentUserIDElement = document.getElementById("current-user-id");
                 if (currentUserIDElement) {
                     const id = parseInt(currentUserIDElement.textContent, 10);
-                    if (id !== NaN) {
+                    if (!isNaN(id)) {
                         currentUserID = id;
                     }
                 }

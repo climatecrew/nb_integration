@@ -24,6 +24,7 @@ type alias Model =
     , email : String
     , phone : String
     , notes : String
+    , personID : Maybe Int
     , rootURL : String
     , slug : String
     }
@@ -53,6 +54,7 @@ initialModel flags =
     , email = ""
     , phone = ""
     , notes = ""
+    , personID = flags.nbID
     , rootURL = flags.rootURL
     , slug = flags.slug
     }
@@ -218,13 +220,20 @@ encodeContactRequest model =
 
         notes =
             JE.string model.notes
+
+        person_id = case model.personID of
+            Just id ->
+                JE.int id
+            Nothing ->
+                JE.null
     in
         object
             [ ( "data"
               , object
                     [ ( "person"
                       , object
-                            [ ( "first_name", first_name )
+                            [ ( "person_id",  person_id )
+                            , ( "first_name", first_name )
                             , ( "last_name", last_name )
                             , ( "email", email )
                             , ( "phone", phone )
