@@ -43,6 +43,13 @@ class HandleContactRequestCreation
       body = { errors: [{ title: "Failed to create contact request" }] }
     else
       code = 201
+      nb_user_id = nb_person
+        .fetch("person")
+        .fetch("id")
+      nb_user_email = payload
+        .fetch("person")
+        .fetch("email")
+      ContactRequest.create(nb_slug: account.nb_slug, nb_user_id: nb_user_id, nb_user_email: nb_user_email, nb_person: nb_response.body)
       body = { data: nb_person }
     end
     [code, body]

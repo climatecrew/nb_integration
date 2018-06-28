@@ -19,3 +19,4 @@ require "helpers/handle_contact_request_creation"
 $:.unshift File.expand_path(File.dirname(__FILE__), "models/")
 require "models/account"
 require "models/event"
+require "models/contact_request"

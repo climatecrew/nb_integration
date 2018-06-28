@@ -63,7 +63,7 @@ RSpec.describe "POST /api/contact_requests" do
           "person": {
             "first_name": "Sadie",
             "last_name": "Brewis",
-            "email": "#{contact_email}",
+            "email": "#{nb_user_email}",
             "phone": "555-123-4567"
           }
         }
@@ -77,13 +77,15 @@ RSpec.describe "POST /api/contact_requests" do
       {
         "person" => base_body["person"].merge(
           "parent_id" => ENV["NB_POINT_PERSON_ID"].to_i,
-          "tags": ["Prep Week September 2018"]
+          "tags" => ["Prep Week September 2018"]
         )
       }
     end
 
     let(:nb_person_body) do
-      forwarded_person
+      {
+        "person" => forwarded_person["person"].merge("id" => nb_user_id)
+      }
     end
 
     before do
@@ -101,6 +103,19 @@ RSpec.describe "POST /api/contact_requests" do
     end
 
     context "when the NationBuilder request succeeds" do
+      it "writes the created contact_request to the DB" do
+        stub_request(:post, url).with(body: forwarded_person)
+          .to_return(body: JSON.generate(nb_person_body))
+
+        post "/api/contact_requests?slug=#{slug}", client_body, api_test_rack_env
+
+        expect(ContactRequest.count).to eq(1)
+        stored_contact_request = ContactRequest.first
+        expect(JSON.parse(stored_contact_request.nb_person)).to eq(nb_person_body)
+        expect(stored_contact_request.nb_user_id).to eq(nb_user_id)
+        expect(stored_contact_request.nb_user_email).to eq(nb_user_email)
+      end
+
       it "returns 201 and the person payload" do
         stub_request(:post, url).with(body: forwarded_person)
           .to_return(body: JSON.generate(nb_person_body))
@@ -109,7 +124,7 @@ RSpec.describe "POST /api/contact_requests" do
 
         expect(last_response.status).to eq(201)
         expect(JSON.parse(last_response.body)).to match_json_expression({
-          "data" => forwarded_person
+          "data" => nb_person_body
         })
       end
     end
