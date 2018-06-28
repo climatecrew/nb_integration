@@ -118,6 +118,10 @@ class Server < Roda
 
           r.post do
             logger.info("Attempting to create contact_request for nation #{slug}")
+            payload = r.params['data']
+            code, body = HandleContactRequestCreation.new(logger, account, payload).call
+            response.status = code
+            body
           end
         end
 
