@@ -8,33 +8,66 @@
 
             body { font-family: calibri, helvetica, arial, sans-serif; }
         </style>
-
-        <div id="event-creator", style="display: none;">
-            <div id="email">event.creator@gmail.com</div>
-            <div id="current-user-id">30</div>
-        </div>
     </head>
 
     <body>
+        <div id="nb-integration-requesting-user">
+          <div id="current-user-id">2</div>
+          <div id="email">big.cat@gmail.com</div>
+
+          <div id="first_name">Big</div>
+          <div id="last_name">Cat</div>
+
+          <!-- "home" phone number in NationBuilder -->
+          <div id="phone_number">2031112222</div>
+          <div id="mobile_number">5083334444</div>
+          <div id="work_phone_number">6175556666</div>
+        </div>
+
         <div id="interface"></div>
         <script>
+            function getUserValue(container, id) {
+                var el = container.querySelector('#' + id);
+                if (el && el.textContent != "") {
+                    return el.textContent;
+                } else {
+                    return null;
+                }
+            }
+
+            function getUserID(container) {
+                var id = getUserValue(container, "current-user-id");
+                if (id) {
+                    var numericID = parseInt(id);
+                    if (!isNaN(numericID)) {
+                        return numericID;
+                    }
+                }
+                return null;
+            }
+
+            function getPhone(container) {
+                var phone = getUserValue(container, "phone_number");
+                var mobile = getUserValue(container, "mobile_number");
+                var work_phone_number = getUserValue(container, "work_phone_number");
+
+                if (phone) { return phone; }
+                if (mobile) { return mobile; }
+                if (work_phone_number) { return work_phone_number; }
+
+                return null;
+            }
+
             function renderInterface() {
                 var node = document.getElementById("interface");
 
-                var email = null;
-                var emailElement = document.getElementById("email")
-                if (emailElement) {
-                    email = emailElement.textContent;
-                }
+                var requestingUserElement = document.getElementById("nb-integration-requesting-user");
 
-                var currentUserID = null;
-                var currentUserIDElement = document.getElementById("current-user-id");
-                if (currentUserIDElement) {
-                    const id = parseInt(currentUserIDElement.textContent, 10);
-                    if (id !== NaN) {
-                        currentUserID = id;
-                    }
-                }
+                var currentUserID = getUserID(requestingUserElement);
+                var email = getUserValue(requestingUserElement, "email");
+                var phone = getPhone(requestingUserElement);
+                var first_name = getUserValue(requestingUserElement, "first_name");
+                var last_name = getUserValue(requestingUserElement, "last_name");
 
                 NBIntegration.contactMeInterface(node, email, currentUserID);
             }
