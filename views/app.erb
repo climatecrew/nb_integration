@@ -11,7 +11,7 @@
     </head>
 
     <body>
-        <div id="nb-integration-requesting-user">
+        <div id="nb-integration-requesting-user" style="display: none;">
           <div id="current-user-id">2</div>
           <div id="email">big.cat@gmail.com</div>
 
@@ -63,13 +63,14 @@
 
                 var requestingUserElement = document.getElementById("nb-integration-requesting-user");
 
-                var currentUserID = getUserID(requestingUserElement);
-                var email = getUserValue(requestingUserElement, "email");
-                var phone = getPhone(requestingUserElement);
-                var first_name = getUserValue(requestingUserElement, "first_name");
-                var last_name = getUserValue(requestingUserElement, "last_name");
-
-                NBIntegration.contactMeInterface(node, email, currentUserID);
+                var initialValues = {
+                    nbPersonID: getUserID(requestingUserElement),
+                    nbFirstName: getUserValue(requestingUserElement, "first_name"),
+                    nbLastName: getUserValue(requestingUserElement, "last_name"),
+                    nbEmail: getUserValue(requestingUserElement, "email"),
+                    nbPhone: getPhone(requestingUserElement)
+                };
+                NBIntegration.contactMeInterface(node, initialValues);
             }
         </script>
 

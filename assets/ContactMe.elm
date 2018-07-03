@@ -1,7 +1,7 @@
 module ContactMe exposing (Model, Msg, Flags, init, view, update)
 
 import Html exposing (Html, div, span, text, ul, li, input, textarea, label, button)
-import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows)
+import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows, value)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as JD exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
@@ -19,12 +19,12 @@ type Msg
 
 
 type alias Model =
-    { first_name : String
-    , last_name : String
+    { personID : Maybe Int
+    , firstName : String
+    , lastName : String
     , email : String
     , phone : String
     , notes : String
-    , personID : Maybe Int
     , rootURL : String
     , slug : String
     , loading : Bool
@@ -45,17 +45,24 @@ type alias Error =
 
 
 type alias Flags =
-    { nbID : Maybe Int, nbEmail : Maybe String, rootURL : String, slug : String }
+    { nbPersonID : Maybe Int
+    , nbFirstName : Maybe String
+    , nbLastName : Maybe String
+    , nbEmail : Maybe String
+    , nbPhone : Maybe String
+    , rootURL : String
+    , slug : String
+    }
 
 
 initialModel : Flags -> Model
 initialModel flags =
-    { first_name = ""
-    , last_name = ""
-    , email = ""
-    , phone = ""
+    { personID = flags.nbPersonID
+    , firstName = Maybe.withDefault "" flags.nbFirstName
+    , lastName = Maybe.withDefault "" flags.nbLastName
+    , email = Maybe.withDefault "" flags.nbEmail
+    , phone = Maybe.withDefault "" flags.nbPhone
     , notes = ""
-    , personID = flags.nbID
     , rootURL = flags.rootURL
     , slug = flags.slug
     , loading = False
@@ -84,7 +91,7 @@ mainView model =
             [ ul [ class "flex-outer" ]
                 [ li [ class "section-start" ]
                     [ label [ for "first-name" ] [ text "First Name" ]
-                    , input [ id "first-name", type_ "last-name", placeholder "Required", onInput FirstName ] []
+                    , input [ id "first-name", type_ "last-name", placeholder "Required", value model.firstName, onInput FirstName ] []
                     , span
                         [ class <| validationClass <| getViewError model "contact.first_name"
                         , style [ ( "visibility", validationVisibility <| getViewError model "contact.first_name" ) ]
@@ -93,7 +100,7 @@ mainView model =
                     ]
                 , li []
                     [ label [ for "last-name" ] [ text "Last Name" ]
-                    , input [ id "last-name", type_ "last-name", placeholder "Required", onInput LastName ] []
+                    , input [ id "last-name", type_ "last-name", placeholder "Required", value model.lastName, onInput LastName ] []
                     , span
                         [ class <| validationClass <| getViewError model "contact.last_name"
                         , style [ ( "visibility", validationVisibility <| getViewError model "contact.last_name" ) ]
@@ -102,7 +109,7 @@ mainView model =
                     ]
                 , li []
                     [ label [ for "email" ] [ text "Email" ]
-                    , input [ id "email", type_ "email", placeholder "Required", onInput Email ] []
+                    , input [ id "email", type_ "email", placeholder "Required", value model.email, onInput Email ] []
                     , span
                         [ class <| validationClass <| getViewError model "contact.email"
                         , style [ ( "visibility", validationVisibility <| getViewError model "contact.email" ) ]
@@ -111,7 +118,7 @@ mainView model =
                     ]
                 , li []
                     [ label [ for "phone" ] [ text "Phone" ]
-                    , input [ id "phone", type_ "phone", onInput Phone ] []
+                    , input [ id "phone", type_ "phone", value model.phone, onInput Phone ] []
                     , emptyValidationView
                     ]
                 , li []
@@ -126,8 +133,9 @@ mainView model =
                     ]
                 ]
             ]
-            , loadingSpinner model
+        , loadingSpinner model
         ]
+
 
 loadingSpinner : Model -> Html Msg
 loadingSpinner model =
@@ -135,6 +143,7 @@ loadingSpinner model =
         div [ class "loader" ] []
     else
         div [] []
+
 
 getViewError : Model -> String -> Bool
 getViewError model errorKey =
@@ -178,11 +187,11 @@ invalidInput model =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        FirstName first_name ->
-            ( { model | first_name = first_name }, Cmd.none )
+        FirstName firstName ->
+            ( { model | firstName = firstName }, Cmd.none )
 
-        LastName last_name ->
-            ( { model | last_name = last_name }, Cmd.none )
+        LastName lastName ->
+            ( { model | lastName = lastName }, Cmd.none )
 
         Email email ->
             ( { model | email = email }, Cmd.none )
@@ -215,11 +224,11 @@ createContactRequest model =
 encodeContactRequest : Model -> Value
 encodeContactRequest model =
     let
-        first_name =
-            JE.string model.first_name
+        firstName =
+            JE.string model.firstName
 
-        last_name =
-            JE.string model.last_name
+        lastName =
+            JE.string model.lastName
 
         email =
             JE.string model.email
@@ -230,25 +239,27 @@ encodeContactRequest model =
         notes =
             JE.string model.notes
 
-        person_id = case model.personID of
-            Just id ->
-                JE.int id
-            Nothing ->
-                JE.null
+        person_id =
+            case model.personID of
+                Just id ->
+                    JE.int id
+
+                Nothing ->
+                    JE.null
     in
         object
             [ ( "data"
               , object
                     [ ( "person"
                       , object
-                            [ ( "id",  person_id )
-                            , ( "first_name", first_name )
-                            , ( "last_name", last_name )
+                            [ ( "id", person_id )
+                            , ( "first_name", firstName )
+                            , ( "last_name", lastName )
                             , ( "email", email )
                             , ( "phone", phone )
                             ]
                       )
-                      , ( "notes", notes )
+                    , ( "notes", notes )
                     ]
               )
             ]
