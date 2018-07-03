@@ -11,6 +11,8 @@ class HandleContactRequestCreation
     path_provider = PathProvider.new(slug: account.nb_slug,
                                      api_token: account.nb_access_token)
     person_id = payload["person"].delete("id")
+    notes = payload.delete("notes")
+    notes = notes.to_s.empty? ? nil : notes
     forwarded_payload = if person_id
                           prepare_payload(payload, :update)
                         else
@@ -30,7 +32,7 @@ class HandleContactRequestCreation
     if nb_response.status.to_i >= 400
       code, body = on_failure(nb_response)
     else
-      code, body = on_success(nb_response)
+      code, body = on_success(nb_response, notes)
     end
     [code, body]
   end
@@ -53,7 +55,7 @@ class HandleContactRequestCreation
     payload
   end
 
-  def on_success(nb_response)
+  def on_success(nb_response, notes)
     nb_person = begin
                  JSON.parse(nb_response.body)
                rescue JSON::ParserError
@@ -71,7 +73,7 @@ class HandleContactRequestCreation
       nb_user_email = payload
         .fetch("person")
         .fetch("email")
-      ContactRequest.create(nb_slug: account.nb_slug, nb_user_id: nb_user_id, nb_user_email: nb_user_email, nb_person: nb_response.body)
+      ContactRequest.create(nb_slug: account.nb_slug, nb_user_id: nb_user_id, nb_user_email: nb_user_email, nb_person: nb_response.body, notes: notes)
       body = { data: nb_person }
     end
     [code, body]

@@ -1,7 +1,7 @@
 module ContactMe exposing (Model, Msg, Flags, init, view, update)
 
-import Html exposing (Html, div, span, text, ul, li, input, label, button)
-import Html.Attributes exposing (id, class, placeholder, style, type_, for)
+import Html exposing (Html, div, span, text, ul, li, input, textarea, label, button)
+import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as JD exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
@@ -13,6 +13,7 @@ type Msg
     | LastName String
     | Email String
     | Phone String
+    | Notes String
     | SubmitForm
     | SubmitFormResult (Result Http.Error APIResult)
 
@@ -22,8 +23,11 @@ type alias Model =
     , last_name : String
     , email : String
     , phone : String
+    , notes : String
+    , personID : Maybe Int
     , rootURL : String
     , slug : String
+    , loading : Bool
     }
 
 
@@ -50,8 +54,11 @@ initialModel flags =
     , last_name = ""
     , email = ""
     , phone = ""
+    , notes = ""
+    , personID = flags.nbID
     , rootURL = flags.rootURL
     , slug = flags.slug
+    , loading = False
     }
 
 
@@ -107,6 +114,11 @@ mainView model =
                     , input [ id "phone", type_ "phone", onInput Phone ] []
                     , emptyValidationView
                     ]
+                , li []
+                    [ label [ for "notes" ] [ text "Notes" ]
+                    , textarea [ id "notes", rows 5, onInput Notes ] []
+                    , emptyValidationView
+                    ]
                 , li [ class <| submitButtonClass model ]
                     [ label [] []
                     , button [ onClick SubmitForm ] [ text "Submit" ]
@@ -114,8 +126,15 @@ mainView model =
                     ]
                 ]
             ]
+            , loadingSpinner model
         ]
 
+loadingSpinner : Model -> Html Msg
+loadingSpinner model =
+    if model.loading then
+        div [ class "loader" ] []
+    else
+        div [] []
 
 getViewError : Model -> String -> Bool
 getViewError model errorKey =
@@ -171,11 +190,14 @@ update msg model =
         Phone phone ->
             ( { model | phone = phone }, Cmd.none )
 
+        Notes notes ->
+            ( { model | notes = notes }, Cmd.none )
+
         SubmitForm ->
-            ( model, Http.send SubmitFormResult (createContactRequest model) )
+            ( { model | loading = True }, Http.send SubmitFormResult (createContactRequest model) )
 
         SubmitFormResult result ->
-            ( model, Cmd.none )
+            ( { model | loading = False }, Cmd.none )
 
 
 contactRequestsURL : Model -> String
@@ -204,18 +226,29 @@ encodeContactRequest model =
 
         phone =
             JE.string model.phone
+
+        notes =
+            JE.string model.notes
+
+        person_id = case model.personID of
+            Just id ->
+                JE.int id
+            Nothing ->
+                JE.null
     in
         object
             [ ( "data"
               , object
                     [ ( "person"
                       , object
-                            [ ( "first_name", first_name )
+                            [ ( "id",  person_id )
+                            , ( "first_name", first_name )
                             , ( "last_name", last_name )
                             , ( "email", email )
                             , ( "phone", phone )
                             ]
                       )
+                      , ( "notes", notes )
                     ]
               )
             ]

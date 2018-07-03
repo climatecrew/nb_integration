@@ -70,7 +70,8 @@ RSpec.describe "POST /api/contact_requests" do
             "last_name": "Brewis",
             "email": "#{nb_user_email}",
             "phone": "555-123-4567"
-          }
+          },
+          "notes": "Tell me about the cheesecake"
         }
       JSON
     end
@@ -150,6 +151,20 @@ RSpec.describe "POST /api/contact_requests" do
         expect(JSON.parse(stored_contact_request.nb_person)).to eq(nb_person_body)
         expect(stored_contact_request.nb_user_id).to eq(nb_user_id)
         expect(stored_contact_request.nb_user_email).to eq(nb_user_email)
+        expect(stored_contact_request.notes).to eq("Tell me about the cheesecake")
+      end
+
+      it "converts empty notes to NULL" do
+        stub_request(:post, post_url).with(body: forwarded_create_person)
+          .to_return(body: JSON.generate(nb_person_body))
+
+        body_without_notes = JSON.parse(client_create_body)
+        body_without_notes["data"].delete("notes")
+        post "/api/contact_requests?slug=#{slug}", JSON.generate(body_without_notes), api_test_rack_env
+
+        expect(ContactRequest.count).to eq(1)
+        stored_contact_request = ContactRequest.first
+        expect(stored_contact_request.notes).to be_nil
       end
 
       it "returns 201 and the person payload" do
