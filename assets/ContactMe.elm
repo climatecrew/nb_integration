@@ -68,24 +68,10 @@ mainView model =
         [ class "nb-integration-container" ]
         [ div [ class "form" ]
             [ ul [ class "flex-outer" ]
-                [ li [ class "section-start" ]
-                    [ label [ for "first-name" ] [ text "First Name" ]
-                    , input [ id "first-name", type_ "last-name", placeholder "Required", value model.firstName, onInput FirstName ] []
-                    , span
-                        [ class <| validationClass <| getViewError model "contact.first_name"
-                        , style [ ( "visibility", validationVisibility <| getViewError model "contact.first_name" ) ]
-                        ]
-                        [ text "First name must be present" ]
-                    ]
-                , li []
-                    [ label [ for "last-name" ] [ text "Last Name" ]
-                    , input [ id "last-name", type_ "last-name", placeholder "Required", value model.lastName, onInput LastName ] []
-                    , span
-                        [ class <| validationClass <| getViewError model "contact.last_name"
-                        , style [ ( "visibility", validationVisibility <| getViewError model "contact.last_name" ) ]
-                        ]
-                        [ text "Last name must be present" ]
-                    ]
+                [ li [ class "section-start" ] <|
+                    FormInput.inputView model.form.submitted model.form.firstName FirstName
+                , li [] <|
+                    FormInput.inputView model.form.submitted model.form.lastName LastName
                 , li [] <|
                     FormInput.inputView model.form.submitted model.form.email Email
                 , li [] <|
@@ -157,10 +143,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         FirstName firstName ->
-            ( { model | firstName = firstName }, Cmd.none )
+            ( { model | firstName = firstName, form = ContactMeForm.updateFirstName model.form firstName }, Cmd.none )
 
         LastName lastName ->
-            ( { model | lastName = lastName }, Cmd.none )
+            ( { model | lastName = lastName, form = ContactMeForm.updateLastName model.form lastName }, Cmd.none )
 
         Email email ->
             ( { model | email = email, form = ContactMeForm.updateEmail model.form email }, Cmd.none )

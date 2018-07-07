@@ -6,6 +6,8 @@ import FormInput exposing (FormInput, setupNonInteractiveInput, setupInteractive
 
 type alias Form =
     { submitted : Bool
+    , firstName : FormInput
+    , lastName : FormInput
     , email : FormInput
     , phone : FormInput
     }
@@ -16,6 +18,44 @@ setupForm flags =
     let
         isValid =
             (\val -> String.length val > 0)
+
+        firstNameInput =
+            case flags.nbPersonID of
+                Nothing ->
+                    FormInput.setupInteractiveInput
+                        { value = ""
+                        , placeholder = "Required"
+                        , label = "First Name"
+                        , for = "first_name"
+                        , id = "first_name"
+                        , type_ = "first_name"
+                        , touched = False
+                        , isValid = isValid
+                        , errorMessage = (\val -> "First Name is required")
+                        }
+
+                Just _ ->
+                    FormInput.setupNonInteractiveInput
+                        { value = Maybe.withDefault "" flags.nbFirstName }
+
+        lastNameInput =
+            case flags.nbPersonID of
+                Nothing ->
+                    FormInput.setupInteractiveInput
+                        { value = ""
+                        , placeholder = "Required"
+                        , label = "Last Name"
+                        , for = "last_name"
+                        , id = "last_name"
+                        , type_ = "last_name"
+                        , touched = False
+                        , isValid = isValid
+                        , errorMessage = (\val -> "Last Name is required")
+                        }
+
+                Just _ ->
+                    FormInput.setupNonInteractiveInput
+                        { value = Maybe.withDefault "" flags.nbLastName }
 
         emailInput =
             case flags.nbEmail of
@@ -56,9 +96,21 @@ setupForm flags =
                         { value = phone }
     in
         { submitted = False
+        , firstName = firstNameInput
+        , lastName = lastNameInput
         , email = emailInput
         , phone = phoneInput
         }
+
+
+updateFirstName : Form -> String -> Form
+updateFirstName form value =
+    { form | firstName = FormInput.updateFormInput form.firstName value }
+
+
+updateLastName : Form -> String -> Form
+updateLastName form value =
+    { form | lastName = FormInput.updateFormInput form.lastName value }
 
 
 updateEmail : Form -> String -> Form
