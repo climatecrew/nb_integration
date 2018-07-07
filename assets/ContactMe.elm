@@ -6,16 +6,9 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as JD exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
 import Json.Encode as JE exposing (Value, encode, object)
-
-
-type Msg
-    = FirstName String
-    | LastName String
-    | Email String
-    | Phone String
-    | Notes String
-    | SubmitForm
-    | SubmitFormResult (Result Http.Error APIResult)
+import ContactMeForm exposing (Form)
+import FormInput exposing (FormInput)
+import ContactMeTypes exposing (..)
 
 
 type alias Model =
@@ -28,31 +21,16 @@ type alias Model =
     , rootURL : String
     , slug : String
     , loading : Bool
+    , form : Form
     }
 
 
-type APIResult
-    = APIErrors (List Error)
-    | APIContactRequest ContactRequest
-
-
-type alias ContactRequest =
-    String
-
-
-type alias Error =
-    { title : String }
+type alias Msg =
+    ContactMeTypes.Msg
 
 
 type alias Flags =
-    { nbPersonID : Maybe Int
-    , nbFirstName : Maybe String
-    , nbLastName : Maybe String
-    , nbEmail : Maybe String
-    , nbPhone : Maybe String
-    , rootURL : String
-    , slug : String
-    }
+    ContactMeTypes.Flags
 
 
 initialModel : Flags -> Model
@@ -66,6 +44,7 @@ initialModel flags =
     , rootURL = flags.rootURL
     , slug = flags.slug
     , loading = False
+    , form = ContactMeForm.setupForm flags
     }
 
 
@@ -107,15 +86,8 @@ mainView model =
                         ]
                         [ text "Last name must be present" ]
                     ]
-                , li []
-                    [ label [ for "email" ] [ text "Email" ]
-                    , input [ id "email", type_ "email", placeholder "Required", value model.email, onInput Email ] []
-                    , span
-                        [ class <| validationClass <| getViewError model "contact.email"
-                        , style [ ( "visibility", validationVisibility <| getViewError model "contact.email" ) ]
-                        ]
-                        [ text "Email must be present" ]
-                    ]
+                , li [] <|
+                    FormInput.inputView model.form.submitted model.form.email Email
                 , li []
                     [ label [ for "phone" ] [ text "Phone" ]
                     , input [ id "phone", type_ "phone", value model.phone, onInput Phone ] []
@@ -193,8 +165,8 @@ update msg model =
         LastName lastName ->
             ( { model | lastName = lastName }, Cmd.none )
 
-        Email email ->
-            ( { model | email = email }, Cmd.none )
+        Email e ->
+            ( { model | email = e, form = ContactMeForm.updateEmail model.form e }, Cmd.none )
 
         Phone phone ->
             ( { model | phone = phone }, Cmd.none )
