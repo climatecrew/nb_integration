@@ -8,7 +8,7 @@ import ContactMeTypes exposing (Msg)
 
 type alias InteractiveInput =
     { inputType : TextInputType
-    , value : String
+    , value : Maybe String
     , placeholder : String
     , id : String
     , label : String
@@ -21,7 +21,7 @@ type alias InteractiveInput =
 
 
 type alias NonInteractiveInput =
-    { value : String
+    { value : Maybe String
     }
 
 
@@ -49,10 +49,16 @@ updateFormInput : FormInput -> String -> FormInput
 updateFormInput formInput val =
     case formInput of
         Interactive input ->
-            Interactive { input | value = val, touched = True }
+            if String.length val > 0 then
+                Interactive { input | value = Just val, touched = True }
+            else
+                Interactive { input | value = Nothing, touched = True }
 
         NonInteractive input ->
-            NonInteractive { input | value = val }
+            if String.length val > 0 then
+                NonInteractive { input | value = Just val }
+            else
+                NonInteractive { input | value = Nothing }
 
 
 inputView : Bool -> FormInput -> (String -> Msg) -> List (Html Msg)
@@ -65,7 +71,7 @@ inputView formSubmitted formInput inputMsg =
                         [ id input.id
                         , type_ input.type_
                         , placeholder input.placeholder
-                        , value input.value
+                        , value <| Maybe.withDefault "" input.value
                         , onInput inputMsg
                         ]
                         []
@@ -75,13 +81,13 @@ inputView formSubmitted formInput inputMsg =
                         [ id input.id
                         , placeholder input.placeholder
                         , rows rowCount
-                        , value input.value
+                        , value <| Maybe.withDefault "" input.value
                         , onInput inputMsg
                         ]
                         []
 
         showValidation input =
-            (not <| input.isValid input.value)
+            (not <| input.isValid <| Maybe.withDefault "" input.value)
                 && (input.touched || formSubmitted)
     in
         case formInput of
@@ -109,7 +115,7 @@ validationVisibility showErrors =
 
 validationMessage : InteractiveInput -> String
 validationMessage input =
-    if input.isValid input.value then
+    if input.isValid (Maybe.withDefault "" input.value) then
         ""
     else
-        input.errorMessage input.value
+        input.errorMessage (Maybe.withDefault "" input.value)

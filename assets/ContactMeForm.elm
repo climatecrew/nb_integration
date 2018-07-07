@@ -25,7 +25,7 @@ setupForm flags =
                 Nothing ->
                     FormInput.setupInteractiveInput
                         { inputType = FormInput.Input
-                        , value = ""
+                        , value = Nothing
                         , placeholder = "Required"
                         , label = "First Name"
                         , for = "first_name"
@@ -38,14 +38,14 @@ setupForm flags =
 
                 Just _ ->
                     FormInput.setupNonInteractiveInput
-                        { value = Maybe.withDefault "" flags.nbFirstName }
+                        { value = flags.nbFirstName }
 
         lastNameInput =
             case flags.nbPersonID of
                 Nothing ->
                     FormInput.setupInteractiveInput
                         { inputType = FormInput.Input
-                        , value = ""
+                        , value = Nothing
                         , placeholder = "Required"
                         , label = "Last Name"
                         , for = "last_name"
@@ -58,14 +58,14 @@ setupForm flags =
 
                 Just _ ->
                     FormInput.setupNonInteractiveInput
-                        { value = Maybe.withDefault "" flags.nbLastName }
+                        { value = flags.nbLastName }
 
         emailInput =
             case flags.nbEmail of
                 Nothing ->
                     FormInput.setupInteractiveInput
                         { inputType = FormInput.Input
-                        , value = ""
+                        , value = Nothing
                         , placeholder = "Required"
                         , label = "Email"
                         , for = "email"
@@ -78,14 +78,14 @@ setupForm flags =
 
                 Just email ->
                     FormInput.setupNonInteractiveInput
-                        { value = email }
+                        { value = Just email }
 
         phoneInput =
             case flags.nbPhone of
                 Nothing ->
                     FormInput.setupInteractiveInput
                         { inputType = FormInput.Input
-                        , value = ""
+                        , value = Nothing
                         , placeholder = "Optional, helps us coordinate with you about the event"
                         , label = "Phone"
                         , for = "phone"
@@ -98,12 +98,12 @@ setupForm flags =
 
                 Just phone ->
                     FormInput.setupNonInteractiveInput
-                        { value = phone }
+                        { value = Just phone }
 
         notesInput =
             FormInput.setupInteractiveInput
                 { inputType = FormInput.TextArea 5
-                , value = ""
+                , value = Nothing
                 , placeholder = "Comments or questions about your event idea"
                 , label = "Notes"
                 , for = "notes"
