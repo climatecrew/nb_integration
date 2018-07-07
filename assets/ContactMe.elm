@@ -158,10 +158,22 @@ update msg model =
             ( { model | notes = notes }, Cmd.none )
 
         SubmitForm ->
-            ( { model | loading = True }, Http.send SubmitFormResult (createContactRequest model) )
+            ( submitForm model, Http.send SubmitFormResult (createContactRequest model) )
 
         SubmitFormResult result ->
             ( { model | loading = False }, Cmd.none )
+
+
+submitForm : Model -> Model
+submitForm model =
+    let
+        { form } =
+            model
+
+        updatedForm =
+            ContactMeForm.submit form
+    in
+        { model | loading = True, form = updatedForm }
 
 
 contactRequestsURL : Model -> String

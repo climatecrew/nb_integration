@@ -121,3 +121,8 @@ updateEmail form value =
 updatePhone : Form -> String -> Form
 updatePhone form value =
     { form | phone = FormInput.updateFormInput form.phone value }
+
+
+submit : Form -> Form
+submit form =
+    { form | submitted = True }
