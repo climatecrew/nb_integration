@@ -76,11 +76,7 @@ mainView model =
                     FormInput.inputView model.form.submitted model.form.email Email
                 , li [] <|
                     FormInput.inputView model.form.submitted model.form.phone Phone
-                , li []
-                    [ label [ for "notes" ] [ text "Notes" ]
-                    , textarea [ id "notes", rows 5, onInput Notes ] []
-                    , emptyValidationView
-                    ]
+                , li [] <| FormInput.inputView model.form.submitted model.form.notes Notes
                 , li [ class <| submitButtonClass model ]
                     [ label [] []
                     , button [ onClick SubmitForm ] [ text "Submit" ]
@@ -155,7 +151,7 @@ update msg model =
             ( { model | phone = phone, form = ContactMeForm.updatePhone model.form phone }, Cmd.none )
 
         Notes notes ->
-            ( { model | notes = notes }, Cmd.none )
+            ( { model | notes = notes, form = ContactMeForm.updateNotes model.form notes }, Cmd.none )
 
         SubmitForm ->
             ( submitForm model, Http.send SubmitFormResult (createContactRequest model) )

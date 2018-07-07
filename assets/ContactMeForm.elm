@@ -1,7 +1,7 @@
 module ContactMeForm exposing (..)
 
 import ContactMeTypes exposing (Flags)
-import FormInput exposing (FormInput, setupNonInteractiveInput, setupInteractiveInput, inputView)
+import FormInput exposing (FormInput)
 
 
 type alias Form =
@@ -10,6 +10,7 @@ type alias Form =
     , lastName : FormInput
     , email : FormInput
     , phone : FormInput
+    , notes : FormInput
     }
 
 
@@ -23,7 +24,8 @@ setupForm flags =
             case flags.nbPersonID of
                 Nothing ->
                     FormInput.setupInteractiveInput
-                        { value = ""
+                        { inputType = FormInput.Input
+                        , value = ""
                         , placeholder = "Required"
                         , label = "First Name"
                         , for = "first_name"
@@ -42,7 +44,8 @@ setupForm flags =
             case flags.nbPersonID of
                 Nothing ->
                     FormInput.setupInteractiveInput
-                        { value = ""
+                        { inputType = FormInput.Input
+                        , value = ""
                         , placeholder = "Required"
                         , label = "Last Name"
                         , for = "last_name"
@@ -61,7 +64,8 @@ setupForm flags =
             case flags.nbEmail of
                 Nothing ->
                     FormInput.setupInteractiveInput
-                        { value = ""
+                        { inputType = FormInput.Input
+                        , value = ""
                         , placeholder = "Required"
                         , label = "Email"
                         , for = "email"
@@ -80,8 +84,9 @@ setupForm flags =
             case flags.nbPhone of
                 Nothing ->
                     FormInput.setupInteractiveInput
-                        { value = ""
-                        , placeholder = ""
+                        { inputType = FormInput.Input
+                        , value = ""
+                        , placeholder = "Optional, helps us coordinate with you about the event"
                         , label = "Phone"
                         , for = "phone"
                         , id = "phone"
@@ -94,12 +99,27 @@ setupForm flags =
                 Just phone ->
                     FormInput.setupNonInteractiveInput
                         { value = phone }
+
+        notesInput =
+            FormInput.setupInteractiveInput
+                { inputType = FormInput.TextArea 5
+                , value = ""
+                , placeholder = "Comments or questions about your event idea"
+                , label = "Notes"
+                , for = "notes"
+                , id = "notes"
+                , type_ = "text"
+                , touched = False
+                , isValid = (\_ -> True)
+                , errorMessage = (\_ -> "")
+                }
     in
         { submitted = False
         , firstName = firstNameInput
         , lastName = lastNameInput
         , email = emailInput
         , phone = phoneInput
+        , notes = notesInput
         }
 
 
@@ -121,6 +141,11 @@ updateEmail form value =
 updatePhone : Form -> String -> Form
 updatePhone form value =
     { form | phone = FormInput.updateFormInput form.phone value }
+
+
+updateNotes : Form -> String -> Form
+updateNotes form value =
+    { form | notes = FormInput.updateFormInput form.notes value }
 
 
 submit : Form -> Form

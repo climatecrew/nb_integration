@@ -1,4 +1,4 @@
-module FormInput exposing (FormInput, setupNonInteractiveInput, setupInteractiveInput, updateFormInput, inputView)
+module FormInput exposing (FormInput, TextInputType(..), setupNonInteractiveInput, setupInteractiveInput, updateFormInput, inputView)
 
 import Html exposing (Html, span, text, input, textarea, label)
 import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows, value)
@@ -7,7 +7,8 @@ import ContactMeTypes exposing (Msg)
 
 
 type alias InteractiveInput =
-    { value : String
+    { inputType : TextInputType
+    , value : String
     , placeholder : String
     , id : String
     , label : String
@@ -22,6 +23,11 @@ type alias InteractiveInput =
 type alias NonInteractiveInput =
     { value : String
     }
+
+
+type TextInputType
+    = Input
+    | TextArea Int
 
 
 type FormInput
@@ -53,14 +59,26 @@ inputView : Bool -> FormInput -> (String -> Msg) -> List (Html Msg)
 inputView formSubmitted formInput inputMsg =
     let
         htmlInput input =
-            Html.input
-                [ id input.id
-                , type_ input.type_
-                , placeholder input.placeholder
-                , value input.value
-                , onInput inputMsg
-                ]
-                []
+            case input.inputType of
+                Input ->
+                    Html.input
+                        [ id input.id
+                        , type_ input.type_
+                        , placeholder input.placeholder
+                        , value input.value
+                        , onInput inputMsg
+                        ]
+                        []
+
+                TextArea rowCount ->
+                    Html.textarea
+                        [ id input.id
+                        , placeholder input.placeholder
+                        , rows rowCount
+                        , value input.value
+                        , onInput inputMsg
+                        ]
+                        []
 
         showValidation input =
             (not <| input.isValid input.value)
