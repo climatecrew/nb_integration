@@ -88,11 +88,8 @@ mainView model =
                     ]
                 , li [] <|
                     FormInput.inputView model.form.submitted model.form.email Email
-                , li []
-                    [ label [ for "phone" ] [ text "Phone" ]
-                    , input [ id "phone", type_ "phone", value model.phone, onInput Phone ] []
-                    , emptyValidationView
-                    ]
+                , li [] <|
+                    FormInput.inputView model.form.submitted model.form.phone Phone
                 , li []
                     [ label [ for "notes" ] [ text "Notes" ]
                     , textarea [ id "notes", rows 5, onInput Notes ] []
@@ -165,11 +162,11 @@ update msg model =
         LastName lastName ->
             ( { model | lastName = lastName }, Cmd.none )
 
-        Email e ->
-            ( { model | email = e, form = ContactMeForm.updateEmail model.form e }, Cmd.none )
+        Email email ->
+            ( { model | email = email, form = ContactMeForm.updateEmail model.form email }, Cmd.none )
 
         Phone phone ->
-            ( { model | phone = phone }, Cmd.none )
+            ( { model | phone = phone, form = ContactMeForm.updatePhone model.form phone }, Cmd.none )
 
         Notes notes ->
             ( { model | notes = notes }, Cmd.none )
