@@ -139,12 +139,10 @@ submitForm model =
                     { model | form = ContactMeForm.submit form, loading = False }
 
         cmd =
-            case ContactMeForm.formInputsValid model.form of
-                True ->
-                    Http.send SubmitFormResult (createContactRequest model)
-
-                False ->
-                    Cmd.none
+            if (not model.loading) && ContactMeForm.formInputsValid model.form then
+                Http.send SubmitFormResult (createContactRequest model)
+            else
+                Cmd.none
     in
         ( updatedModel, cmd )
 
