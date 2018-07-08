@@ -12,6 +12,7 @@
 
     <body>
         <div id="nb-integration-requesting-user" style="display: none;">
+        <% if populate_nb_values %>
           <div id="current-user-id">2</div>
           <div id="email">big.cat@gmail.com</div>
 
@@ -22,6 +23,17 @@
           <div id="phone_number">2031112222</div>
           <div id="mobile_number">5083334444</div>
           <div id="work_phone_number">6175556666</div>
+        <% else %>
+          <div id="current-user-id"></div>
+          <div id="email"></div>
+
+          <div id="first_name"></div>
+          <div id="last_name"></div>
+
+          <div id="phone_number"></div>
+          <div id="mobile_number"></div>
+          <div id="work_phone_number"></div>
+        <% end %>
         </div>
 
         <div id="interface"></div>

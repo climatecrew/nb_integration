@@ -70,7 +70,7 @@ class Server < Roda
     end
 
     r.on "app" do
-      render("app")
+      render("app", locals: { populate_nb_values: r.params["logged_in"] == "true" })
     end
 
     # load JavaScript app for embed on nation web page
