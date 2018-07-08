@@ -177,6 +177,12 @@ encodeContactRequest model =
         phone =
             encodeNullable JE.string values.phone
 
+        mobile =
+            encodeNullable JE.string values.mobile
+
+        workPhoneNumber =
+            encodeNullable JE.string values.workPhoneNumber
+
         notes =
             encodeNullable JE.string values.notes
 
@@ -193,6 +199,8 @@ encodeContactRequest model =
                             , ( "last_name", lastName )
                             , ( "email", email )
                             , ( "phone", phone )
+                            , ( "mobile", mobile )
+                            , ( "work_phone_number", workPhoneNumber )
                             ]
                       )
                     , ( "notes", notes )

@@ -10,6 +10,8 @@ type alias Form =
     , lastName : FormInput
     , email : FormInput
     , phone : FormInput
+    , mobile : FormInput
+    , workPhoneNumber : FormInput
     , notes : FormInput
     }
 
@@ -19,6 +21,8 @@ type alias FormInputValues =
     , lastName : Maybe String
     , email : Maybe String
     , phone : Maybe String
+    , mobile : Maybe String
+    , workPhoneNumber : Maybe String
     , notes : Maybe String
     }
 
@@ -90,8 +94,15 @@ setupForm flags =
                         { value = Just email }
 
         phoneInput =
-            case flags.nbPhone of
-                Nothing ->
+            case
+                List.filterMap identity
+                    [ flags.nbPhone
+                    , flags.nbMobile
+                    , flags.nbWorkPhoneNumber
+                    ]
+                    |> List.length
+            of
+                0 ->
                     FormInput.setupInteractiveInput
                         { inputType = FormInput.Input
                         , value = Nothing
@@ -105,9 +116,17 @@ setupForm flags =
                         , errorMessage = (\_ -> "")
                         }
 
-                Just phone ->
+                otherwise ->
                     FormInput.setupNonInteractiveInput
-                        { value = Just phone }
+                        { value = flags.nbPhone }
+
+        mobileInput =
+            FormInput.setupNonInteractiveInput
+                { value = flags.nbMobile }
+
+        workPhoneNumberInput =
+            FormInput.setupNonInteractiveInput
+                { value = flags.nbWorkPhoneNumber }
 
         notesInput =
             FormInput.setupInteractiveInput
@@ -128,6 +147,8 @@ setupForm flags =
         , lastName = lastNameInput
         , email = emailInput
         , phone = phoneInput
+        , mobile = mobileInput
+        , workPhoneNumber = workPhoneNumberInput
         , notes = notesInput
         }
 
@@ -163,6 +184,8 @@ formInputValues form =
     , lastName = FormInput.value form.lastName
     , email = FormInput.value form.email
     , phone = FormInput.value form.phone
+    , mobile = FormInput.value form.mobile
+    , workPhoneNumber = FormInput.value form.workPhoneNumber
     , notes = FormInput.value form.notes
     }
 

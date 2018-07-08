@@ -19,6 +19,8 @@ type alias Flags =
     , nbLastName : Maybe String
     , nbEmail : Maybe String
     , nbPhone : Maybe String
+    , nbMobile : Maybe String
+    , nbWorkPhoneNumber : Maybe String
     , rootURL : String
     , slug : String
     }

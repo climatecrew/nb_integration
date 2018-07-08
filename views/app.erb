@@ -58,18 +58,6 @@
                 return null;
             }
 
-            function getPhone(container) {
-                var phone = getUserValue(container, "phone_number");
-                var mobile = getUserValue(container, "mobile_number");
-                var work_phone_number = getUserValue(container, "work_phone_number");
-
-                if (phone) { return phone; }
-                if (mobile) { return mobile; }
-                if (work_phone_number) { return work_phone_number; }
-
-                return null;
-            }
-
             function renderInterface() {
                 var node = document.getElementById("interface");
 
@@ -80,7 +68,9 @@
                     nbFirstName: getUserValue(requestingUserElement, "first_name"),
                     nbLastName: getUserValue(requestingUserElement, "last_name"),
                     nbEmail: getUserValue(requestingUserElement, "email"),
-                    nbPhone: getPhone(requestingUserElement)
+                    nbPhone: getUserValue(requestingUserElement, "phone_number"),
+                    nbMobile: getUserValue(requestingUserElement, "mobile_number"),
+                    nbWorkPhoneNumber: getUserValue(requestingUserElement, "work_phone_number")
                 };
                 NBIntegration.contactMeInterface(node, initialValues);
             }
