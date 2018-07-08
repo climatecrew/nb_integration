@@ -95,7 +95,7 @@ setupForm flags =
                     FormInput.setupInteractiveInput
                         { inputType = FormInput.Input
                         , value = Nothing
-                        , placeholder = "Optional, helps us coordinate with you about the event"
+                        , placeholder = "Optional"
                         , label = "Phone"
                         , for = "phone"
                         , id = "phone"
