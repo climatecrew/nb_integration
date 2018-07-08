@@ -1,4 +1,4 @@
-module FormInput exposing (FormInput, TextInputType(..), setupNonInteractiveInput, setupInteractiveInput, updateFormInput, inputView)
+module FormInput exposing (FormInput, TextInputType(..), setupNonInteractiveInput, setupInteractiveInput, updateFormInput, value, valid, inputView)
 
 import Html exposing (Html, span, text, input, textarea, label)
 import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows, value)
@@ -61,6 +61,26 @@ updateFormInput formInput val =
                 NonInteractive { input | value = Nothing }
 
 
+value : FormInput -> Maybe String
+value formInput =
+    case formInput of
+        Interactive input ->
+            input.value
+
+        NonInteractive input ->
+            input.value
+
+
+valid : FormInput -> Bool
+valid formInput =
+    case formInput of
+        Interactive input ->
+            Maybe.withDefault "" input.value |> input.isValid
+
+        NonInteractive _ ->
+            True
+
+
 inputView : Bool -> FormInput -> (String -> Msg) -> List (Html Msg)
 inputView formSubmitted formInput inputMsg =
     let
@@ -71,7 +91,7 @@ inputView formSubmitted formInput inputMsg =
                         [ id input.id
                         , type_ input.type_
                         , placeholder input.placeholder
-                        , value <| Maybe.withDefault "" input.value
+                        , Html.Attributes.value <| Maybe.withDefault "" input.value
                         , onInput inputMsg
                         ]
                         []
@@ -81,7 +101,7 @@ inputView formSubmitted formInput inputMsg =
                         [ id input.id
                         , placeholder input.placeholder
                         , rows rowCount
-                        , value <| Maybe.withDefault "" input.value
+                        , Html.Attributes.value <| Maybe.withDefault "" input.value
                         , onInput inputMsg
                         ]
                         []

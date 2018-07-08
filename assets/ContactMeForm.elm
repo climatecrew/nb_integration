@@ -14,6 +14,15 @@ type alias Form =
     }
 
 
+type alias FormInputValues =
+    { firstName : Maybe String
+    , lastName : Maybe String
+    , email : Maybe String
+    , phone : Maybe String
+    , notes : Maybe String
+    }
+
+
 setupForm : Flags -> Form
 setupForm flags =
     let
@@ -146,6 +155,28 @@ updatePhone form value =
 updateNotes : Form -> String -> Form
 updateNotes form value =
     { form | notes = FormInput.updateFormInput form.notes value }
+
+
+formInputValues : Form -> FormInputValues
+formInputValues form =
+    { firstName = FormInput.value form.firstName
+    , lastName = FormInput.value form.lastName
+    , email = FormInput.value form.email
+    , phone = FormInput.value form.phone
+    , notes = FormInput.value form.notes
+    }
+
+
+formInputsValid : Form -> Bool
+formInputsValid form =
+    List.all identity <|
+        List.map FormInput.valid
+            [ form.firstName
+            , form.lastName
+            , form.email
+            , form.phone
+            , form.notes
+            ]
 
 
 submit : Form -> Form

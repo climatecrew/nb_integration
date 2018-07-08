@@ -12,16 +12,11 @@ import ContactMeTypes exposing (..)
 
 
 type alias Model =
-    { personID : Maybe Int
-    , firstName : String
-    , lastName : String
-    , email : String
-    , phone : String
-    , notes : String
-    , rootURL : String
+    { rootURL : String
     , slug : String
-    , loading : Bool
+    , personID : Maybe Int
     , form : Form
+    , loading : Bool
     }
 
 
@@ -35,16 +30,11 @@ type alias Flags =
 
 initialModel : Flags -> Model
 initialModel flags =
-    { personID = flags.nbPersonID
-    , firstName = Maybe.withDefault "" flags.nbFirstName
-    , lastName = Maybe.withDefault "" flags.nbLastName
-    , email = Maybe.withDefault "" flags.nbEmail
-    , phone = Maybe.withDefault "" flags.nbPhone
-    , notes = ""
-    , rootURL = flags.rootURL
+    { rootURL = flags.rootURL
     , slug = flags.slug
-    , loading = False
+    , personID = flags.nbPersonID
     , form = ContactMeForm.setupForm flags
+    , loading = False
     }
 
 
@@ -139,37 +129,50 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         FirstName firstName ->
-            ( { model | firstName = firstName, form = ContactMeForm.updateFirstName model.form firstName }, Cmd.none )
+            ( { model | form = ContactMeForm.updateFirstName model.form firstName }, Cmd.none )
 
         LastName lastName ->
-            ( { model | lastName = lastName, form = ContactMeForm.updateLastName model.form lastName }, Cmd.none )
+            ( { model | form = ContactMeForm.updateLastName model.form lastName }, Cmd.none )
 
         Email email ->
-            ( { model | email = email, form = ContactMeForm.updateEmail model.form email }, Cmd.none )
+            ( { model | form = ContactMeForm.updateEmail model.form email }, Cmd.none )
 
         Phone phone ->
-            ( { model | phone = phone, form = ContactMeForm.updatePhone model.form phone }, Cmd.none )
+            ( { model | form = ContactMeForm.updatePhone model.form phone }, Cmd.none )
 
         Notes notes ->
-            ( { model | notes = notes, form = ContactMeForm.updateNotes model.form notes }, Cmd.none )
+            ( { model | form = ContactMeForm.updateNotes model.form notes }, Cmd.none )
 
         SubmitForm ->
-            ( submitForm model, Http.send SubmitFormResult (createContactRequest model) )
+            submitForm model
 
         SubmitFormResult result ->
             ( { model | loading = False }, Cmd.none )
 
 
-submitForm : Model -> Model
+submitForm : Model -> ( Model, Cmd Msg )
 submitForm model =
     let
         { form } =
             model
 
-        updatedForm =
-            ContactMeForm.submit form
+        updatedModel =
+            case ContactMeForm.formInputsValid model.form of
+                True ->
+                    { model | form = ContactMeForm.submit form, loading = True }
+
+                False ->
+                    { model | form = ContactMeForm.submit form, loading = False }
+
+        cmd =
+            case ContactMeForm.formInputsValid model.form of
+                True ->
+                    Http.send SubmitFormResult (createContactRequest model)
+
+                False ->
+                    Cmd.none
     in
-        { model | loading = True, form = updatedForm }
+        ( updatedModel, cmd )
 
 
 contactRequestsURL : Model -> String
@@ -187,28 +190,26 @@ createContactRequest model =
 encodeContactRequest : Model -> Value
 encodeContactRequest model =
     let
+        values =
+            ContactMeForm.formInputValues model.form
+
         firstName =
-            JE.string model.firstName
+            encodeNullable JE.string values.firstName
 
         lastName =
-            JE.string model.lastName
+            encodeNullable JE.string values.lastName
 
         email =
-            JE.string model.email
+            encodeNullable JE.string values.email
 
         phone =
-            JE.string model.phone
+            encodeNullable JE.string values.phone
 
         notes =
-            JE.string model.notes
+            encodeNullable JE.string values.notes
 
         person_id =
-            case model.personID of
-                Just id ->
-                    JE.int id
-
-                Nothing ->
-                    JE.null
+            encodeNullable JE.int model.personID
     in
         object
             [ ( "data"
@@ -226,6 +227,16 @@ encodeContactRequest model =
                     ]
               )
             ]
+
+
+encodeNullable : (t -> Value) -> Maybe t -> Value
+encodeNullable encoder data =
+    case data of
+        Just d ->
+            encoder d
+
+        Nothing ->
+            JE.null
 
 
 errorsDecoder =
