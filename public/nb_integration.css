@@ -67,9 +67,6 @@
   flex: 0 0 300px;
   color: #f70f32;
 }
-.flex-outer > li > span.validation-errors {
-  color: #f70f32;
-}
 
 .flex-inner {
   justify-content: space-between;

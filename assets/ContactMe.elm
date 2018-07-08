@@ -86,43 +86,17 @@ loadingSpinner model =
         div [] []
 
 
-getViewError : Model -> String -> Bool
-getViewError model errorKey =
-    False
-
-
-validationVisibility : Bool -> String
-validationVisibility showErrors =
-    if showErrors then
-        "visible"
-    else
-        "hidden"
-
-
-validationClass : Bool -> String
-validationClass showErrors =
-    if showErrors then
-        "validation validation-errors"
-    else
-        "validation"
-
-
 emptyValidationView : Html Msg
 emptyValidationView =
-    span [ class <| validationClass False ] []
+    span [ class "validation" ] []
 
 
 submitButtonClass : Model -> String
 submitButtonClass model =
-    if invalidInput model then
-        "create-event-button create-event-button-disabled"
-    else
+    if ContactMeForm.formInputsValid model.form then
         "create-event-button"
-
-
-invalidInput : Model -> Bool
-invalidInput model =
-    False
+    else
+        "create-event-button create-event-button-disabled"
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -239,6 +213,7 @@ encodeNullable encoder data =
             JE.null
 
 
+errorsDecoder : JD.Decoder APIResult
 errorsDecoder =
     JD.map APIErrors <|
         field "errors" <|
@@ -246,11 +221,13 @@ errorsDecoder =
                 JD.map Error (field "title" string)
 
 
+dataContactRequestDecoder : JD.Decoder APIResult
 dataContactRequestDecoder =
     JD.map APIContactRequest <|
         field "data" <|
             contactRequestDecoder
 
 
+contactRequestDecoder : JD.Decoder String
 contactRequestDecoder =
     field "person" <| succeed "TEMP"
