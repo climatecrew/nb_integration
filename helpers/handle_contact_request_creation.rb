@@ -40,6 +40,10 @@ class HandleContactRequestCreation
   private
 
   def prepare_payload(payload, request_type)
+    optional_keys = ["phone", "mobile", "work_phone_number"].each do |key|
+      payload["person"].delete(key) if payload["person"][key].nil?
+    end
+
     if request_type == :update
       payload = {
         "person" => {
