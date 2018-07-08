@@ -130,7 +130,7 @@ setupForm flags =
 
         notesInput =
             FormInput.setupInteractiveInput
-                { inputType = FormInput.TextArea 5
+                { inputType = FormInput.TextArea 7
                 , value = Nothing
                 , placeholder = "Comments or questions about your event idea"
                 , label = "Notes"
