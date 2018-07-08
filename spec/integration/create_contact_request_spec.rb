@@ -100,7 +100,8 @@ RSpec.describe "POST /api/contact_requests" do
       {
         "person" => {
           "parent_id" => ENV["NB_POINT_PERSON_ID"].to_i,
-          "tags" => ["Prep Week September 2018"]
+          "tags" => ["Prep Week September 2018"],
+          "phone": "555-123-4567"
         }
       }
     end

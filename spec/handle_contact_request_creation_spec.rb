@@ -5,15 +5,75 @@ RSpec.describe HandleContactRequestCreation do
   let(:slug) { 'test_slug' }
   let(:access_token) { 'test_token' }
   let(:account) { Account.create(nb_slug: slug, nb_access_token: access_token) }
-  let(:post_url) do
-    "https://#{slug}.nationbuilder.com/api/v1/people" \
+  let(:person_id) { 123 }
+  let(:put_url) do
+    "https://#{slug}.nationbuilder.com/api/v1/people/#{person_id}" \
     "?access_token=#{access_token}"
   end
 
   describe "makes API request to NationBuilder" do
-    it "removes null items from person payload" do
+    it "does not overwrite required fields in person payload" do
       payload = {
         'person' => {
+          'id' => person_id,
+          'first_name' => 'F',
+          'last_name' => 'L',
+          'email' => 'E'
+        }
+      }
+
+      forwarded_payload = {
+        'person' => {
+          'tags' => ['Prep Week September 2018'],
+          'parent_id' => AppConfiguration.app_point_person_id.to_i
+        }
+      }
+
+      stub_request(:put, put_url).with(body: forwarded_payload)
+
+      described_class.new(logger, account, payload).call
+
+      expect(a_request(:put, put_url)
+        .with("body": forwarded_payload))
+        .to have_been_made.once
+    end
+
+    it "sends non-null optional fields from person payload" do
+      payload = {
+        'person' => {
+          'id' => person_id,
+          'first_name' => 'F',
+          'last_name' => 'L',
+          'email' => 'E',
+          'phone' => '111-1111',
+          'mobile' => '222-2222',
+          'work_phone_number' => '333-3333'
+        }
+      }
+
+      forwarded_payload = {
+        'person' => {
+          'tags' => ['Prep Week September 2018'],
+          'parent_id' => AppConfiguration.app_point_person_id.to_i,
+          'phone' => '111-1111',
+          'mobile' => '222-2222',
+          'work_phone_number' => '333-3333'
+        }
+      }
+
+      stub_request(:put, put_url).with(body: forwarded_payload)
+
+      described_class.new(logger, account, payload).call
+
+      expect(a_request(:put, put_url)
+        .with("body": forwarded_payload))
+        .to have_been_made.once
+    end
+
+    it "removes null optional fields from person payload" do
+      payload = {
+        'person' => {
+          'id' => person_id,
           'first_name' => 'F',
           'last_name' => 'L',
           'email' => 'E',
@@ -25,19 +85,16 @@ RSpec.describe HandleContactRequestCreation do
 
       forwarded_payload = {
         'person' => {
-          'first_name' => 'F',
-          'last_name' => 'L',
-          'email' => 'E',
           'tags' => ['Prep Week September 2018'],
           'parent_id' => AppConfiguration.app_point_person_id.to_i
         }
       }
 
-      stub_request(:post, post_url).with(body: forwarded_payload)
+      stub_request(:put, put_url).with(body: forwarded_payload)
 
       described_class.new(logger, account, payload).call
 
-      expect(a_request(:post, post_url)
+      expect(a_request(:put, put_url)
         .with("body": forwarded_payload))
         .to have_been_made.once
     end

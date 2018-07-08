@@ -40,8 +40,13 @@ class HandleContactRequestCreation
   private
 
   def prepare_payload(payload, request_type)
-    optional_keys = ["phone", "mobile", "work_phone_number"].each do |key|
-      payload["person"].delete(key) if payload["person"][key].nil?
+    present_optional_fields = {}
+    ["phone", "mobile", "work_phone_number"].each do |key|
+      if payload["person"][key].nil?
+        payload["person"].delete(key)
+      else
+        present_optional_fields[key] = payload["person"][key]
+      end
     end
 
     if request_type == :update
@@ -49,7 +54,7 @@ class HandleContactRequestCreation
         "person" => {
           "tags" => ["Prep Week September 2018"],
           "parent_id" => AppConfiguration.app_point_person_id.to_i
-        }
+        }.merge(present_optional_fields)
       }
     else
       payload["person"]["tags"] = ["Prep Week September 2018"]
