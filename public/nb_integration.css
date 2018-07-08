@@ -54,7 +54,7 @@
   background: #A9A9A9;
 }
 
-.flex-outer > li > input {
+.flex-outer > li > input, textarea {
   box-sizing: border-box;
   padding-left: 0;
   padding-right: 0;
