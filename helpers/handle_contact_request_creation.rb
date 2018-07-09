@@ -8,27 +8,18 @@ class HandleContactRequestCreation
   attr_reader :logger, :account, :payload
 
   def call
-    path_provider = PathProvider.new(slug: account.nb_slug,
-                                     api_token: account.nb_access_token)
-    person_id = payload["person"].delete("id")
-    notes = payload.delete("notes")
+    person_id = try_person_id(payload)
+    notes = payload["notes"]
     notes = notes.to_s.empty? ? nil : notes
+
     forwarded_payload = if person_id
                           prepare_payload(payload, :update)
                         else
                           prepare_payload(payload, :create)
                         end
+
     logger.info("Sending payload:\n#{forwarded_payload}")
-    nb_response = if person_id
-                    Client.update(path_provider: path_provider,
-                                  resource: :people,
-                                  id: person_id,
-                                  payload: forwarded_payload)
-                  else
-                    Client.create(path_provider: path_provider,
-                                  resource: :people,
-                                  payload: forwarded_payload)
-                  end
+    nb_response = make_api_request(person_id, forwarded_payload)
     if nb_response.status.to_i >= 400
       code, body = on_failure(nb_response)
     else
@@ -38,6 +29,11 @@ class HandleContactRequestCreation
   end
 
   private
+
+  def try_person_id(payload)
+    person_id = payload["person"]["id"]
+    person_id
+  end
 
   def prepare_payload(payload, request_type)
     present_optional_fields = {}
@@ -50,18 +46,40 @@ class HandleContactRequestCreation
     end
 
     if request_type == :update
-      payload = {
+      {
         "person" => {
           "tags" => ["Prep Week September 2018"],
           "parent_id" => AppConfiguration.app_point_person_id.to_i
         }.merge(present_optional_fields)
       }
     else
-      payload["person"]["tags"] = ["Prep Week September 2018"]
-      payload["person"]["parent_id"] = AppConfiguration.app_point_person_id.to_i
-    end
+      required_create_fields = ["first_name", "last_name", "email"].each_with_object({}) do |key, hash|
+        hash[key] = payload["person"][key]
+      end
 
-    payload
+      {
+        "person" => {
+          "tags" => ["Prep Week September 2018"],
+          "parent_id" => AppConfiguration.app_point_person_id.to_i
+        }.merge(present_optional_fields)
+         .merge(required_create_fields)
+      }
+    end
+  end
+
+  def make_api_request(person_id, forwarded_payload)
+    path_provider = PathProvider.new(slug: account.nb_slug,
+                                     api_token: account.nb_access_token)
+    if person_id
+      Client.update(path_provider: path_provider,
+                    resource: :people,
+                    id: person_id,
+                    payload: forwarded_payload)
+    else
+      Client.create(path_provider: path_provider,
+                    resource: :people,
+                    payload: forwarded_payload)
+    end
   end
 
   def on_success(nb_response, notes)
