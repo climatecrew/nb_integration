@@ -15,6 +15,7 @@ require "helpers/request_oauth_access_token"
 require "helpers/handle_oauth_callback"
 require "helpers/handle_event_creation"
 require "helpers/handle_contact_request_creation"
+require "helpers/match_nb_person"
 
 $:.unshift File.expand_path(File.dirname(__FILE__), "models/")
 require "models/account"

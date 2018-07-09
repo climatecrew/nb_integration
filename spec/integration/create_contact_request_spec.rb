@@ -1,6 +1,5 @@
 require "securerandom"
 require "support/rack_test_helper"
-require "models/account"
 
 RSpec.describe "POST /api/contact_requests" do
   include RackTestHelper

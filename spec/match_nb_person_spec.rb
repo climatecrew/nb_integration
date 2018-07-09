@@ -1,0 +1,18 @@
+RSpec.describe MatchNBPerson do
+  let(:logger) { Logger.new('log/test.log') }
+  let(:slug) { 'test_slug' }
+  let(:access_token) { 'test_token' }
+  let(:email) { 'person@example.com' }
+  let(:path_provider) { PathProvider.new(slug: slug, api_token: access_token) }
+  let(:url) do
+    "https://#{slug}.nationbuilder.com/api/v1/people/match" \
+    "?access_token=#{access_token}" \
+    "&email=#{email}"
+  end
+
+  it "makes an API request to NationBuilder" do
+    stub_request(:get, url)
+    described_class.new(logger, path_provider, email).call
+    expect(a_request(:get, url)).to have_been_made.once
+  end
+end
