@@ -99,4 +99,24 @@ RSpec.describe HandleContactRequestCreation do
         .to have_been_made.once
     end
   end
+
+  context "when person ID not given" do
+    it "attempts to match the person by email before creating" do
+      payload = {
+        'person' => {
+          'first_name' => 'F',
+          'last_name' => 'L',
+          'email' => 'E'
+        }
+      }
+
+      described_class.new(logger, account, payload).call
+    end
+
+    it "sends an update if it can match the person" do
+    end
+
+    it "sends a create if it cannot match the person" do
+    end
+  end
 end
