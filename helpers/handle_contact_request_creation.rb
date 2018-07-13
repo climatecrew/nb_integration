@@ -32,6 +32,12 @@ class HandleContactRequestCreation
 
   def try_person_id(payload)
     person_id = payload["person"]["id"]
+    if person_id.nil?
+      path_provider = PathProvider.new(slug: account.nb_slug,
+                                       api_token: account.nb_access_token)
+      person = MatchNBPerson.new(logger, path_provider, payload["person"]["email"]).call
+      person_id = person["person"]["id"] if person
+    end
     person_id
   end
 

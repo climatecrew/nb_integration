@@ -10,6 +10,10 @@ RSpec.describe HandleContactRequestCreation do
     "https://#{slug}.nationbuilder.com/api/v1/people/#{person_id}" \
     "?access_token=#{access_token}"
   end
+  let(:post_url) do
+    "https://#{slug}.nationbuilder.com/api/v1/people" \
+    "?access_token=#{access_token}"
+  end
 
   describe "makes API request to NationBuilder" do
     it "does not overwrite required fields in person payload" do
@@ -101,22 +105,66 @@ RSpec.describe HandleContactRequestCreation do
   end
 
   context "when person ID not given" do
-    it "attempts to match the person by email before creating" do
-      payload = {
-        'person' => {
-          'first_name' => 'F',
-          'last_name' => 'L',
-          'email' => 'E'
+    let(:email) { 'me@example.com' }
+    let(:payload) do
+      {
+       'person' => {
+         'first_name' => 'F',
+         'last_name' => 'L',
+         'email' => email
+       }
+     }
+    end
+
+    describe "attempts to match the person by email before creating" do
+      it "sends an update if it can match the person" do
+        person_response = {
+          "person" => {
+            "id" => person_id,
+            "email" => email
+          }
         }
-      }
+        match_nb_person = MatchNBPerson.new(nil, nil, email)
+        allow(MatchNBPerson).to receive(:new).and_return(match_nb_person)
+        allow(match_nb_person).to receive(:call).and_return(person_response)
 
-      described_class.new(logger, account, payload).call
-    end
+        forwarded_payload = {
+          'person' => {
+            'tags' => ['Prep Week September 2018'],
+            'parent_id' => AppConfiguration.app_point_person_id.to_i
+          }
+        }
+        stub_request(:put, put_url).with(body: forwarded_payload)
 
-    it "sends an update if it can match the person" do
-    end
+        described_class.new(logger, account, payload).call
 
-    it "sends a create if it cannot match the person" do
+        expect(a_request(:put, put_url)
+          .with("body": forwarded_payload))
+          .to have_been_made.once
+      end
+
+      it "sends a create if it cannot match the person" do
+        match_nb_person = MatchNBPerson.new(nil, nil, email)
+        allow(MatchNBPerson).to receive(:new).and_return(match_nb_person)
+        allow(match_nb_person).to receive(:call).and_return(nil)
+
+        forwarded_payload = {
+          'person' => {
+            'first_name' => 'F',
+            'last_name' => 'L',
+            'email' => email,
+            'tags' => ['Prep Week September 2018'],
+            'parent_id' => AppConfiguration.app_point_person_id.to_i
+          }
+        }
+        stub_request(:post, post_url).with(body: forwarded_payload)
+
+        described_class.new(logger, account, payload).call
+
+        expect(a_request(:post, post_url)
+          .with("body": forwarded_payload))
+          .to have_been_made.once
+      end
     end
   end
 end
