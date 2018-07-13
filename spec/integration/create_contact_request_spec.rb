@@ -11,6 +11,12 @@ RSpec.describe "POST /api/contact_requests" do
     test_rack_env.merge("CONTENT_TYPE" => "application/json")
   end
 
+  def stub_match_nb_person(return_value)
+    match_nb_person = MatchNBPerson.new(nil, nil, nb_user_email)
+    allow(MatchNBPerson).to receive(:new).and_return(match_nb_person)
+    allow(match_nb_person).to receive(:call).and_return(return_value)
+  end
+
   context "when request is not successful" do
     it "returns 422 when missing parameters" do
       post "/api/contact_requests", {}, test_rack_env
@@ -117,6 +123,7 @@ RSpec.describe "POST /api/contact_requests" do
 
     context "when the user does not exist in NationBuilder yet" do
       it "makes a create request to NationBuilder with the formatted payload" do
+        stub_match_nb_person(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person)
 
         post "/api/contact_requests?slug=#{slug}", client_create_body, api_test_rack_env
@@ -141,6 +148,7 @@ RSpec.describe "POST /api/contact_requests" do
 
     context "when the NationBuilder request succeeds" do
       it "writes the created contact_request to the DB" do
+        stub_match_nb_person(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person)
           .to_return(body: JSON.generate(nb_person_body))
 
@@ -155,6 +163,7 @@ RSpec.describe "POST /api/contact_requests" do
       end
 
       it "converts empty notes to NULL" do
+        stub_match_nb_person(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person)
           .to_return(body: JSON.generate(nb_person_body))
 
@@ -168,6 +177,7 @@ RSpec.describe "POST /api/contact_requests" do
       end
 
       it "returns 201 and the person payload" do
+        stub_match_nb_person(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person)
           .to_return(body: JSON.generate(nb_person_body))
 
@@ -182,6 +192,7 @@ RSpec.describe "POST /api/contact_requests" do
 
     context "when the NationBuilder request fails" do
       it "returns an error message" do
+        stub_match_nb_person(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person )
           .to_return(status: 404, body: "{}")
 
@@ -194,6 +205,7 @@ RSpec.describe "POST /api/contact_requests" do
       end
 
       it "handles non-JSON responses from NationBuilder" do
+        stub_match_nb_person(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person )
           .to_return(status: 200, body: "<html><body>Gateway Timeout</body></html>")
 
