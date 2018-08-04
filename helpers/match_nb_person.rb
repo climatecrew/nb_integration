@@ -13,7 +13,7 @@ class MatchNBPerson
                                resource: :people,
                                parameters: { email: email })
     if nb_response.status >= 400
-      logger.info("Could not match person person with email #{email}")
+      logger.info("Could not match person with email #{email}")
       return nil
     end
 
