@@ -38,7 +38,7 @@ RSpec.describe HandleContactRequestCreation do
       described_class.new(logger, account, payload).call
 
       expect(a_request(:put, put_url)
-        .with("body": forwarded_payload))
+        .with(body: forwarded_payload))
         .to have_been_made.once
     end
 
@@ -70,7 +70,7 @@ RSpec.describe HandleContactRequestCreation do
       described_class.new(logger, account, payload).call
 
       expect(a_request(:put, put_url)
-        .with("body": forwarded_payload))
+        .with(body: forwarded_payload))
         .to have_been_made.once
     end
 
@@ -99,7 +99,7 @@ RSpec.describe HandleContactRequestCreation do
       described_class.new(logger, account, payload).call
 
       expect(a_request(:put, put_url)
-        .with("body": forwarded_payload))
+        .with(body: forwarded_payload))
         .to have_been_made.once
     end
   end
@@ -139,7 +139,7 @@ RSpec.describe HandleContactRequestCreation do
         described_class.new(logger, account, payload).call
 
         expect(a_request(:put, put_url)
-          .with("body": forwarded_payload))
+          .with(body: forwarded_payload))
           .to have_been_made.once
       end
 
@@ -162,7 +162,7 @@ RSpec.describe HandleContactRequestCreation do
         described_class.new(logger, account, payload).call
 
         expect(a_request(:post, post_url)
-          .with("body": forwarded_payload))
+          .with(body: forwarded_payload))
           .to have_been_made.once
       end
     end

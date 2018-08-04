@@ -1,4 +1,6 @@
 class CreateSurveyResponse
+  include AppConfiguration
+
   def initialize(logger, path_provider, person_id, response_text)
     @logger = logger
     @path_provider= path_provider
@@ -9,6 +11,9 @@ class CreateSurveyResponse
   attr_reader :logger, :path_provider, :person_id, :response_text
 
   def call
+    Client.create(path_provider: path_provider,
+                  resource: :survey_responses,
+                  payload: payload)
   end
 
   private

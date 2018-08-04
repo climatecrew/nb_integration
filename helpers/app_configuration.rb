@@ -48,10 +48,10 @@ module AppConfiguration
   end
 
   def app_event_planning_survey_id
-    ENV['NB_EVENT_PLANNING_SURVEY_ID']
+    ENV['NB_EVENT_PLANNING_SURVEY_ID'].to_i
   end
 
   def app_event_planning_survey_comments_question_id
-    ENV['NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID']
+    ENV['NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID'].to_i
   end
 end

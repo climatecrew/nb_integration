@@ -9,26 +9,33 @@ RSpec.describe CreateSurveyResponse do
   let(:path_provider) { PathProvider.new(slug: slug, api_token: access_token) }
   let(:url) do
     "https://#{slug}.nationbuilder.com/api/v1/survey_responses" \
-    "?access_token=#{access_token}"
+      "?access_token=#{access_token}"
+  end
+
+  before do
+    ENV['NB_EVENT_PLANNING_SURVEY_ID'] = survey_id.to_s
+    ENV['NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID'] = question_id.to_s
   end
 
   it "makes an API request to NationBuilder" do
-    stub_request(:post, url).to_return(body: "{}")
+    expected_body =
+      {
+        "survey_response": {
+          "survey_id": survey_id,
+          "person_id": person_id,
+          "is_private": true,
+          "question_responses": [{
+            "question_id": question_id,
+            "response": response_text
+          }]
+        }
+    }
+    stub_request(:post, url).with(body: expected_body).to_return(body: "{}")
+
     described_class.new(logger, path_provider, person_id, response_text).call
+
     expect(a_request(:post, url)
-            .with do |req| req.body == "abc"
-                    {
-                      "survey_response": {
-                        "survey_id": survey_id,
-                        "person_id": person_id,
-                        "is_private": true,
-                        "question_responses": [{
-                          "question_id": question_id,
-                          "response": response_text
-                        }]
-                      }
-                    }
-                  end
-          ).to have_been_made.once
+      .with(body: JSON.generate(expected_body)))
+      .to have_been_made.once
   end
 end

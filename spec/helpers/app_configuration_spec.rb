@@ -128,7 +128,7 @@ RSpec.describe AppConfiguration do
     it "returns ENV['NB_EVENT_PLANNING_SURVEY_ID']" do
       ENV['NB_EVENT_PLANNING_SURVEY_ID'] = '5'
 
-      expect(described_class.app_event_planning_survey_id).to eq('5')
+      expect(described_class.app_event_planning_survey_id).to eq(5)
     end
   end
 
@@ -136,7 +136,7 @@ RSpec.describe AppConfiguration do
     it "returns ENV['NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID']" do
       ENV['NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID'] = '82'
 
-      expect(described_class.app_event_planning_survey_comments_question_id).to eq('82')
+      expect(described_class.app_event_planning_survey_comments_question_id).to eq(82)
     end
   end
 end
