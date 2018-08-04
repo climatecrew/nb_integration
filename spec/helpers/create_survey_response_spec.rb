@@ -14,7 +14,7 @@ RSpec.describe CreateSurveyResponse do
 
   it "makes an API request to NationBuilder" do
     stub_request(:post, url).to_return(body: "{}")
-    described_class.new(logger, path_provider, response_text).call
+    described_class.new(logger, path_provider, person_id, response_text).call
     expect(a_request(:post, url)
             .with do |req| req.body == "abc"
                     {
