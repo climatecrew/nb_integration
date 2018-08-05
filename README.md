@@ -99,11 +99,11 @@ By virtue of an admin installing it in crew.nationbuilder.com, the app will obta
 
 2. Make an *unlisted* web page in NB of type Survey. The new survey must be associated with a web page to be accessible to the API. It is helpful to make it a sub-page of a page related to this survey. Example:
 
-    * page slug: event_planning_survey
-    * page type: survey
-    * Do not include in top nav
-    * Select the previously created survey
-    * Save
+  * page slug: event_planning_survey
+  * page type: survey
+  * Do not include in top nav
+  * Select the previously created survey
+  * Save
 
 3. The survey ID and question ID must be known to the nb_integration app.
     In Heroku, set environment variables with the relevant values.
