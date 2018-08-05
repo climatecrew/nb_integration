@@ -1,22 +1,36 @@
 class CreateSurveyResponse
   include AppConfiguration
 
-  def initialize(logger, path_provider, person_id, response_text)
+  def initialize(logger, path_provider, contact_request)
     @logger = logger
     @path_provider= path_provider
-    @person_id = person_id
-    @response_text = response_text
+    @contact_request = contact_request
   end
 
-  attr_reader :logger, :path_provider, :person_id, :response_text
+  attr_reader :logger, :path_provider, :contact_request
 
   def call
-    Client.create(path_provider: path_provider,
-                  resource: :survey_responses,
-                  payload: payload)
+    nb_response = Client.create(path_provider: path_provider,
+                                resource: :survey_responses,
+                                payload: payload)
+    survey_response = begin
+                        JSON.generate(JSON.parse(nb_response.body.to_s))
+                      rescue JSON::ParserError => error
+                        logger.warn("#{self.class.name}##{__callee__}: obtained invalid JSON when creating NB survey response: #{nb_response.body}")
+                        nil
+                      end
+    contact_request.update(nb_survey_response: survey_response)
   end
 
   private
+
+  def person_id
+    contact_request.nb_user_id
+  end
+
+  def response_text
+    contact_request.notes
+  end
 
   def payload
     {
