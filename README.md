@@ -11,6 +11,7 @@ Integration to enhance CREW's NationBuilder website.
   * [Buildpacks](#buildpacks)
   * [Continuous Deployment](#continuous-deployment)
   * [NationBuilder Setup](#nationbuilder-setup)
+    + [How to create a survey and make it available to the API](#how-to-create-a-survey-and-make-it-available-to-the-api)
 - [Development and Testing](#development-and-testing)
   * [Web Service](#web-service)
     + [Prerequisites](#prerequisites)
@@ -21,6 +22,8 @@ Integration to enhance CREW's NationBuilder website.
     + [Making changes](#making-changes)
   * [Frontend Client](#frontend-client)
     + [Prerequisites](#prerequisites-1)
+    + [Development](#development)
+    + [Run tests](#run-tests)
 - [Documentation](#documentation)
 
 <!-- tocstop -->
@@ -87,20 +90,20 @@ By virtue of an admin installing it in crew.nationbuilder.com, the app will obta
 ### How to create a survey and make it available to the API
 
 1. Go to People -> More -> Surveys (https://crew.nationbuilder.com/admin/surveys)
-  + New Survey
-  Example name: Climate Preparedness Event Planning
-  Create a single question at minimum:
-    comments_questions
-    Any comments or questions about your event idea?
-    Format: text
+  Click New Survey
+  * Example name: Climate Preparedness Event Planning
+  * Create a single question at minimum:
+    * comments_questions
+    * Any comments or questions about your event idea?
+    * Format: text
 
 2. Make an *unlisted* web page in NB of type Survey. The new survey must be associated with a web page to be accessible to the API. It is helpful to make it a sub-page of a page related to this survey. Example:
 
-    page slug: event_planning_survey
-    page type: survey
-    Do not include in top nav
-    Select the previously created survey
-    Save
+    * page slug: event_planning_survey
+    * page type: survey
+    * Do not include in top nav
+    * Select the previously created survey
+    * Save
 
 3. The survey ID and question ID must be known to the nb_integration app.
     In Heroku, set environment variables with the relevant values.
