@@ -65,5 +65,20 @@ RSpec.describe CreateSurveyResponse do
   end
 
   it "does not raise an error if the survey response creation fails" do
+    stub_request(:post, url).to_return(status: 503, body: "<h1>Service Unavailable</h1>")
+    expect do
+      described_class.new(logger, path_provider, contact_request).call
+    end.not_to raise_error
+
+    expect(contact_request.refresh.nb_survey_response).to be_nil
+  end
+
+  it "does not raise an error if recording the survey response fails" do
+    stub_request(:post, url).to_return(body: '{}')
+    allow(contact_request).to receive(:update).and_raise('Nothing gold can stay')
+
+    expect do
+      described_class.new(logger, path_provider, contact_request).call
+    end.not_to raise_error
   end
 end

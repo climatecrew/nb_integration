@@ -20,6 +20,8 @@ class CreateSurveyResponse
                         nil
                       end
     contact_request.update(nb_survey_response: survey_response)
+  rescue StandardError => error
+    logger.warn("#{self.class.name}##{__callee__}: survey response creation failed: #{error}")
   end
 
   private
