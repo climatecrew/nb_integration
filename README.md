@@ -11,6 +11,7 @@ Integration to enhance CREW's NationBuilder website.
   * [Buildpacks](#buildpacks)
   * [Continuous Deployment](#continuous-deployment)
   * [NationBuilder Setup](#nationbuilder-setup)
+    + [App registration and installation](#app-registration-and-installation)
     + [How to create a survey and make it available to the API](#how-to-create-a-survey-and-make-it-available-to-the-api)
 - [Development and Testing](#development-and-testing)
   * [Web Service](#web-service)
@@ -73,6 +74,7 @@ We have a Heroku pipeline, crew-1, to deploy staging and then production.
 ## NationBuilder Setup
 
 [NationBuilder developer docs](https://nationbuilder.com/developers)
+### App registration and installation
 
 We need to do the following as a one-time setup. It is based on the [API Quickstart](https://nationbuilder.com/api_quickstart) guide.
 
