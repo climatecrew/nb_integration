@@ -84,6 +84,28 @@ A nation that registers an app can choose to make it available for other nations
 
 By virtue of an admin installing it in crew.nationbuilder.com, the app will obtain an API access token. It uses that token to authenticate when making requests to the NationBuilder API on behalf of CREW.
 
+### How to create a survey and make it available to the API
+
+1. Go to People -> More -> Surveys (https://crew.nationbuilder.com/admin/surveys)
+  + New Survey
+  Example name: Climate Preparedness Event Planning
+  Create a single question at minimum:
+    comments_questions
+    Any comments or questions about your event idea?
+    Format: text
+
+2. Make an *unlisted* web page in NB of type Survey. The new survey must be associated with a web page to be accessible to the API. It is helpful to make it a sub-page of a page related to this survey. Example:
+
+    page slug: event_planning_survey
+    page type: survey
+    Do not include in top nav
+    Select the previously created survey
+    Save
+
+3. The survey ID and question ID must be known to the nb_integration app.
+    In Heroku, set environment variables with the relevant values.
+    We could do this differently, like by storing those values in the DB, or retrieving from the /surveys API and parsing out from the response. Environment variables were expedient for a one-off survey.
+
 
 # Development and Testing
 
