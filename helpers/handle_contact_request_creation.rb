@@ -3,9 +3,11 @@ class HandleContactRequestCreation
     @logger = logger
     @account = account
     @payload = payload
+    @path_provider = PathProvider.new(slug: account.nb_slug,
+                                      api_token: account.nb_access_token)
   end
 
-  attr_reader :logger, :account, :payload
+  attr_reader :logger, :account, :payload, :path_provider
 
   def call
     person_id = try_person_id(payload)
@@ -33,8 +35,6 @@ class HandleContactRequestCreation
   def try_person_id(payload)
     person_id = payload["person"]["id"]
     if person_id.nil?
-      path_provider = PathProvider.new(slug: account.nb_slug,
-                                       api_token: account.nb_access_token)
       person = MatchNBPerson.new(logger, path_provider, payload["person"]["email"]).call
       person_id = person["person"]["id"] if person
     end
@@ -74,8 +74,6 @@ class HandleContactRequestCreation
   end
 
   def make_api_request(person_id, forwarded_payload)
-    path_provider = PathProvider.new(slug: account.nb_slug,
-                                     api_token: account.nb_access_token)
     if person_id
       Client.update(path_provider: path_provider,
                     resource: :people,
@@ -106,7 +104,14 @@ class HandleContactRequestCreation
       nb_user_email = payload
         .fetch("person")
         .fetch("email")
-      ContactRequest.create(nb_slug: account.nb_slug, nb_user_id: nb_user_id, nb_user_email: nb_user_email, nb_person: nb_response.body, notes: notes)
+      contact_request = ContactRequest.create(nb_slug: account.nb_slug,
+                                              nb_user_id: nb_user_id,
+                                              nb_user_email: nb_user_email,
+                                              nb_person: nb_response.body,
+                                              notes: notes)
+      # we use a NationBuilder survey to make the notes visible in the control panel
+      CreateSurveyResponse.new(logger, path_provider, contact_request).call
+
       body = { data: nb_person }
     end
     [code, body]

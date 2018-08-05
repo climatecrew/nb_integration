@@ -1,3 +1,4 @@
+
 require "securerandom"
 require "support/rack_test_helper"
 
@@ -15,6 +16,12 @@ RSpec.describe "POST /api/contact_requests" do
     match_nb_person = MatchNBPerson.new(nil, nil, nb_user_email)
     allow(MatchNBPerson).to receive(:new).and_return(match_nb_person)
     allow(match_nb_person).to receive(:call).and_return(return_value)
+  end
+
+  def stub_survey_response_creation(return_value)
+    url = "https://#{slug}.nationbuilder.com/api/v1/survey_responses" \
+          "?access_token=#{access_token}"
+    stub_request(:post, url).to_return(body: return_value)
   end
 
   context "when request is not successful" do
@@ -146,9 +153,10 @@ RSpec.describe "POST /api/contact_requests" do
       end
     end
 
-    context "when the NationBuilder request succeeds" do
+    context "when the NationBuilder person request succeeds" do
       it "writes the created contact_request to the DB" do
         stub_match_nb_person(nil)
+        stub_survey_response_creation(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person)
           .to_return(body: JSON.generate(nb_person_body))
 
@@ -164,6 +172,7 @@ RSpec.describe "POST /api/contact_requests" do
 
       it "converts empty notes to NULL" do
         stub_match_nb_person(nil)
+        stub_survey_response_creation(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person)
           .to_return(body: JSON.generate(nb_person_body))
 
@@ -176,8 +185,35 @@ RSpec.describe "POST /api/contact_requests" do
         expect(stored_contact_request.notes).to be_nil
       end
 
+      it "writes the survey response to the created contact_request" do
+        stub_match_nb_person(nil)
+        survey_response = {
+            "survey_response" => {
+              "id" => 6,
+              "updated_at" => "2018-08-04T17:41:50-04:00",
+              "created_at" => "2018-08-04T17:41:50-04:00",
+              "survey_id" => 68,
+              "person_id" => 381,
+              "is_private" => true,
+              "question_responses" => [{
+                "id" => 1,
+                "question_id" => 502,
+                "response" => "Tell me about the cheesecake"
+              }]
+            }
+          }
+        stub_survey_response_creation(JSON.generate(survey_response))
+        stub_request(:post, post_url).with(body: forwarded_create_person)
+          .to_return(body: JSON.generate(nb_person_body))
+
+        post "/api/contact_requests?slug=#{slug}", client_create_body, api_test_rack_env
+        stored_contact_request = ContactRequest.first
+        expect(JSON.parse(stored_contact_request.nb_survey_response)).to eq(survey_response)
+      end
+
       it "returns 201 and the person payload" do
         stub_match_nb_person(nil)
+        stub_survey_response_creation(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person)
           .to_return(body: JSON.generate(nb_person_body))
 
@@ -190,7 +226,7 @@ RSpec.describe "POST /api/contact_requests" do
       end
     end
 
-    context "when the NationBuilder request fails" do
+    context "when the NationBuilder person request fails" do
       it "returns an error message" do
         stub_match_nb_person(nil)
         stub_request(:post, post_url).with(body: forwarded_create_person )
