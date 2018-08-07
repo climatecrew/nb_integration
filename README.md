@@ -65,11 +65,19 @@ The last Heroku buildpack determines the process type of the deployed applicatio
 
 ## Continuous Deployment
 
-We have a build and deploy workflow defined in [CircleCI](https://circleci.com). You will need access to the [climatecrew](https://circleci.com/gh/climatecrew) team in CircleCI.
+We have a workflow defined in [CircleCI](https://circleci.com) that runs the tests. You will need access to the [climatecrew](https://circleci.com/gh/climatecrew) team in CircleCI.
 
-When you push the `master` branch, Circle runs the test suite, and if it passes it will deploy to Heroku. The `master` branch is protected with status checks on CI.
+When you push the `master` branch Circle runs the test suite, and Heroku listens to webhook notifications from Github and will deploy the *staging* app if the tests pass.
 
-We have a Heroku pipeline, crew-1, to deploy staging and then production.
+We have a Heroku pipeline, crew-1, to deploy staging and then production. To deploy production login to Heroku, go to the [pipeline](https://dashboard.heroku.com/pipelines/6bf6f14d-d2bf-4763-93df-b09a2d1da91f), and promote staging to production. As a rule, we should only do this after click-testing that the latest staging deploy works in the staging nation, [skarger.nationbuilder.com](https://skarger.nationbuilder.com).
+
+Because this app integrates with a NationBuilder website, deploys sometimes require a coordinated change to the web page that loads this app's client, which you do via the nation's control panel. As a manual process this is error prone. We can avoid problems with the following steps:
+
+  * Always ensure that the app works on the actual staging NationBuilder website.
+  * Make notes of the manual changes required within the NationBuilder control panel while working them out in staging.
+  * When practical, make backwards-compatible changes to this app so that deploying it does not need to happen in lock-step with the NB website edits.
+
+
 
 ## NationBuilder Setup
 
