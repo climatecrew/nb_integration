@@ -1,16 +1,17 @@
+# frozen_string_literal: true
+
 # instruct Heroku to use desired Ruby version
-ruby "2.5.1"
+ruby '2.5.1'
 
 source 'https://rubygems.org'
 
 gem 'faraday'
-gem 'sequel'
 gem 'pg'
 gem 'puma'
 gem 'rake'
 gem 'roda'
+gem 'sequel'
 gem 'tilt'
-
 
 group :test, :development do
   gem 'dotenv'

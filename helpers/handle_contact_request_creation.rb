@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HandleContactRequestCreation
   def initialize(logger, account, payload)
     @logger = logger
@@ -11,7 +13,7 @@ class HandleContactRequestCreation
 
   def call
     person_id = try_person_id(payload)
-    notes = payload["notes"]
+    notes = payload['notes']
     notes = notes.to_s.empty? ? nil : notes
 
     forwarded_payload = if person_id
@@ -33,42 +35,42 @@ class HandleContactRequestCreation
   private
 
   def try_person_id(payload)
-    person_id = payload["person"]["id"]
+    person_id = payload['person']['id']
     if person_id.nil?
-      person = MatchNBPerson.new(logger, path_provider, payload["person"]["email"]).call
-      person_id = person["person"]["id"] if person
+      person = MatchNBPerson.new(logger, path_provider, payload['person']['email']).call
+      person_id = person['person']['id'] if person
     end
     person_id
   end
 
   def prepare_payload(payload, request_type)
     present_optional_fields = {}
-    ["phone", "mobile", "work_phone_number"].each do |key|
-      if payload["person"][key].nil?
-        payload["person"].delete(key)
+    %w[phone mobile work_phone_number].each do |key|
+      if payload['person'][key].nil?
+        payload['person'].delete(key)
       else
-        present_optional_fields[key] = payload["person"][key]
+        present_optional_fields[key] = payload['person'][key]
       end
     end
 
     if request_type == :update
       {
-        "person" => {
-          "tags" => ["Prep Week September 2018"],
-          "parent_id" => AppConfiguration.app_point_person_id.to_i
+        'person' => {
+          'tags' => ['Prep Week September 2018'],
+          'parent_id' => AppConfiguration.app_point_person_id.to_i
         }.merge(present_optional_fields)
       }
     else
-      required_create_fields = ["first_name", "last_name", "email"].each_with_object({}) do |key, hash|
-        hash[key] = payload["person"][key]
+      required_create_fields = %w[first_name last_name email].each_with_object({}) do |key, hash|
+        hash[key] = payload['person'][key]
       end
 
       {
-        "person" => {
-          "tags" => ["Prep Week September 2018"],
-          "parent_id" => AppConfiguration.app_point_person_id.to_i
+        'person' => {
+          'tags' => ['Prep Week September 2018'],
+          'parent_id' => AppConfiguration.app_point_person_id.to_i
         }.merge(present_optional_fields)
-         .merge(required_create_fields)
+          .merge(required_create_fields)
       }
     end
   end
@@ -95,15 +97,15 @@ class HandleContactRequestCreation
                end
     if nb_person.nil?
       code = 500
-      body = { errors: [{ title: "Failed to create contact request" }] }
+      body = { errors: [{ title: 'Failed to create contact request' }] }
     else
       code = 201
       nb_user_id = nb_person
-        .fetch("person")
-        .fetch("id")
+                   .fetch('person')
+                   .fetch('id')
       nb_user_email = payload
-        .fetch("person")
-        .fetch("email")
+                      .fetch('person')
+                      .fetch('email')
       contact_request = ContactRequest.create(nb_slug: account.nb_slug,
                                               nb_user_id: nb_user_id,
                                               nb_user_email: nb_user_email,
@@ -122,7 +124,7 @@ class HandleContactRequestCreation
 
     [
       nb_response.status,
-      { errors: [ErrorPresenter.new(body: nb_response.body).transform.merge({ title: "Failed to create contact request" })] }
+      { errors: [ErrorPresenter.new(body: nb_response.body).transform.merge(title: 'Failed to create contact request')] }
     ]
   end
 end

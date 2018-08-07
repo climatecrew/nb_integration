@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-$:.unshift File.expand_path(".")
-require "helpers/dotenv_loader"
+$LOAD_PATH.unshift File.expand_path('.')
+require 'helpers/dotenv_loader'
 DotenvLoader.new(environment: :development).load
 
 command = "DATABASE_URL=#{ENV['DATABASE_URL']} sequel -I . -r dependencies -L helpers -L models #{ENV['DATABASE_URL']}"

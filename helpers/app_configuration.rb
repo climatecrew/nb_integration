@@ -1,18 +1,18 @@
+# frozen_string_literal: true
+
 module AppConfiguration
   module_function
 
   def nb_configuration_valid?
-    ENV['NB_CLIENT_ID'].to_s.length > 0 &&
-      ENV['NB_CLIENT_SECRET'].to_s.length > 0 &&
-        ENV['NB_POINT_PERSON_ID'].to_s.length > 0 &&
-          ENV['NB_EVENT_PLANNING_SURVEY_ID'].to_s.length > 0 &&
-            ENV['NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID'].to_s.length > 0
+    !ENV['NB_CLIENT_ID'].to_s.empty? &&
+      !ENV['NB_CLIENT_SECRET'].to_s.empty? &&
+      !ENV['NB_POINT_PERSON_ID'].to_s.empty? &&
+      !ENV['NB_EVENT_PLANNING_SURVEY_ID'].to_s.empty? &&
+      !ENV['NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID'].to_s.empty?
   end
 
   def log_nb_configuration_error(logger)
-    if ENV['NB_CLIENT_ID'].to_s.empty?
-      logger.warn("ENV['NB_CLIENT_ID'] unset.")
-    end
+    logger.warn("ENV['NB_CLIENT_ID'] unset.") if ENV['NB_CLIENT_ID'].to_s.empty?
 
     if ENV['NB_CLIENT_SECRET'].to_s.empty?
       logger.warn("ENV['NB_CLIENT_SECRET'] unset.")

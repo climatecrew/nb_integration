@@ -1,7 +1,9 @@
-require "json"
+# frozen_string_literal: true
+
+require 'json'
 
 class ErrorPresenter
-  def initialize(body: "")
+  def initialize(body: '')
     @body = body
   end
 
@@ -9,7 +11,7 @@ class ErrorPresenter
 
   def transform
     transformed = JSON.parse(body)
-    transformed["detail"] = transformed.delete("message")
+    transformed['detail'] = transformed.delete('message')
     transformed
   end
 end

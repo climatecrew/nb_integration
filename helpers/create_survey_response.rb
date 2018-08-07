@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class CreateSurveyResponse
   include AppConfiguration
 
   def initialize(logger, path_provider, contact_request)
     @logger = logger
-    @path_provider= path_provider
+    @path_provider = path_provider
     @contact_request = contact_request
   end
 

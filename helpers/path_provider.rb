@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PathProvider
   def initialize(slug:, api_token:)
     @slug = slug
@@ -28,7 +30,7 @@ class PathProvider
 
   def update(resource, id)
     if resource == :events
-    "#{base_url}/sites/#{slug}/pages/#{resource}/#{id}?#{access_token}"
+      "#{base_url}/sites/#{slug}/pages/#{resource}/#{id}?#{access_token}"
     else
       "#{base_url}/#{resource}/#{id}?#{access_token}"
     end
@@ -36,9 +38,9 @@ class PathProvider
 
   def match(resource, parameters)
     encoded_parameters = parameters.each_with_object([]) do |(key, val), list|
-      list << "#{CGI::escape(key.to_s)}=#{CGI::escape(val.to_s)}"
+      list << "#{CGI.escape(key.to_s)}=#{CGI.escape(val.to_s)}"
     end
-    query_string = encoded_parameters.join("&")
+    query_string = encoded_parameters.join('&')
     "#{base_url}/#{resource}/match?#{query_string}&#{access_token}"
   end
 

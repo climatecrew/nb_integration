@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RequestOAuthAccessToken
   include AppConfiguration
 
@@ -10,7 +12,7 @@ class RequestOAuthAccessToken
 
   def call
     Faraday.new(url: nation_url).post do |req|
-      req.url "/oauth/token"
+      req.url '/oauth/token'
       req.headers['Content-Type'] = 'application/json'
       req.body = access_token_request_body
     end
@@ -25,7 +27,7 @@ class RequestOAuthAccessToken
       client_id: app_client_id,
       client_secret: app_client_secret,
       redirect_uri: "#{app_base_url}/oauth/callback?slug=#{slug}",
-      grant_type: "authorization_code",
+      grant_type: 'authorization_code',
       code: code
     }.to_json
   end

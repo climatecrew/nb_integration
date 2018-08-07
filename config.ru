@@ -1,12 +1,14 @@
-require "logger"
+# frozen_string_literal: true
 
-$:.unshift File.dirname(__FILE__)
-require "dependencies"
+require 'logger'
 
-require "server"
+$LOAD_PATH.unshift File.dirname(__FILE__)
+require 'dependencies'
 
-if !AppConfiguration.nb_configuration_valid?
-  message = "NationBuilder configuration missing. Exiting."
+require 'server'
+
+unless AppConfiguration.nb_configuration_valid?
+  message = 'NationBuilder configuration missing. Exiting.'
   Logger.new($stderr).fatal(message)
   exit CONFIGURATION_ERROR
 end

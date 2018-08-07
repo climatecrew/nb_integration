@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HandleEventCreation
   def initialize(logger, account, payload)
     @logger = logger
@@ -10,7 +12,7 @@ class HandleEventCreation
   def call
     path_provider = PathProvider.new(slug: account.nb_slug,
                                      api_token: account.nb_access_token)
-    author_email = payload["event"].delete("author_email")
+    author_email = payload['event'].delete('author_email')
     forwarded_payload = prepare_payload(payload)
     logger.info("Sending payload:\n#{forwarded_payload}")
     nb_response = Client.create(path_provider: path_provider,
@@ -27,8 +29,8 @@ class HandleEventCreation
   private
 
   def prepare_payload(payload)
-    payload["event"]["status"] = "published"
-    payload["event"]["calendar_id"] = ENV["NB_CALENDAR_ID"].to_i
+    payload['event']['status'] = 'published'
+    payload['event']['calendar_id'] = ENV['NB_CALENDAR_ID'].to_i
     payload
   end
 
@@ -42,16 +44,16 @@ class HandleEventCreation
 
     if nb_event.nil?
       code = 500
-      body = { errors: [{ title: "Failed to create event" }] }
+      body = { errors: [{ title: 'Failed to create event' }] }
     else
       code = 201
       author_id = payload
-        .fetch("event")
-        .fetch("author_id")
+                  .fetch('event')
+                  .fetch('author_id')
       contact_email = payload
-        .fetch("event")
-        .fetch("contact")
-        .fetch("email")
+                      .fetch('event')
+                      .fetch('contact')
+                      .fetch('email')
       Event.create(nb_slug: account.nb_slug,
                    author_nb_id: author_id,
                    author_email: author_email,
@@ -68,7 +70,7 @@ class HandleEventCreation
     logger.warn("Create Event: NationBuilder request failed. Status: #{nb_response.status} / Body: #{nb_response.body}")
     [
       nb_response.status,
-      { errors: [ErrorPresenter.new(body: nb_response.body).transform.merge({ title: "Failed to create event" })] }
+      { errors: [ErrorPresenter.new(body: nb_response.body).transform.merge(title: 'Failed to create event')] }
     ]
   end
 end

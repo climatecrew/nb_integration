@@ -1,8 +1,10 @@
-require "logger"
+# frozen_string_literal: true
+
+require 'logger'
 
 RSpec.describe AppConfiguration do
-  describe "nb_configuration_valid?" do
-    it "returns true if NB_CLIENT_ID, NB_CLIENT_SECRET, and NB_POINT_PERSON_ID are present" do
+  describe 'nb_configuration_valid?' do
+    it 'returns true if NB_CLIENT_ID, NB_CLIENT_SECRET, and NB_POINT_PERSON_ID are present' do
       ENV['NB_CLIENT_ID'] = 'abc'
       ENV['NB_CLIENT_SECRET'] = 'def'
       ENV['NB_POINT_PERSON_ID'] = '123'
@@ -12,13 +14,13 @@ RSpec.describe AppConfiguration do
       expect(described_class.nb_configuration_valid?).to be_truthy
     end
 
-    it "returns false if any of the required values are missing" do
-      required_values = [
-        'NB_CLIENT_ID',
-        'NB_CLIENT_SECRET',
-        'NB_POINT_PERSON_ID',
-        'NB_EVENT_PLANNING_SURVEY_ID',
-        'NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID'
+    it 'returns false if any of the required values are missing' do
+      required_values = %w[
+        NB_CLIENT_ID
+        NB_CLIENT_SECRET
+        NB_POINT_PERSON_ID
+        NB_EVENT_PLANNING_SURVEY_ID
+        NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID
       ]
       required_values.each do |missing_value|
         present = required_values - [missing_value]
@@ -32,7 +34,7 @@ RSpec.describe AppConfiguration do
     end
   end
 
-  describe "log_nb_configuration_error" do
+  describe 'log_nb_configuration_error' do
     it "logs if ENV['NB_CLIENT_ID'] unset" do
       logger = Logger.new($stderr)
 
@@ -70,15 +72,15 @@ RSpec.describe AppConfiguration do
     end
   end
 
-  describe "domain_name" do
+  describe 'domain_name' do
     it "returns ENV['DOMAIN_NAME']" do
       ENV['DOMAIN_NAME'] = 'www.example.com'
       expect(described_class.domain_name).to eq('www.example.com')
     end
   end
 
-  describe "protocol" do
-    it "defaults to https" do
+  describe 'protocol' do
+    it 'defaults to https' do
       ENV.delete('HTTP_PROTOCOL')
 
       expect(described_class.protocol).to eq('https')
@@ -91,8 +93,8 @@ RSpec.describe AppConfiguration do
     end
   end
 
-  describe "app_base_url" do
-    it "returns a URL configured with protocol and domain" do
+  describe 'app_base_url' do
+    it 'returns a URL configured with protocol and domain' do
       ENV['HTTP_PROTOCOL'] = 'http'
       ENV['DOMAIN_NAME'] = 'api.test.gov'
 
@@ -100,7 +102,7 @@ RSpec.describe AppConfiguration do
     end
   end
 
-  describe "app_client_id" do
+  describe 'app_client_id' do
     it "returns ENV['NB_CLIENT_ID']" do
       ENV['NB_CLIENT_ID'] = '29edc'
 
@@ -108,7 +110,7 @@ RSpec.describe AppConfiguration do
     end
   end
 
-  describe "app_client_secret" do
+  describe 'app_client_secret' do
     it "returns ENV['NB_CLIENT_SECRET']" do
       ENV['NB_CLIENT_SECRET'] = 'dd74e'
 
@@ -116,7 +118,7 @@ RSpec.describe AppConfiguration do
     end
   end
 
-  describe "app_point_person_id" do
+  describe 'app_point_person_id' do
     it "returns ENV['NB_POINT_PERSON_ID']" do
       ENV['NB_POINT_PERSON_ID'] = '007'
 
@@ -124,7 +126,7 @@ RSpec.describe AppConfiguration do
     end
   end
 
-  describe "app_event_planning_survey_id" do
+  describe 'app_event_planning_survey_id' do
     it "returns ENV['NB_EVENT_PLANNING_SURVEY_ID']" do
       ENV['NB_EVENT_PLANNING_SURVEY_ID'] = '5'
 
@@ -132,7 +134,7 @@ RSpec.describe AppConfiguration do
     end
   end
 
-  describe "app_event_planning_survey_comments_question_id" do
+  describe 'app_event_planning_survey_comments_question_id' do
     it "returns ENV['NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID']" do
       ENV['NB_EVENT_PLANNING_SURVEY_COMMENTS_QUESTION_ID'] = '82'
 

@@ -1,18 +1,20 @@
+# frozen_string_literal: true
+
 RSpec.describe PathProvider do
   let(:slug) { 'test-nation' }
   let(:api_token) { 'test-token' }
   let(:path_provider) { PathProvider.new(slug: slug, api_token: api_token) }
 
-  describe ".new" do
-    it "accepts a slug and API token" do
+  describe '.new' do
+    it 'accepts a slug and API token' do
       expect { described_class.new(slug: 'test-nation', api_token: 'abc') }
         .to_not raise_error
     end
   end
 
-  describe "#index" do
-    describe "events" do
-      it "returns the expected URL" do
+  describe '#index' do
+    describe 'events' do
+      it 'returns the expected URL' do
         expect(path_provider.index(:events)).to eq(
           "https://#{slug}.nationbuilder.com/api/v1/sites/#{slug}/pages/events?" \
           "access_token=#{api_token}"
@@ -21,9 +23,9 @@ RSpec.describe PathProvider do
     end
   end
 
-  describe "#create" do
-    describe "events" do
-      it "returns the expected URL" do
+  describe '#create' do
+    describe 'events' do
+      it 'returns the expected URL' do
         expect(path_provider.create(:events)).to eq(
           "https://#{slug}.nationbuilder.com/api/v1/sites/#{slug}/pages/events?" \
           "access_token=#{api_token}"
@@ -31,8 +33,8 @@ RSpec.describe PathProvider do
       end
     end
 
-    describe "people" do
-      it "returns the expected URL" do
+    describe 'people' do
+      it 'returns the expected URL' do
         expect(path_provider.create(:people)).to eq(
           "https://#{slug}.nationbuilder.com/api/v1/people?" \
           "access_token=#{api_token}"
@@ -41,9 +43,9 @@ RSpec.describe PathProvider do
     end
   end
 
-  describe "#delete" do
-    describe "events" do
-      it "returns the expected URL" do
+  describe '#delete' do
+    describe 'events' do
+      it 'returns the expected URL' do
         id = 99
         expect(path_provider.delete(:events, id)).to eq(
           "https://#{slug}.nationbuilder.com/api/v1/sites/#{slug}/pages/events/#{id}?" \
@@ -52,8 +54,8 @@ RSpec.describe PathProvider do
       end
     end
 
-    describe "people" do
-      it "returns the expected URL" do
+    describe 'people' do
+      it 'returns the expected URL' do
         id = 99
         expect(path_provider.delete(:people, id)).to eq(
           "https://#{slug}.nationbuilder.com/api/v1/people/#{id}?" \
@@ -63,9 +65,9 @@ RSpec.describe PathProvider do
     end
   end
 
-  describe "#update" do
-    describe "events" do
-      it "returns the expected URL" do
+  describe '#update' do
+    describe 'events' do
+      it 'returns the expected URL' do
         id = 99
         expect(path_provider.update(:events, id)).to eq(
           "https://#{slug}.nationbuilder.com/api/v1/sites/#{slug}/pages/events/#{id}?" \
@@ -74,8 +76,8 @@ RSpec.describe PathProvider do
       end
     end
 
-    describe "people" do
-      it "returns the expected URL" do
+    describe 'people' do
+      it 'returns the expected URL' do
         id = 99
         expect(path_provider.update(:people, id)).to eq(
           "https://#{slug}.nationbuilder.com/api/v1/people/#{id}?" \
@@ -85,9 +87,9 @@ RSpec.describe PathProvider do
     end
   end
 
-  describe "#match" do
-    describe "people" do
-      it "returns the expected URL" do
+  describe '#match' do
+    describe 'people' do
+      it 'returns the expected URL' do
         first_name = 'First Name'
         last_name = 'Last Name'
         parameters = {
@@ -96,7 +98,7 @@ RSpec.describe PathProvider do
         }
         expect(path_provider.match(:people, parameters)).to eq(
           "https://#{slug}.nationbuilder.com/api/v1/people/match?" \
-          "first_name=First+Name&last_name=Last+Name" \
+          'first_name=First+Name&last_name=Last+Name' \
           "&access_token=#{api_token}"
         )
       end

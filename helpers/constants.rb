@@ -1,12 +1,7 @@
+# frozen_string_literal: true
 
-unless Object.const_defined? :SUCCESS
-  SUCCESS = 0
-end
+SUCCESS = 0 unless Object.const_defined? :SUCCESS
 
-unless Object.const_defined? :CONFIGURATION_ERROR
-  CONFIGURATION_ERROR = 1
-end
+CONFIGURATION_ERROR = 1 unless Object.const_defined? :CONFIGURATION_ERROR
 
-unless Object.const_defined? :REQUEST_FAILED
-  REQUEST_FAILED = 2
-end
+REQUEST_FAILED = 2 unless Object.const_defined? :REQUEST_FAILED

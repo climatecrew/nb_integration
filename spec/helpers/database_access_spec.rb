@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sequel'
 
 RSpec.describe DatabaseAccess do
@@ -7,16 +9,16 @@ RSpec.describe DatabaseAccess do
     end
   end
 
-  it "sets DB to a connection" do
+  it 'sets DB to a connection' do
     connection = Sequel.connect(ENV['DATABASE_URL'])
     expect(described_class::DB.opts[:uri]).to eq(connection.opts[:uri])
   end
 
-  it "makes the DB constant available to including class" do
+  it 'makes the DB constant available to including class' do
     expect(including_class::DB).to eq(described_class::DB)
   end
 
-  describe ".connect_options" do
+  describe '.connect_options' do
     before do
       @old_db_url = ENV['DATABASE_URL']
     end
@@ -25,15 +27,15 @@ RSpec.describe DatabaseAccess do
       ENV['DATABASE_URL'] = @old_db_url
     end
 
-    it "reads from the environment" do
+    it 'reads from the environment' do
       db_url = 'postgres://user:password@localhost/nb_integration_test'
       ENV['DATABASE_URL'] = db_url
       expect(DatabaseAccess.connect_options).to eq(db_url)
     end
   end
 
-  describe ".attempt" do
-    it "rescues Sequel::DatabaseDisconnectError" do
+  describe '.attempt' do
+    it 'rescues Sequel::DatabaseDisconnectError' do
       should_raise = true
       expect do
         described_class.attempt(wait_time: 0.01, logger: Logger.new('log/test.log')) do
@@ -45,7 +47,7 @@ RSpec.describe DatabaseAccess do
       end.not_to raise_error
     end
 
-    it "rescues Sequel::DatabaseConnectionError" do
+    it 'rescues Sequel::DatabaseConnectionError' do
       should_raise = true
       expect do
         described_class.attempt(wait_time: 0.01, logger: Logger.new('log/test.log')) do
@@ -57,19 +59,19 @@ RSpec.describe DatabaseAccess do
       end.not_to raise_error
     end
 
-    it "passes other errors through" do
+    it 'passes other errors through' do
       should_raise = true
       expect do
         described_class.attempt(wait_time: 0.01, logger: Logger.new('log/test.log')) do
           if should_raise
             should_raise = false
-            raise RuntimeError.new("Some other error")
+            raise 'Some other error'
           end
         end
       end.to raise_error(RuntimeError, /Some other error/)
     end
 
-    it "re-raises rescued errors if it cannot succeed after retrying" do
+    it 're-raises rescued errors if it cannot succeed after retrying' do
       expect do
         described_class.attempt(wait_time: 0.01, logger: Logger.new('log/test.log')) do
           raise Sequel::DatabaseConnectionError
@@ -77,7 +79,7 @@ RSpec.describe DatabaseAccess do
       end.to raise_error(Sequel::DatabaseConnectionError)
     end
 
-    it "attempts 3 times by default" do
+    it 'attempts 3 times by default' do
       tries = 0
       expect do
         described_class.attempt(wait_time: 0.01, logger: Logger.new('log/test.log')) do
@@ -89,7 +91,7 @@ RSpec.describe DatabaseAccess do
       expect(tries).to eq(3)
     end
 
-    it "attempts N times if specified" do
+    it 'attempts N times if specified' do
       tries = 0
       expect do
         described_class.attempt(wait_time: 0.01, max_attempts: 1, logger: Logger.new('log/test.log')) do
@@ -101,8 +103,8 @@ RSpec.describe DatabaseAccess do
       expect(tries).to eq(1)
     end
 
-    it "logs the operation tag if given" do
-      operation = "wassup"
+    it 'logs the operation tag if given' do
+      operation = 'wassup'
       max_attempts = 1
       wait_time = 0.01
       logger = Logger.new('log/test.log')

@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 class MatchNBPerson
   def initialize(logger, path_provider, email)
     @logger = logger
-    @path_provider= path_provider
+    @path_provider = path_provider
     @email = email
   end
 

@@ -1,4 +1,6 @@
-require "models/account"
+# frozen_string_literal: true
+
+require 'models/account'
 
 RSpec.describe HandleContactRequestCreation do
   let(:logger) { Logger.new('log/test.log') }
@@ -15,8 +17,8 @@ RSpec.describe HandleContactRequestCreation do
     "?access_token=#{access_token}"
   end
 
-  describe "makes API request to NationBuilder" do
-    it "does not overwrite required fields in person payload" do
+  describe 'makes API request to NationBuilder' do
+    it 'does not overwrite required fields in person payload' do
       payload = {
         'person' => {
           'id' => person_id,
@@ -42,7 +44,7 @@ RSpec.describe HandleContactRequestCreation do
         .to have_been_made.once
     end
 
-    it "sends non-null optional fields from person payload" do
+    it 'sends non-null optional fields from person payload' do
       payload = {
         'person' => {
           'id' => person_id,
@@ -74,7 +76,7 @@ RSpec.describe HandleContactRequestCreation do
         .to have_been_made.once
     end
 
-    it "removes null optional fields from person payload" do
+    it 'removes null optional fields from person payload' do
       payload = {
         'person' => {
           'id' => person_id,
@@ -104,24 +106,24 @@ RSpec.describe HandleContactRequestCreation do
     end
   end
 
-  context "when person ID not given" do
+  context 'when person ID not given' do
     let(:email) { 'me@example.com' }
     let(:payload) do
       {
-       'person' => {
-         'first_name' => 'F',
-         'last_name' => 'L',
-         'email' => email
-       }
-     }
+        'person' => {
+          'first_name' => 'F',
+          'last_name' => 'L',
+          'email' => email
+        }
+      }
     end
 
-    describe "attempts to match the person by email before creating" do
-      it "sends an update if it can match the person" do
+    describe 'attempts to match the person by email before creating' do
+      it 'sends an update if it can match the person' do
         person_response = {
-          "person" => {
-            "id" => person_id,
-            "email" => email
+          'person' => {
+            'id' => person_id,
+            'email' => email
           }
         }
         match_nb_person = MatchNBPerson.new(nil, nil, email)
@@ -143,7 +145,7 @@ RSpec.describe HandleContactRequestCreation do
           .to have_been_made.once
       end
 
-      it "sends a create if it cannot match the person" do
+      it 'sends a create if it cannot match the person' do
         match_nb_person = MatchNBPerson.new(nil, nil, email)
         allow(MatchNBPerson).to receive(:new).and_return(match_nb_person)
         allow(match_nb_person).to receive(:call).and_return(nil)

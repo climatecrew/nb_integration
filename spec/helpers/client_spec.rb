@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Client do
   let(:resource) { :test_resource }
   let(:path_provider_klass) do
@@ -6,48 +8,49 @@ RSpec.describe Client do
         @path = path
       end
 
-      def index(resource)
+      def index(_resource)
         @path
       end
 
-      def create(resource)
+      def create(_resource)
         @path
       end
 
-      def delete(resource, id)
+      def delete(_resource, _id)
         @path
       end
 
-      def update(resource, id)
+      def update(_resource, _id)
         @path
       end
 
-      def match(resource, parameters)
+      def match(_resource, _parameters)
         @path
       end
     end
   end
 
-  describe ".index" do
-    let(:index_path) { "https://www.example.com/tests" }
+  describe '.index' do
+    let(:index_path) { 'https://www.example.com/tests' }
 
-    it "takes a path provider and a resource" do
+    it 'takes a path provider and a resource' do
       stub_request(:get, index_path)
 
       path_provider = path_provider_klass.new(index_path)
       Client.index(path_provider: path_provider, resource: resource)
 
       expect(a_request(:get, index_path).with(
-        headers: {
-          "Accept" => "application/json"
-        })).to have_been_made.once
+               headers: {
+                 'Accept' => 'application/json'
+               }
+             )).to have_been_made.once
     end
   end
 
-  describe ".create" do
-    let(:create_path) { "https://www.example.com/tests" }
+  describe '.create' do
+    let(:create_path) { 'https://www.example.com/tests' }
 
-    it "takes a path provider and a resource" do
+    it 'takes a path provider and a resource' do
       stub_request(:post, create_path)
 
       path_provider = path_provider_klass.new(create_path)
@@ -56,7 +59,7 @@ RSpec.describe Client do
       expect(a_request(:post, create_path)).to have_been_made.once
     end
 
-    it "defaults payload to {}" do
+    it 'defaults payload to {}' do
       stub_request(:post, create_path)
 
       path_provider = path_provider_klass.new(create_path)
@@ -65,49 +68,50 @@ RSpec.describe Client do
       expect(a_request(:post, create_path).with(body: {})).to have_been_made.once
     end
 
-    it "accepts a payload" do
+    it 'accepts a payload' do
       stub_request(:post, create_path)
 
       expected_payload = {
-        "key" => "value"
+        'key' => 'value'
       }
       path_provider = path_provider_klass.new(create_path)
       Client.create(path_provider: path_provider,
-                             resource: resource,
-                             payload: expected_payload)
+                    resource: resource,
+                    payload: expected_payload)
 
       expect(a_request(:post, create_path).with(
-        body: JSON.generate(expected_payload),
-        headers: {
-          "Accept" => "application/json",
-          "Content-Type" => "application/json"
-        }
-      )).to have_been_made.once
+               body: JSON.generate(expected_payload),
+               headers: {
+                 'Accept' => 'application/json',
+                 'Content-Type' => 'application/json'
+               }
+             )).to have_been_made.once
     end
   end
 
-  describe ".delete" do
+  describe '.delete' do
     let(:id) { 123 }
     let(:delete_path) { "https://www.example.com/tests/#{id}" }
 
-    it "takes a path provider, resource, and id" do
+    it 'takes a path provider, resource, and id' do
       stub_request(:delete, delete_path)
 
       path_provider = path_provider_klass.new(delete_path)
       Client.delete(path_provider: path_provider, resource: resource, id: id)
 
       expect(a_request(:delete, delete_path).with(
-        headers: {
-          "Accept" => "application/json"
-        })).to have_been_made.once
+               headers: {
+                 'Accept' => 'application/json'
+               }
+             )).to have_been_made.once
     end
   end
 
-  describe ".update" do
+  describe '.update' do
     let(:id) { 123 }
     let(:update_path) { "https://www.example.com/tests/#{id}" }
 
-    it "takes a path provider, resource, id, and payload" do
+    it 'takes a path provider, resource, id, and payload' do
       stub_request(:put, update_path)
 
       path_provider = path_provider_klass.new(update_path)
@@ -115,36 +119,36 @@ RSpec.describe Client do
         key: :value
       }
       Client.update(path_provider: path_provider,
-                             resource: resource,
-                             id: id,
-                             payload: payload)
+                    resource: resource,
+                    id: id,
+                    payload: payload)
 
       expect(a_request(:put, update_path).with(
-        headers: {
-          "Accept" => "application/json",
-          "Content-Type" => "application/json"
-        }
-      )).to have_been_made.once
+               headers: {
+                 'Accept' => 'application/json',
+                 'Content-Type' => 'application/json'
+               }
+             )).to have_been_made.once
     end
   end
 
-  describe ".match" do
+  describe '.match' do
     let(:parameters) { { email: 'dog@canines.org', city: 'Dog Town' } }
-    let(:match_path) { "https://www.example.com/tests/match?email=dog%40canines.org&city=Dog+Town" }
+    let(:match_path) { 'https://www.example.com/tests/match?email=dog%40canines.org&city=Dog+Town' }
 
-    it "takes a path provider, resource, id, and payload" do
+    it 'takes a path provider, resource, id, and payload' do
       stub_request(:get, match_path)
 
       path_provider = path_provider_klass.new(match_path)
       Client.match(path_provider: path_provider,
-                             resource: resource,
-                             parameters: parameters)
+                   resource: resource,
+                   parameters: parameters)
       expect(a_request(:get, match_path).with(
-        headers: {
-          "Accept" => "application/json",
-          "Content-Type" => "application/json"
-        }
-      )).to have_been_made.once
+               headers: {
+                 'Accept' => 'application/json',
+                 'Content-Type' => 'application/json'
+               }
+             )).to have_been_made.once
     end
   end
 end
