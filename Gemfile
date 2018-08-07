@@ -16,6 +16,7 @@ group :test, :development do
   gem 'dotenv'
   gem 'pry'
   gem 'rerun'
+  gem 'rubocop', require: false
 end
 
 group :test do
