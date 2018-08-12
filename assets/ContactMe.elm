@@ -8,6 +8,7 @@ import Json.Decode as JD exposing (field, dict, list, string, array, int, oneOf,
 import Json.Encode as JE exposing (Value, encode, object)
 import ContactMeForm exposing (Form)
 import FormInput exposing (FormInput)
+import FormResult exposing (FormResult)
 import ContactMeTypes exposing (..)
 
 
@@ -72,7 +73,7 @@ mainView model =
                     , button [ onClick SubmitForm ] [ text "Submit" ]
                     , emptyValidationView
                     ]
-                , li [] <| ContactMeForm.resultsView model.form.results
+                , li [] <| FormResult.resultView model.form.result
                 ]
             ]
         , loadingSpinner model
@@ -156,7 +157,7 @@ update msg model =
                 _ =
                     Debug.log "parsedResults" parsedResults
             in
-                ( { model | loading = False, form = ContactMeForm.updateResults model.form parsedResults }, Cmd.none )
+                ( { model | loading = False, form = ContactMeForm.updateResult model.form parsedResults }, Cmd.none )
 
 
 submitForm : Model -> ( Model, Cmd Msg )
