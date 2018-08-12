@@ -3,7 +3,6 @@ module FormInput exposing (FormInput, TextInputType(..), setupNonInteractiveInpu
 import Html exposing (Html, span, text, input, textarea, label, div)
 import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows, value)
 import Html.Events exposing (onInput)
-import ContactMeTypes exposing (Msg)
 
 
 type alias InteractiveInput =
@@ -81,7 +80,7 @@ valid formInput =
             True
 
 
-inputView : Bool -> FormInput -> (String -> Msg) -> List (Html Msg)
+inputView : Bool -> FormInput -> (String -> msg) -> List (Html msg)
 inputView formSubmitted formInput inputMsg =
     let
         htmlInput input =
