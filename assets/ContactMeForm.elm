@@ -1,7 +1,10 @@
 module ContactMeForm exposing (..)
 
-import ContactMeTypes exposing (Flags)
+import ContactMeTypes exposing (Flags, APIResult)
 import FormInput exposing (FormInput)
+import Html exposing (Html, text, label)
+import Html.Attributes exposing (class)
+import ContactMeTypes exposing (Msg)
 
 
 type alias Form =
@@ -13,7 +16,35 @@ type alias Form =
     , mobile : FormInput
     , workPhoneNumber : FormInput
     , notes : FormInput
+    , results : Maybe APIResult
+    , resultsView : Maybe APIResult -> List (Html Msg)
     }
+
+
+resultsView : Maybe APIResult -> List (Html Msg)
+resultsView apiResult =
+    case apiResult of
+        Just result ->
+            case result of
+                ContactMeTypes.APIErrors errors ->
+                    [ label [ class "results-column-1" ] []
+                    , text <| String.concat [ "results: ", List.map (\e -> e.title) errors |> String.join ", " ]
+                    ]
+
+                otherwise ->
+                    [ label [ class "results-column-1" ] []
+                    , text "results: succeeded"
+                    ]
+
+        Nothing ->
+            [ label [ class "results-column-1" ] []
+            , text "no results ..."
+            ]
+
+
+updateResults : Form -> Maybe APIResult -> Form
+updateResults form value =
+    { form | results = value }
 
 
 type alias FormInputValues =
@@ -150,6 +181,8 @@ setupForm flags =
         , mobile = mobileInput
         , workPhoneNumber = workPhoneNumberInput
         , notes = notesInput
+        , results = Nothing
+        , resultsView = resultsView
         }
 
 

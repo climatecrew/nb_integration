@@ -1,6 +1,6 @@
 module FormInput exposing (FormInput, TextInputType(..), setupNonInteractiveInput, setupInteractiveInput, updateFormInput, value, valid, inputView)
 
-import Html exposing (Html, span, text, input, textarea, label)
+import Html exposing (Html, span, text, input, textarea, label, div)
 import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows, value)
 import Html.Events exposing (onInput)
 import ContactMeTypes exposing (Msg)

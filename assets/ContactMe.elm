@@ -72,6 +72,7 @@ mainView model =
                     , button [ onClick SubmitForm ] [ text "Submit" ]
                     , emptyValidationView
                     ]
+                , li [] <| ContactMeForm.resultsView model.form.results
                 ]
             ]
         , loadingSpinner model
@@ -121,7 +122,41 @@ update msg model =
             submitForm model
 
         SubmitFormResult result ->
-            ( { model | loading = False }, Cmd.none )
+            let
+                parsedResults =
+                    case result of
+                        Ok a ->
+                            Just a
+
+                        Err err ->
+                            case err of
+                                Http.BadStatus response ->
+                                    let
+                                        _ =
+                                            Debug.log "response" response
+                                    in
+                                        let
+                                            decoded =
+                                                JD.decodeString errorsDecoder response.body
+                                        in
+                                            case decoded of
+                                                Ok ae ->
+                                                    Just ae
+
+                                                Err err ->
+                                                    let
+                                                        _ =
+                                                            Debug.log "decode err" err
+                                                    in
+                                                        Nothing
+
+                                otherwise ->
+                                    Nothing
+
+                _ =
+                    Debug.log "parsedResults" parsedResults
+            in
+                ( { model | loading = False, form = ContactMeForm.updateResults model.form parsedResults }, Cmd.none )
 
 
 submitForm : Model -> ( Model, Cmd Msg )
