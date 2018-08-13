@@ -58,23 +58,25 @@ mainView model =
     div
         [ class "nb-integration-container" ]
         [ div [ class "form" ]
-            [ ul [ class "flex-outer" ]
-                [ li [ class "section-start" ] <|
-                    FormInput.inputView model.form.submitted model.form.firstName FirstName
-                , li [] <|
-                    FormInput.inputView model.form.submitted model.form.lastName LastName
-                , li [] <|
-                    FormInput.inputView model.form.submitted model.form.email Email
-                , li [] <|
-                    FormInput.inputView model.form.submitted model.form.phone Phone
-                , li [] <| FormInput.inputView model.form.submitted model.form.notes Notes
-                , li [ class <| submitButtonClass model ]
-                    [ label [] []
-                    , button [ onClick SubmitForm ] [ text "Submit" ]
-                    , emptyValidationView
+            [ ul [ class "flex-outer" ] <|
+                List.append
+                    [ li [ class "section-start" ] <|
+                        FormInput.inputView model.form.submitted model.form.firstName FirstName
+                    , li [] <|
+                        FormInput.inputView model.form.submitted model.form.lastName LastName
+                    , li [] <|
+                        FormInput.inputView model.form.submitted model.form.email Email
+                    , li [] <|
+                        FormInput.inputView model.form.submitted model.form.phone Phone
+                    , li [] <| FormInput.inputView model.form.submitted model.form.notes Notes
+                    , li [ class <| submitButtonClass model ]
+                        [ label [] []
+                        , button [ onClick SubmitForm ] [ text "Submit" ]
+                        , emptyValidationView
+                        ]
                     ]
-                , li [] <| FormResult.resultView model.form.result
-                ]
+                <|
+                    FormResult.resultView model.form.result
             ]
         , loadingSpinner model
         ]
@@ -123,43 +125,7 @@ update msg model =
             submitForm model
 
         SubmitFormResult result ->
-            let
-                updatedForm =
-                    case result of
-                        Ok _ ->
-                            ContactMeForm.successResult model.form "Thanks for reaching out! We will follow up to help plan your event."
-
-                        Err err ->
-                            case err of
-                                Http.BadStatus response ->
-                                    let
-                                        _ =
-                                            Debug.log "response" response
-                                    in
-                                        let
-                                            decoded =
-                                                JD.decodeString errorsDecoder response.body
-                                        in
-                                            case decoded of
-                                                Ok ae ->
-                                                    case ae of
-                                                        APIErrors es ->
-                                                            ContactMeForm.errorResult model.form "Submission failed." <| List.map (\e -> e.title) es
-
-                                                        otherwise ->
-                                                            ContactMeForm.errorResult model.form "Submission failed." []
-
-                                                Err err ->
-                                                    let
-                                                        _ =
-                                                            Debug.log "decode err" err
-                                                    in
-                                                        ContactMeForm.errorResult model.form "Submission failed." []
-
-                                otherwise ->
-                                    ContactMeForm.errorResult model.form "Submission failed." []
-            in
-                ( { model | loading = False, form = updatedForm }, Cmd.none )
+            ( { model | loading = False, form = updateFormResult model.form result }, Cmd.none )
 
 
 submitForm : Model -> ( Model, Cmd Msg )
@@ -194,7 +160,7 @@ createContactRequest : Model -> Http.Request APIResult
 createContactRequest model =
     Http.post (contactRequestsURL model)
         (Http.jsonBody <| encodeContactRequest model)
-        (oneOf [ dataContactRequestDecoder, errorsDecoder ])
+        dataContactRequestDecoder
 
 
 encodeContactRequest : Model -> Value
@@ -257,12 +223,11 @@ encodeNullable encoder data =
             JE.null
 
 
-errorsDecoder : JD.Decoder APIResult
+errorsDecoder : JD.Decoder (List Error)
 errorsDecoder =
-    JD.map APIErrors <|
-        field "errors" <|
-            list <|
-                JD.map Error (field "title" string)
+    field "errors" <|
+        list <|
+            JD.map Error (field "title" string)
 
 
 dataContactRequestDecoder : JD.Decoder APIResult
@@ -275,3 +240,37 @@ dataContactRequestDecoder =
 contactRequestDecoder : JD.Decoder String
 contactRequestDecoder =
     field "person" <| succeed "TEMP"
+
+
+updateFormResult : Form -> Result Http.Error APIResult -> Form
+updateFormResult form result =
+    case result of
+        Ok _ ->
+            ContactMeForm.successResult form "Thanks for reaching out! We will follow up to help plan your event."
+
+        Err err ->
+            case err of
+                Http.BadStatus response ->
+                    let
+                        decodeResult =
+                            Result.withDefault [] <|
+                                JD.decodeString errorsDecoder response.body
+
+                        errorList =
+                            List.map (\e -> e.title) decodeResult
+                    in
+                        ContactMeForm.errorResult form "Submission failed" errorList
+
+                -- BadPayload: success response code but undecodable response body
+                -- Likely means API changed
+                Http.BadPayload _ _ ->
+                    ContactMeForm.successResult form "Thanks for reaching out! We will follow up to help plan your event."
+
+                Http.Timeout ->
+                    ContactMeForm.errorResult form "Submission failed" [ "Request timed out. please try again" ]
+
+                Http.NetworkError ->
+                    ContactMeForm.errorResult form "Submission failed" [ "Network error. Please ensure your Internet connection is working and try again" ]
+
+                Http.BadUrl _ ->
+                    ContactMeForm.errorResult form "Submission failed" [ "Sorry, an unexpected error happened on our side. Please try again later." ]

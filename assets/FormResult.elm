@@ -27,19 +27,28 @@ successResult message =
 
 resultView : FormResult -> List (Html msg)
 resultView formResult =
-    case formResult of
-        NotYetObtained ->
-            [ label [ class "results-column-1" ] []
-            , text "not yet obtained..."
-            ]
+    let
+        placeholderLabel =
+            label [] []
+    in
+        case formResult of
+            NotYetObtained ->
+                [ li []
+                    [ placeholderLabel
+                    , text "not yet obtained..."
+                    ]
+                ]
 
-        Errors message distinctErrors ->
-            [ label [ class "results-column-1" ] []
-            , text message
-            , div [] [ ul [] <| List.map (\e -> li [] [ text e ]) distinctErrors ]
-            ]
+            Errors message distinctErrors ->
+                let
+                    errorItems =
+                        List.map (\e -> li [] [ placeholderLabel, text e ]) distinctErrors
+                in
+                    (li [] [ placeholderLabel, text message ]) :: errorItems
 
-        Success message ->
-            [ label [ class "results-column-1" ] []
-            , text message
-            ]
+            Success message ->
+                [ li []
+                    [ placeholderLabel
+                    , text message
+                    ]
+                ]
