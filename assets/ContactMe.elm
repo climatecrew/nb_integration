@@ -124,10 +124,10 @@ update msg model =
 
         SubmitFormResult result ->
             let
-                parsedResults =
+                updatedForm =
                     case result of
-                        Ok a ->
-                            Just a
+                        Ok _ ->
+                            ContactMeForm.successResult model.form "Thanks for reaching out! We will follow up to help plan your event."
 
                         Err err ->
                             case err of
@@ -142,22 +142,24 @@ update msg model =
                                         in
                                             case decoded of
                                                 Ok ae ->
-                                                    Just ae
+                                                    case ae of
+                                                        APIErrors es ->
+                                                            ContactMeForm.errorResult model.form "Submission failed." <| List.map (\e -> e.title) es
+
+                                                        otherwise ->
+                                                            ContactMeForm.errorResult model.form "Submission failed." []
 
                                                 Err err ->
                                                     let
                                                         _ =
                                                             Debug.log "decode err" err
                                                     in
-                                                        Nothing
+                                                        ContactMeForm.errorResult model.form "Submission failed." []
 
                                 otherwise ->
-                                    Nothing
-
-                _ =
-                    Debug.log "parsedResults" parsedResults
+                                    ContactMeForm.errorResult model.form "Submission failed." []
             in
-                ( { model | loading = False, form = ContactMeForm.updateResult model.form parsedResults }, Cmd.none )
+                ( { model | loading = False, form = updatedForm }, Cmd.none )
 
 
 submitForm : Model -> ( Model, Cmd Msg )

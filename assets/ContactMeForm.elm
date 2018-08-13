@@ -20,9 +20,14 @@ type alias Form =
     }
 
 
-updateResult : Form -> Maybe APIResult -> Form
-updateResult form newResult =
-    { form | result = FormResult.updateResult form.result newResult }
+errorResult : Form -> String -> List String -> Form
+errorResult form message distinctErrors =
+    { form | result = FormResult.errorResult message distinctErrors }
+
+
+successResult : Form -> String -> Form
+successResult form message =
+    { form | result = FormResult.successResult message }
 
 
 type alias FormInputValues =

@@ -1,13 +1,13 @@
-module FormResult exposing (FormResult, resultView, updateResult, initialFormResult)
+module FormResult exposing (FormResult, resultView, initialFormResult, successResult, errorResult)
 
-import Html exposing (Html, text, label)
+import Html exposing (Html, text, label, ul, li, div)
 import Html.Attributes exposing (class)
-import ContactMeTypes exposing (APIResult)
 
 
 type FormResult
     = NotYetObtained
-    | Obtained APIResult
+    | Errors String (List String)
+    | Success String
 
 
 initialFormResult : FormResult
@@ -15,14 +15,14 @@ initialFormResult =
     NotYetObtained
 
 
-updateResult : FormResult -> Maybe APIResult -> FormResult
-updateResult formResult value =
-    case value of
-        Just result ->
-            Obtained result
+errorResult : String -> List String -> FormResult
+errorResult message distinctErrors =
+    Errors message distinctErrors
 
-        Nothing ->
-            NotYetObtained
+
+successResult : String -> FormResult
+successResult message =
+    Success message
 
 
 resultView : FormResult -> List (Html msg)
@@ -33,14 +33,13 @@ resultView formResult =
             , text "not yet obtained..."
             ]
 
-        Obtained apiResult ->
-            case apiResult of
-                ContactMeTypes.APIErrors errors ->
-                    [ label [ class "results-column-1" ] []
-                    , text <| String.concat [ "results: ", List.map (\e -> e.title) errors |> String.join ", " ]
-                    ]
+        Errors message distinctErrors ->
+            [ label [ class "results-column-1" ] []
+            , text message
+            , div [] [ ul [] <| List.map (\e -> li [] [ text e ]) distinctErrors ]
+            ]
 
-                otherwise ->
-                    [ label [ class "results-column-1" ] []
-                    , text "results: succeeded"
-                    ]
+        Success message ->
+            [ label [ class "results-column-1" ] []
+            , text message
+            ]
