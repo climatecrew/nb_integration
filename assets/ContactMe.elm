@@ -249,28 +249,36 @@ updateFormResult form result =
             ContactMeForm.successResult form "Thanks for reaching out! We will follow up to help plan your event."
 
         Err err ->
-            case err of
-                Http.BadStatus response ->
-                    let
-                        decodeResult =
-                            Result.withDefault [] <|
-                                JD.decodeString errorsDecoder response.body
+            transformHttpError form err
 
-                        errorList =
-                            List.map (\e -> e.title) decodeResult
-                    in
-                        ContactMeForm.errorResult form "Submission failed" errorList
 
-                -- BadPayload: success response code but undecodable response body
-                -- Likely means API changed
-                Http.BadPayload _ _ ->
-                    ContactMeForm.successResult form "Thanks for reaching out! We will follow up to help plan your event."
+transformHttpError : Form -> Http.Error -> Form
+transformHttpError form httpError =
+    case httpError of
+        Http.BadUrl _ ->
+            ContactMeForm.errorResult form ( "Submission failed:", [ "Sorry, an unexpected error happened on our side. Please try again later." ] )
 
-                Http.Timeout ->
-                    ContactMeForm.errorResult form "Submission failed" [ "Request timed out. please try again" ]
+        Http.Timeout ->
+            ContactMeForm.errorResult form ( "Submission failed:", [ "Request timed out. Please try again." ] )
 
-                Http.NetworkError ->
-                    ContactMeForm.errorResult form "Submission failed" [ "Network error. Please ensure your Internet connection is working and try again" ]
+        Http.NetworkError ->
+            ContactMeForm.errorResult form ( "Submission failed:", [ "Network error. Please ensure your Internet connection is working and try again." ] )
 
-                Http.BadUrl _ ->
-                    ContactMeForm.errorResult form "Submission failed" [ "Sorry, an unexpected error happened on our side. Please try again later." ]
+        Http.BadStatus response ->
+            let
+                httpStatus =
+                    toString response.status.code ++ " " ++ response.status.message
+
+                decodeResult =
+                    Result.withDefault [ { title = httpStatus } ] <|
+                        JD.decodeString errorsDecoder response.body
+
+                errorList =
+                    List.map (\e -> e.title) decodeResult
+            in
+                ContactMeForm.errorResult form ( "Submission failed:", errorList )
+
+        -- BadPayload: success response code but undecodable response body
+        -- Likely means API changed
+        Http.BadPayload _ _ ->
+            ContactMeForm.successResult form "Thanks for reaching out! We will follow up to help plan your event."

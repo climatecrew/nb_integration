@@ -20,8 +20,8 @@ type alias Form =
     }
 
 
-errorResult : Form -> String -> List String -> Form
-errorResult form message distinctErrors =
+errorResult : Form -> ( String, List String ) -> Form
+errorResult form ( message, distinctErrors ) =
     { form | result = FormResult.errorResult message distinctErrors }
 
 
