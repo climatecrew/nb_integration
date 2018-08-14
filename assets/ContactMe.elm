@@ -227,7 +227,7 @@ errorsDecoder : JD.Decoder (List Error)
 errorsDecoder =
     field "errors" <|
         list <|
-            JD.map Error (field "title" string)
+            JD.map Error (field "detail" string)
 
 
 dataContactRequestDecoder : JD.Decoder APIResult
