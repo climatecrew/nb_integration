@@ -68,9 +68,12 @@ class HandleEventCreation
 
   def on_failure(nb_response)
     logger.warn("Create Event: NationBuilder request failed. Status: #{nb_response.status} / Body: #{nb_response.body}")
-    [
-      nb_response.status,
-      { errors: [ErrorPresenter.new(body: nb_response.body).transform.merge(title: 'Failed to create event')] }
-    ]
+
+    errors = ErrorPresenter.new(body: nb_response.body).transform
+    errors.each do |error|
+      error.merge!(title: 'Failed to create event')
+    end
+
+    [nb_response.status, { errors: errors }]
   end
 end

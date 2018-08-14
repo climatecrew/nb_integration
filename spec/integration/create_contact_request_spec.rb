@@ -237,7 +237,11 @@ RSpec.describe 'POST /api/contact_requests' do
 
         expect(last_response.status).to eq(404)
         expect(JSON.parse(last_response.body)).to match_json_expression(
-          'errors' => [{ "title": 'Failed to create contact request', "detail": nil }]
+          'errors' => [{
+            "code": nil,
+            "title": 'Failed to create contact request',
+            "detail": nil
+          }]
         )
       end
 
