@@ -122,11 +122,11 @@ class HandleContactRequestCreation
   def on_failure(nb_response)
     logger.warn("Create Event: NationBuilder request failed. Status: #{nb_response.status} / Body: #{nb_response.body}")
 
-    errors = ErrorPresenter.new(body: nb_response.body).transform
-    errors.each do |error|
+    errors = ErrorPresenter.new(nb_response.body).to_h
+    errors['errors'].each do |error|
       error.merge!(title: 'Failed to create contact request')
     end
 
-    [nb_response.status, { errors: errors }]
+    [nb_response.status, errors]
   end
 end

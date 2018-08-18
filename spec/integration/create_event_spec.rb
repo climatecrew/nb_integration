@@ -147,11 +147,7 @@ RSpec.describe 'POST /api/events' do
 
         expect(last_response.status).to eq(404)
         expect(JSON.parse(last_response.body)).to match_json_expression(
-          'errors' => [{
-            "code": nil,
-            "title": 'Failed to create event',
-            "detail": nil
-          }]
+          'errors' => [{ "title": 'Failed to create event' }]
         )
       end
 

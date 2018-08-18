@@ -3,26 +3,39 @@
 require 'json'
 
 class ErrorPresenter
-  def initialize(body: '')
-    @body = body
+  def initialize(body='{}')
+    @body = if body.kind_of?(Hash)
+              body
+            else
+              JSON.parse(body.to_s)
+            end
+    @body = transform(@body)
   end
 
-  attr_reader :body
+  def to_h
+    { 'errors' => @body }
+  end
 
-  def transform
-    transformed = JSON.parse(body)
-    if transformed.has_key?('validation_errors')
-      transformed['validation_errors'].map do |error|
+  private
+
+  def transform(body)
+    if body.has_key?('validation_errors')
+      validation_errors = body['validation_errors']
+      validation_errors.map do |error|
         {
-          'code' => transformed['code'],
-          'detail' => error
+          'code' => body['code'],
+          'title' => error,
+          'detail' => nil
         }
       end
-    else
+    elsif body.has_key?('message')
       [{
-        'code' => transformed['code'],
-        'detail' => transformed['message']
+        'code' => body['code'],
+        'title' => nil,
+        'detail' => body['message']
       }]
+    else
+      [body]
     end
   end
 end
