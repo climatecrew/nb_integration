@@ -1,6 +1,7 @@
 module ContactMeTypes exposing (..)
 
 import Http
+import Dom
 
 
 type Msg
@@ -11,6 +12,7 @@ type Msg
     | Notes String
     | SubmitForm
     | SubmitFormResult (Result Http.Error APIResult)
+    | SubmitButtonUnfocused (Result Dom.Error ())
 
 
 type alias Flags =
