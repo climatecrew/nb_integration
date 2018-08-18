@@ -35,7 +35,7 @@ resultView formResult =
             NotYetObtained ->
                 [ li []
                     [ placeholderLabel
-                    , text "not yet obtained..."
+                    , text ""
                     ]
                 ]
 
