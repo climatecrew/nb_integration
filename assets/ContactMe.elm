@@ -4,8 +4,8 @@ import Html exposing (Html, div, span, text, ul, li, input, textarea, label, but
 import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows, value)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Json.Decode as JD exposing (field, dict, list, string, array, int, oneOf, decodeString, succeed, nullable)
-import Json.Encode as JE exposing (Value, encode, object)
+import Json.Decode as JD
+import Json.Encode as JE
 import ContactMeForm exposing (Form)
 import FormInput exposing (FormInput)
 import FormResult exposing (FormResult)
@@ -163,7 +163,7 @@ createContactRequest model =
         dataContactRequestDecoder
 
 
-encodeContactRequest : Model -> Value
+encodeContactRequest : Model -> JE.Value
 encodeContactRequest model =
     let
         values =
@@ -193,11 +193,11 @@ encodeContactRequest model =
         person_id =
             encodeNullable JE.int model.personID
     in
-        object
+        JE.object
             [ ( "data"
-              , object
+              , JE.object
                     [ ( "person"
-                      , object
+                      , JE.object
                             [ ( "id", person_id )
                             , ( "first_name", firstName )
                             , ( "last_name", lastName )
@@ -213,7 +213,7 @@ encodeContactRequest model =
             ]
 
 
-encodeNullable : (t -> Value) -> Maybe t -> Value
+encodeNullable : (t -> JE.Value) -> Maybe t -> JE.Value
 encodeNullable encoder data =
     case data of
         Just d ->
@@ -225,21 +225,16 @@ encodeNullable encoder data =
 
 errorsDecoder : JD.Decoder (List Error)
 errorsDecoder =
-    field "errors" <|
-        list <|
-            JD.map Error (field "detail" string)
+    JD.field "errors" <|
+        JD.list <|
+            JD.map2 Error
+                (JD.maybe (JD.field "title" JD.string))
+                (JD.maybe (JD.field "detail" JD.string))
 
 
 dataContactRequestDecoder : JD.Decoder APIResult
 dataContactRequestDecoder =
-    JD.map APIContactRequest <|
-        field "data" <|
-            contactRequestDecoder
-
-
-contactRequestDecoder : JD.Decoder String
-contactRequestDecoder =
-    field "person" <| succeed "TEMP"
+    JD.succeed APIContactRequest
 
 
 updateFormResult : Form -> Result Http.Error APIResult -> Form
@@ -270,11 +265,20 @@ transformHttpError form httpError =
                     toString response.status.code ++ " " ++ response.status.message
 
                 decodeResult =
-                    Result.withDefault [ { title = httpStatus } ] <|
+                    Result.withDefault [ { title = Just httpStatus, detail = Nothing } ] <|
                         JD.decodeString errorsDecoder response.body
 
+                errorChooser =
+                    \e ->
+                        case e.detail of
+                            Just detail ->
+                                Just detail
+
+                            Nothing ->
+                                e.title
+
                 errorList =
-                    List.map (\e -> e.title) decodeResult
+                    List.filterMap errorChooser decodeResult
             in
                 ContactMeForm.errorResult form ( "Submission failed:", errorList )
 

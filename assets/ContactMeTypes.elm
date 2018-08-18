@@ -28,7 +28,7 @@ type alias Flags =
 
 type APIResult
     = APIErrors (List Error)
-    | APIContactRequest ContactRequest
+    | APIContactRequest
 
 
 type alias ContactRequest =
@@ -36,4 +36,6 @@ type alias ContactRequest =
 
 
 type alias Error =
-    { title : String }
+    { title : Maybe String
+    , detail : Maybe String
+    }
