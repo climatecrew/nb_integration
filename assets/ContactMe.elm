@@ -18,6 +18,7 @@ type alias Model =
     , personID : Maybe Int
     , form : Form
     , loading : Bool
+    , complete : Bool
     }
 
 
@@ -36,6 +37,7 @@ initialModel flags =
     , personID = flags.nbPersonID
     , form = ContactMeForm.setupForm flags
     , loading = False
+    , complete = False
     }
 
 
@@ -97,7 +99,7 @@ emptyValidationView =
 
 submitButtonClass : Model -> String
 submitButtonClass model =
-    if ContactMeForm.formInputsValid model.form then
+    if ContactMeForm.formInputsValid model.form && not model.loading && not model.complete then
         "create-event-button"
     else
         "create-event-button create-event-button-disabled"
@@ -125,7 +127,7 @@ update msg model =
             submitForm model
 
         SubmitFormResult result ->
-            ( { model | loading = False, form = updateFormResult model.form result }, Cmd.none )
+            submitFormResult model result
 
 
 submitForm : Model -> ( Model, Cmd Msg )
@@ -235,6 +237,26 @@ errorsDecoder =
 dataContactRequestDecoder : JD.Decoder APIResult
 dataContactRequestDecoder =
     JD.succeed APIContactRequest
+
+
+submitFormResult : Model -> Result Http.Error APIResult -> ( Model, Cmd Msg )
+submitFormResult model result =
+    let
+        complete =
+            case result of
+                Ok _ ->
+                    True
+
+                otherwise ->
+                    False
+    in
+        ( { model
+            | loading = False
+            , complete = complete
+            , form = updateFormResult model.form result
+          }
+        , Cmd.none
+        )
 
 
 updateFormResult : Form -> Result Http.Error APIResult -> Form
