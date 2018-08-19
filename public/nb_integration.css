@@ -41,7 +41,6 @@
 .flex-outer li button {
   box-sizing: border-box;
   margin-left: auto;
-  min-height: 35px;
   max-width: 240px;
   padding: 8px 0px;
   background: #353535;
@@ -73,6 +72,10 @@
   position: relative; /* keeps abolutely-positioned spinner inside button */
   display: flex;
   justify-content: center;
+}
+
+.not-visible {
+  visibility: hidden;
 }
 
 .flex-inner {

@@ -100,7 +100,7 @@ mainView model =
                     , li [ class <| submitButtonClass model ]
                         [ label [] []
                         , button [ onClick SubmitForm, id "submit-button" ]
-                            [ buttonContent model ]
+                            (buttonContent model)
                         , emptyValidationView
                         ]
                     ]
@@ -110,12 +110,14 @@ mainView model =
         ]
 
 
-buttonContent : Model -> Html Msg
+buttonContent : Model -> List (Html Msg)
 buttonContent model =
     if model.loading then
-        span [] [ Spinner.view model.spinnerConfig model.spinner ]
+        [ span [ class "not-visible" ] [ text "Submit" ]
+        , span [] [ Spinner.view model.spinnerConfig model.spinner ]
+        ]
     else
-        span [] [ text "Submit" ]
+        [ span [] [ text "Submit" ] ]
 
 
 emptyValidationView : Html Msg
