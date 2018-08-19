@@ -1,7 +1,8 @@
 module ContactMeTypes exposing (..)
 
-import Http
 import Dom
+import Http
+import Spinner
 
 
 type Msg
@@ -13,6 +14,7 @@ type Msg
     | SubmitForm
     | SubmitFormResult (Result Http.Error APIResult)
     | SubmitButtonUnfocused (Result Dom.Error ())
+    | SpinnerMsg Spinner.Msg
 
 
 type alias Flags =

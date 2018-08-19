@@ -14,6 +14,6 @@ main =
         }
 
 
-subscriptions : ContactMe.Model -> Sub msg
+subscriptions : ContactMe.Model -> Sub ContactMe.Msg
 subscriptions model =
-    Sub.none
+    ContactMe.subscriptions model

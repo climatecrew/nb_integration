@@ -1,5 +1,6 @@
-module ContactMe exposing (Model, Msg, Flags, init, view, update)
+module ContactMe exposing (Model, Msg, Flags, init, view, update, subscriptions)
 
+import Color
 import ContactMeForm exposing (Form)
 import ContactMeTypes exposing (..)
 import Dom
@@ -11,6 +12,7 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as JD
 import Json.Encode as JE
+import Spinner
 import Task
 
 
@@ -20,6 +22,8 @@ type alias Model =
     , personID : Maybe Int
     , form : Form
     , loading : Bool
+    , spinner : Spinner.Model
+    , spinnerConfig : Spinner.Config
     , complete : Bool
     }
 
@@ -39,8 +43,36 @@ initialModel flags =
     , personID = flags.nbPersonID
     , form = ContactMeForm.setupForm flags
     , loading = False
+    , spinner = Spinner.init
+    , spinnerConfig = spinnerConfig
     , complete = False
     }
+
+
+spinnerConfig : Spinner.Config
+spinnerConfig =
+    let
+        config =
+            Spinner.defaultConfig
+    in
+        { config
+            | radius = 35
+            , length = 30
+            , scale = 0.2
+            , width = 10
+            , translateX = 8
+            , color = (\_ -> Color.rgb buttonColor buttonColor buttonColor)
+        }
+
+
+buttonColor : Int
+buttonColor =
+    169
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.map SpinnerMsg Spinner.subscription
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -76,22 +108,21 @@ mainView model =
                     , li [ class <| submitButtonClass model ]
                         [ label [] []
                         , button [ onClick SubmitForm, id "submit-button" ] [ text "Submit" ]
-                        , emptyValidationView
+                        , loadingSpinner model
                         ]
                     ]
                 <|
                     FormResult.resultView model.form.result
             ]
-        , loadingSpinner model
         ]
 
 
 loadingSpinner : Model -> Html Msg
 loadingSpinner model =
     if model.loading then
-        div [ class "loader" ] []
+        span [ class "spinner-container" ] [ Spinner.view model.spinnerConfig model.spinner ]
     else
-        div [] []
+        span [ class "spinner-container" ] []
 
 
 emptyValidationView : Html Msg
@@ -133,6 +164,14 @@ update msg model =
 
         SubmitButtonUnfocused result ->
             ( model, Cmd.none )
+
+        SpinnerMsg msg ->
+            ( updateSpinner model msg, Cmd.none )
+
+
+updateSpinner : Model -> Spinner.Msg -> Model
+updateSpinner model msg =
+    { model | spinner = Spinner.update msg model.spinner }
 
 
 submitForm : Model -> ( Model, Cmd Msg )

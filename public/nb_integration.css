@@ -68,6 +68,11 @@
   color: #f70f32;
 }
 
+.flex-outer > li > span.spinner-container {
+  position: relative;
+  flex: 0 0 300px;
+}
+
 .flex-inner {
   justify-content: space-between;
 }
