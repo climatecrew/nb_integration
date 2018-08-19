@@ -41,6 +41,7 @@
 .flex-outer li button {
   box-sizing: border-box;
   margin-left: auto;
+  min-height: 35px;
   max-width: 240px;
   padding: 8px 0px;
   background: #353535;
@@ -68,9 +69,10 @@
   color: #f70f32;
 }
 
-.flex-outer > li > span.spinner-container {
-  position: relative;
-  flex: 0 0 300px;
+.flex-outer > li > button {
+  position: relative; /* keeps abolutely-positioned spinner inside button */
+  display: flex;
+  justify-content: center;
 }
 
 .flex-inner {

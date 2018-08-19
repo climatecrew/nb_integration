@@ -1,6 +1,5 @@
 module ContactMe exposing (Model, Msg, Flags, init, view, update, subscriptions)
 
-import Color
 import ContactMeForm exposing (Form)
 import ContactMeTypes exposing (..)
 import Dom
@@ -60,14 +59,7 @@ spinnerConfig =
             , length = 30
             , scale = 0.2
             , width = 10
-            , translateX = 8
-            , color = (\_ -> Color.rgb buttonColor buttonColor buttonColor)
         }
-
-
-buttonColor : Int
-buttonColor =
-    169
 
 
 subscriptions : Model -> Sub Msg
@@ -107,8 +99,9 @@ mainView model =
                     , li [] <| FormInput.inputView model.form.submitted model.form.notes Notes
                     , li [ class <| submitButtonClass model ]
                         [ label [] []
-                        , button [ onClick SubmitForm, id "submit-button" ] [ text "Submit" ]
-                        , loadingSpinner model
+                        , button [ onClick SubmitForm, id "submit-button" ]
+                            [ buttonContent model ]
+                        , emptyValidationView
                         ]
                     ]
                 <|
@@ -117,12 +110,12 @@ mainView model =
         ]
 
 
-loadingSpinner : Model -> Html Msg
-loadingSpinner model =
+buttonContent : Model -> Html Msg
+buttonContent model =
     if model.loading then
-        span [ class "spinner-container" ] [ Spinner.view model.spinnerConfig model.spinner ]
+        span [] [ Spinner.view model.spinnerConfig model.spinner ]
     else
-        span [ class "spinner-container" ] []
+        span [] [ text "Submit" ]
 
 
 emptyValidationView : Html Msg
@@ -132,7 +125,7 @@ emptyValidationView =
 
 submitButtonClass : Model -> String
 submitButtonClass model =
-    if ContactMeForm.formInputsValid model.form && not model.loading && not model.complete then
+    if ContactMeForm.formInputsValid model.form && not model.complete then
         "create-event-button"
     else
         "create-event-button create-event-button-disabled"
