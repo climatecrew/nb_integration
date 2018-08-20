@@ -124,9 +124,7 @@ class HandleContactRequestCreation
 
     errors = ErrorPresenter.new(nb_response.body).to_h
     errors['errors'].each do |error|
-      if error['title'].nil?
-        error['title'] = 'Failed to create contact request'
-      end
+      error['title'] = 'Failed to create contact request' if error['title'].nil?
     end
 
     [nb_response.status, errors]

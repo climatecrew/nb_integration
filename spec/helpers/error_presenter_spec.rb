@@ -21,16 +21,16 @@ RSpec.describe ErrorPresenter do
     expect(described_class.new(nb_body).to_h).to eq(expected)
   end
 
-  it "if NB validation_errors present it transforms them into error items with titles" do
+  it 'if NB validation_errors present it transforms them into error items with titles' do
     nb_body = <<~JSON
-    {
-      "code":"validation_failed",
-      "message":"Validation Failed.",
-      "validation_errors":[
-        "email is too short (minimum is 3 characters)",
-        "email 'c' should look like an email address"
-      ]
-    }
+      {
+        "code":"validation_failed",
+        "message":"Validation Failed.",
+        "validation_errors":[
+          "email is too short (minimum is 3 characters)",
+          "email 'c' should look like an email address"
+        ]
+      }
     JSON
 
     expected = {

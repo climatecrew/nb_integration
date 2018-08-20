@@ -102,10 +102,10 @@ class Server < Roda
       r.is 'contact_requests' do
         slug = r.params['slug']
         if slug.nil?
-          r.halt(422, ErrorPresenter.new({ title: 'missing slug parameter' }).to_h)
+          r.halt(422, ErrorPresenter.new(title: 'missing slug parameter').to_h)
         else
           account = Account.first(nb_slug: slug)
-          r.halt(422, ErrorPresenter.new({ title: "nation slug '#{slug}' not recognized" }).to_h) if account.nil?
+          r.halt(422, ErrorPresenter.new(title: "nation slug '#{slug}' not recognized").to_h) if account.nil?
         end
 
         r.post do
@@ -119,7 +119,7 @@ class Server < Roda
     rescue StandardError => error
       logger.warn(error)
       response.status = 500
-      ErrorPresenter.new({ title: 'An unexpected error has occurred.' }).to_h
+      ErrorPresenter.new(title: 'An unexpected error has occurred.').to_h
     end
   end
 end

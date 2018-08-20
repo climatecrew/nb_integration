@@ -3,8 +3,8 @@
 require 'json'
 
 class ErrorPresenter
-  def initialize(body='{}')
-    @body = if body.kind_of?(Hash)
+  def initialize(body = '{}')
+    @body = if body.is_a?(Hash)
               body
             else
               JSON.parse(body.to_s)
@@ -19,7 +19,7 @@ class ErrorPresenter
   private
 
   def transform(body)
-    if body.has_key?('validation_errors')
+    if body.key?('validation_errors')
       validation_errors = body['validation_errors']
       validation_errors.map do |error|
         {
@@ -28,7 +28,7 @@ class ErrorPresenter
           'detail' => nil
         }
       end
-    elsif body.has_key?('message')
+    elsif body.key?('message')
       [{
         'code' => body['code'],
         'title' => nil,
