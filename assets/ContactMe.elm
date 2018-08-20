@@ -183,11 +183,18 @@ submitForm model =
                 False ->
                     { model | form = ContactMeForm.submit form, loading = False }
 
+        blurMsg =
+            Dom.blur "submit-button"
+                |> Task.attempt SubmitButtonUnfocused
+
+        requestMsg =
+            Http.send SubmitFormResult (createContactRequest model)
+
         cmd =
             if (not model.loading) && ContactMeForm.formInputsValid model.form then
-                Http.send SubmitFormResult (createContactRequest model)
+                Cmd.batch [ blurMsg, requestMsg ]
             else
-                Cmd.none
+                blurMsg
     in
         ( updatedModel, cmd )
 
@@ -288,17 +295,13 @@ submitFormResult model result =
 
                 otherwise ->
                     False
-
-        msg =
-            Dom.blur "submit-button"
-                |> Task.attempt SubmitButtonUnfocused
     in
         ( { model
             | loading = False
             , complete = complete
             , form = updateFormResult model.form result
           }
-        , msg
+        , Cmd.none
         )
 
 
