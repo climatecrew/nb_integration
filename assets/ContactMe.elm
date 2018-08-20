@@ -128,9 +128,9 @@ emptyValidationView =
 submitButtonClass : Model -> String
 submitButtonClass model =
     if ContactMeForm.formInputsValid model.form && not model.complete then
-        "submit-button"
+        "nb-integration-submit-button"
     else
-        "submit-button submit-button-disabled"
+        "nb-integration-submit-button nb-integration-submit-button-disabled"
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
