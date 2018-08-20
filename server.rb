@@ -16,11 +16,6 @@ class Server < Roda
   plugin :public, gzip: true, default_mime: 'text/html'
   plugin :halt
 
-  def event(event_index_response)
-    data = JSON.parse(event_index_response.body)
-    data['results'].first
-  end
-
   def logger
     env['rack.logger']
   end
@@ -119,34 +114,6 @@ class Server < Roda
           code, body = HandleContactRequestCreation.new(logger, account, payload).call
           response.status = code
           body
-        end
-      end
-
-      r.is 'events' do
-        slug = r.params['slug']
-        if slug.nil?
-          r.halt(422, ErrorPresenter.new({ title: 'missing slug parameter' }).to_h)
-        else
-          account = Account.first(nb_slug: slug)
-          r.halt(422, ErrorPresenter.new({ title: "nation slug '#{slug}' not recognized" }).to_h) if account.nil?
-        end
-
-        r.post do
-          logger.info("Attempting to create event for nation #{slug}")
-          payload = r.params['data']
-          code, body = HandleEventCreation.new(logger, account, payload).call
-          response.status = code
-          body
-        end
-
-        r.get do
-          conditions = { nb_slug: slug }
-          conditions[:author_nb_id] = r.params['author_nb_id'] unless r.params['author_nb_id'].nil?
-
-          events = Event.where(conditions)
-
-          response.status =  200
-          { data: events.map { |event| JSON.parse(event.nb_event) } }
         end
       end
     rescue StandardError => error
