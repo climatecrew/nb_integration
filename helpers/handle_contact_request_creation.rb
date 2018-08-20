@@ -92,7 +92,7 @@ class HandleContactRequestCreation
     nb_person = begin
                  JSON.parse(nb_response.body)
                rescue JSON::ParserError
-                 logger.warn("Create Event: Invalid JSON returned by NationBuilder: #{nb_response.body}")
+                 logger.warn("#{self.class}: Invalid JSON returned by NationBuilder: #{nb_response.body}")
                  nil
                end
     if nb_person.nil?
@@ -120,7 +120,7 @@ class HandleContactRequestCreation
   end
 
   def on_failure(nb_response)
-    logger.warn("Create Event: NationBuilder request failed. Status: #{nb_response.status} / Body: #{nb_response.body}")
+    logger.warn("#{self.class}: NationBuilder request failed. Status: #{nb_response.status} / Body: #{nb_response.body}")
 
     errors = ErrorPresenter.new(nb_response.body).to_h
     errors['errors'].each do |error|
