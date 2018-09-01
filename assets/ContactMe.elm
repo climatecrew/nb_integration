@@ -342,7 +342,7 @@ transformHttpError form httpError =
         Http.BadStatus response ->
             let
                 httpStatus =
-                    toString response.status.code ++ " " ++ response.status.message
+                    String.fromInt response.status.code ++ " " ++ response.status.message
 
                 decodeResult =
                     Result.withDefault [ { title = Just httpStatus, detail = Nothing } ] <|
