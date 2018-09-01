@@ -1,12 +1,12 @@
-module ContactMe exposing (Model, Msg, Flags, init, view, update, subscriptions)
+module ContactMe exposing (Flags, Model, Msg, init, subscriptions, update, view)
 
 import ContactMeForm exposing (Form)
 import ContactMeTypes exposing (..)
 import Dom
 import FormInput exposing (FormInput)
 import FormResult exposing (FormResult)
-import Html exposing (Html, div, span, text, ul, li, input, textarea, label, button)
-import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows, value)
+import Html exposing (Html, button, div, input, label, li, span, text, textarea, ul)
+import Html.Attributes exposing (class, for, id, placeholder, rows, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as JD
@@ -54,12 +54,12 @@ spinnerConfig =
         config =
             Spinner.defaultConfig
     in
-        { config
-            | radius = 35
-            , length = 30
-            , scale = 0.2
-            , width = 10
-        }
+    { config
+        | radius = 35
+        , length = 30
+        , scale = 0.2
+        , width = 10
+    }
 
 
 subscriptions : Model -> Sub Msg
@@ -73,7 +73,7 @@ init flags =
         model =
             initialModel flags
     in
-        ( model, Cmd.none )
+    ( model, Cmd.none )
 
 
 view : Model -> Html Msg
@@ -116,6 +116,7 @@ buttonContent model =
         [ span [ class "not-visible" ] [ text "Submit" ]
         , span [] [ Spinner.view model.spinnerConfig model.spinner ]
         ]
+
     else
         [ span [] [ text "Submit" ] ]
 
@@ -129,6 +130,7 @@ submitButtonClass : Model -> String
 submitButtonClass model =
     if ContactMeForm.formInputsValid model.form && not model.complete then
         "nb-integration-submit-button"
+
     else
         "nb-integration-submit-button nb-integration-submit-button-disabled"
 
@@ -191,12 +193,13 @@ submitForm model =
             Http.send SubmitFormResult (createContactRequest model)
 
         cmd =
-            if (not model.loading) && ContactMeForm.formInputsValid model.form then
+            if not model.loading && ContactMeForm.formInputsValid model.form then
                 Cmd.batch [ blurMsg, requestMsg ]
+
             else
                 blurMsg
     in
-        ( updatedModel, cmd )
+    ( updatedModel, cmd )
 
 
 contactRequestsURL : Model -> String
@@ -241,24 +244,24 @@ encodeContactRequest model =
         person_id =
             encodeNullable JE.int model.personID
     in
-        JE.object
-            [ ( "data"
-              , JE.object
-                    [ ( "person"
-                      , JE.object
-                            [ ( "id", person_id )
-                            , ( "first_name", firstName )
-                            , ( "last_name", lastName )
-                            , ( "email", email )
-                            , ( "phone", phone )
-                            , ( "mobile", mobile )
-                            , ( "work_phone_number", workPhoneNumber )
-                            ]
-                      )
-                    , ( "notes", notes )
-                    ]
-              )
-            ]
+    JE.object
+        [ ( "data"
+          , JE.object
+                [ ( "person"
+                  , JE.object
+                        [ ( "id", person_id )
+                        , ( "first_name", firstName )
+                        , ( "last_name", lastName )
+                        , ( "email", email )
+                        , ( "phone", phone )
+                        , ( "mobile", mobile )
+                        , ( "work_phone_number", workPhoneNumber )
+                        ]
+                  )
+                , ( "notes", notes )
+                ]
+          )
+        ]
 
 
 encodeNullable : (t -> JE.Value) -> Maybe t -> JE.Value
@@ -296,13 +299,13 @@ submitFormResult model result =
                 otherwise ->
                     False
     in
-        ( { model
-            | loading = False
-            , complete = complete
-            , form = updateFormResult model.form result
-          }
-        , Cmd.none
-        )
+    ( { model
+        | loading = False
+        , complete = complete
+        , form = updateFormResult model.form result
+      }
+    , Cmd.none
+    )
 
 
 updateFormResult : Form -> Result Http.Error APIResult -> Form
@@ -348,7 +351,7 @@ transformHttpError form httpError =
                 errorList =
                     List.filterMap errorChooser decodeResult
             in
-                ContactMeForm.errorResult form ( "Submission failed:", errorList )
+            ContactMeForm.errorResult form ( "Submission failed:", errorList )
 
         -- BadPayload: success response code but undecodable response body
         -- Likely means API changed

@@ -1,6 +1,6 @@
-module FormResult exposing (FormResult, resultView, initialFormResult, successResult, errorResult)
+module FormResult exposing (FormResult, errorResult, initialFormResult, resultView, successResult)
 
-import Html exposing (Html, text, label, ul, li, div)
+import Html exposing (Html, div, label, li, text, ul)
 import Html.Attributes exposing (class)
 
 
@@ -31,24 +31,24 @@ resultView formResult =
         placeholderLabel =
             label [] []
     in
-        case formResult of
-            NotYetObtained ->
-                [ li []
-                    [ placeholderLabel
-                    , text ""
-                    ]
+    case formResult of
+        NotYetObtained ->
+            [ li []
+                [ placeholderLabel
+                , text ""
                 ]
+            ]
 
-            Errors message distinctErrors ->
-                let
-                    errorItems =
-                        List.map (\e -> li [] [ placeholderLabel, text e ]) distinctErrors
-                in
-                    (li [] [ placeholderLabel, text message ]) :: errorItems
+        Errors message distinctErrors ->
+            let
+                errorItems =
+                    List.map (\e -> li [] [ placeholderLabel, text e ]) distinctErrors
+            in
+            li [] [ placeholderLabel, text message ] :: errorItems
 
-            Success message ->
-                [ li []
-                    [ placeholderLabel
-                    , text message
-                    ]
+        Success message ->
+            [ li []
+                [ placeholderLabel
+                , text message
                 ]
+            ]

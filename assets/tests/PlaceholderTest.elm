@@ -1,4 +1,4 @@
-module PlaceholderTest exposing (..)
+module PlaceholderTest exposing (suite)
 
 import Expect exposing (Expectation)
 import Test exposing (..)

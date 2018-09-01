@@ -1,4 +1,4 @@
-module ContactMeTypes exposing (..)
+module ContactMeTypes exposing (APIResult(..), ContactRequest, Error, Flags, Msg(..))
 
 import Dom
 import Http

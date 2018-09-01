@@ -1,10 +1,8 @@
-module ContactMeForm exposing (..)
+module ContactMeForm exposing (Form, FormInputValues, errorResult, formInputValues, formInputsValid, setupForm, submit, successResult, updateEmail, updateFirstName, updateLastName, updateNotes, updatePhone)
 
-import ContactMeTypes exposing (Flags)
+import ContactMeTypes exposing (APIResult, Flags, Msg)
 import FormInput exposing (FormInput)
 import FormResult exposing (FormResult)
-import ContactMeTypes exposing (Msg)
-import ContactMeTypes exposing (APIResult)
 
 
 type alias Form =
@@ -45,7 +43,7 @@ setupForm : Flags -> Form
 setupForm flags =
     let
         isValid =
-            (\val -> String.length val > 0)
+            \val -> String.length val > 0
 
         firstNameInput =
             case flags.nbPersonID of
@@ -60,7 +58,7 @@ setupForm flags =
                         , type_ = "first_name"
                         , touched = False
                         , isValid = isValid
-                        , errorMessage = (\val -> "First Name is required")
+                        , errorMessage = \val -> "First Name is required"
                         }
 
                 Just _ ->
@@ -80,7 +78,7 @@ setupForm flags =
                         , type_ = "last_name"
                         , touched = False
                         , isValid = isValid
-                        , errorMessage = (\val -> "Last Name is required")
+                        , errorMessage = \val -> "Last Name is required"
                         }
 
                 Just _ ->
@@ -100,7 +98,7 @@ setupForm flags =
                         , type_ = "email"
                         , touched = False
                         , isValid = isValid
-                        , errorMessage = (\val -> "Email is required")
+                        , errorMessage = \val -> "Email is required"
                         }
 
                 Just email ->
@@ -126,8 +124,8 @@ setupForm flags =
                         , id = "phone"
                         , type_ = "text"
                         , touched = False
-                        , isValid = (\_ -> True)
-                        , errorMessage = (\_ -> "")
+                        , isValid = \_ -> True
+                        , errorMessage = \_ -> ""
                         }
 
                 otherwise ->
@@ -152,20 +150,20 @@ setupForm flags =
                 , id = "notes"
                 , type_ = "text"
                 , touched = False
-                , isValid = (\_ -> True)
-                , errorMessage = (\_ -> "")
+                , isValid = \_ -> True
+                , errorMessage = \_ -> ""
                 }
     in
-        { submitted = False
-        , firstName = firstNameInput
-        , lastName = lastNameInput
-        , email = emailInput
-        , phone = phoneInput
-        , mobile = mobileInput
-        , workPhoneNumber = workPhoneNumberInput
-        , notes = notesInput
-        , result = FormResult.initialFormResult
-        }
+    { submitted = False
+    , firstName = firstNameInput
+    , lastName = lastNameInput
+    , email = emailInput
+    , phone = phoneInput
+    , mobile = mobileInput
+    , workPhoneNumber = workPhoneNumberInput
+    , notes = notesInput
+    , result = FormResult.initialFormResult
+    }
 
 
 updateFirstName : Form -> String -> Form

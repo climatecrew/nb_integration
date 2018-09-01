@@ -1,7 +1,7 @@
-module FormInput exposing (FormInput, TextInputType(..), setupNonInteractiveInput, setupInteractiveInput, updateFormInput, value, valid, inputView)
+module FormInput exposing (FormInput, TextInputType(..), inputView, setupInteractiveInput, setupNonInteractiveInput, updateFormInput, valid, value)
 
-import Html exposing (Html, span, text, input, textarea, label, div)
-import Html.Attributes exposing (id, class, placeholder, style, type_, for, rows, value)
+import Html exposing (Html, div, input, label, span, text, textarea)
+import Html.Attributes exposing (class, for, id, placeholder, rows, style, type_, value)
 import Html.Events exposing (onInput)
 
 
@@ -50,12 +50,14 @@ updateFormInput formInput val =
         Interactive input ->
             if String.length val > 0 then
                 Interactive { input | value = Just val, touched = True }
+
             else
                 Interactive { input | value = Nothing, touched = True }
 
         NonInteractive input ->
             if String.length val > 0 then
                 NonInteractive { input | value = Just val }
+
             else
                 NonInteractive { input | value = Nothing }
 
@@ -109,25 +111,26 @@ inputView formSubmitted formInput inputMsg =
             (not <| input.isValid <| Maybe.withDefault "" input.value)
                 && (input.touched || formSubmitted)
     in
-        case formInput of
-            NonInteractive _ ->
-                []
+    case formInput of
+        NonInteractive _ ->
+            []
 
-            Interactive input ->
-                [ label [ for input.for ] [ text input.label ]
-                , htmlInput input
-                , span
-                    [ class "validation"
-                    , style [ ( "visibility", validationVisibility <| showValidation input ) ]
-                    ]
-                    [ text <| validationMessage input ]
+        Interactive input ->
+            [ label [ for input.for ] [ text input.label ]
+            , htmlInput input
+            , span
+                [ class "validation"
+                , style "visibility" (validationVisibility <| showValidation input)
                 ]
+                [ text <| validationMessage input ]
+            ]
 
 
 validationVisibility : Bool -> String
 validationVisibility showErrors =
     if showErrors then
         "visible"
+
     else
         "hidden"
 
@@ -136,5 +139,6 @@ validationMessage : InteractiveInput -> String
 validationMessage input =
     if input.isValid (Maybe.withDefault "" input.value) then
         ""
+
     else
         input.errorMessage (Maybe.withDefault "" input.value)

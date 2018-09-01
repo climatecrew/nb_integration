@@ -1,7 +1,7 @@
-module Main exposing (..)
+module Main exposing (main, subscriptions)
 
-import Html exposing (programWithFlags)
 import ContactMe
+import Html exposing (programWithFlags)
 
 
 main : Program ContactMe.Flags ContactMe.Model ContactMe.Msg
