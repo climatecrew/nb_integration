@@ -7,11 +7,11 @@
   "author": "Stephen Karger <stephen.karger@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "elm": "^0.18.0"
+    "elm": "^0.19.0-bugfix2"
   },
   "scripts": {
     "test": "cd assets && elm-test",
-    "postinstall": "yarn run elm-package install -y && yarn run elm-make assets/Main.elm --output public/nb_integration.js",
+    "postinstall": "yarn run elm make assets/Main.elm --output public/nb_integration.js",
     "heroku-postbuild": "gzip -f public/nb_integration.js"
   },
   "devDependencies": {
