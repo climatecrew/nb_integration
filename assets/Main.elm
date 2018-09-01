@@ -1,12 +1,12 @@
 module Main exposing (main, subscriptions)
 
+import Browser
 import ContactMe
-import Html exposing (programWithFlags)
 
 
 main : Program ContactMe.Flags ContactMe.Model ContactMe.Msg
 main =
-    programWithFlags
+    Browser.element
         { init = ContactMe.init
         , update = ContactMe.update
         , subscriptions = subscriptions
