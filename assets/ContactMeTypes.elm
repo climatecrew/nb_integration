@@ -2,7 +2,10 @@ module ContactMeTypes exposing (APIResult(..), ContactRequest, Error, Flags, Msg
 
 import Dom
 import Http
-import Spinner
+
+
+
+--import Spinner
 
 
 type Msg
@@ -14,7 +17,10 @@ type Msg
     | SubmitForm
     | SubmitFormResult (Result Http.Error APIResult)
     | SubmitButtonUnfocused (Result Dom.Error ())
-    | SpinnerMsg Spinner.Msg
+
+
+
+--    | SpinnerMsg Spinner.Msg
 
 
 type alias Flags =
