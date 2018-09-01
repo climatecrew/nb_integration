@@ -29,7 +29,10 @@ var NBIntegration = {
         }
 
         script.onload = function() {
-            Elm.Main.embed(domNode, flags);
+            Elm.Main.init({
+                node: domNode,
+                flags: flags
+            });
         }
 
         document.head.appendChild(script);
