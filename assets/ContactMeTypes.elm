@@ -1,6 +1,6 @@
 module ContactMeTypes exposing (APIResult(..), ContactRequest, Error, Flags, Msg(..))
 
-import Dom
+import Browser.Dom as Dom
 import Http
 
 

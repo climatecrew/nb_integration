@@ -2,9 +2,9 @@ module ContactMe exposing (Flags, Model, Msg, init, subscriptions, update, view)
 
 --import Spinner
 
+import Browser.Dom as Dom
 import ContactMeForm exposing (Form)
 import ContactMeTypes exposing (..)
-import Dom
 import FormInput exposing (FormInput)
 import FormResult exposing (FormResult)
 import Html exposing (Html, button, div, input, label, li, span, text, textarea, ul)
