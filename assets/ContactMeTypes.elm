@@ -1,4 +1,4 @@
-module ContactMeTypes exposing (APIResult(..), ContactRequest, Error, Flags, Msg(..))
+module ContactMeTypes exposing (APIResult(..), Error, Flags, Msg(..))
 
 import Browser.Dom as Dom
 import Http
@@ -33,10 +33,6 @@ type alias Flags =
 type APIResult
     = APIErrors (List Error)
     | APIContactRequest
-
-
-type alias ContactRequest =
-    String
 
 
 type alias Error =

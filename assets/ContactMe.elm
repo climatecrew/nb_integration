@@ -37,10 +37,32 @@ type alias Flags =
 
 initialModel : Flags -> Model
 initialModel flags =
+    let
+        emptyNotes =
+            Just ""
+
+        showNameInput =
+            case flags.nbPersonID of
+                Just _ ->
+                    True
+
+                Nothing ->
+                    False
+
+        initialFormValues =
+            ContactMeForm.FormInputValues
+                flags.nbFirstName
+                flags.nbLastName
+                flags.nbEmail
+                flags.nbPhone
+                flags.nbMobile
+                flags.nbWorkPhoneNumber
+                emptyNotes
+    in
     { rootURL = flags.rootURL
     , slug = flags.slug
     , personID = flags.nbPersonID
-    , form = ContactMeForm.setupForm flags
+    , form = ContactMeForm.setupForm initialFormValues showNameInput
     , loading = False
     , spinner = Spinner.init
     , spinnerConfig = spinnerConfig

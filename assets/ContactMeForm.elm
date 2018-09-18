@@ -1,6 +1,5 @@
 module ContactMeForm exposing (Form, FormInputValues, errorResult, formInputValues, formInputsValid, setupForm, submit, successResult, updateEmail, updateFirstName, updateLastName, updateNotes, updatePhone)
 
-import ContactMeTypes exposing (Flags)
 import FormInput exposing (FormInput)
 import FormResult exposing (FormResult)
 
@@ -39,15 +38,15 @@ type alias FormInputValues =
     }
 
 
-setupForm : Flags -> Form
-setupForm flags =
+setupForm : FormInputValues -> Bool -> Form
+setupForm values showNameInput =
     let
         isValid =
             \val -> String.length val > 0
 
         firstNameInput =
-            case flags.nbPersonID of
-                Nothing ->
+            case showNameInput of
+                True ->
                     FormInput.setupInteractiveInput
                         { inputType = FormInput.Input
                         , value = Nothing
@@ -61,13 +60,13 @@ setupForm flags =
                         , errorMessage = \val -> "First Name is required"
                         }
 
-                Just _ ->
+                False ->
                     FormInput.setupNonInteractiveInput
-                        { value = flags.nbFirstName }
+                        { value = values.firstName }
 
         lastNameInput =
-            case flags.nbPersonID of
-                Nothing ->
+            case showNameInput of
+                True ->
                     FormInput.setupInteractiveInput
                         { inputType = FormInput.Input
                         , value = Nothing
@@ -81,12 +80,12 @@ setupForm flags =
                         , errorMessage = \val -> "Last Name is required"
                         }
 
-                Just _ ->
+                False ->
                     FormInput.setupNonInteractiveInput
-                        { value = flags.nbLastName }
+                        { value = values.lastName }
 
         emailInput =
-            case flags.nbEmail of
+            case values.email of
                 Nothing ->
                     FormInput.setupInteractiveInput
                         { inputType = FormInput.Input
@@ -108,9 +107,9 @@ setupForm flags =
         phoneInput =
             case
                 List.filterMap identity
-                    [ flags.nbPhone
-                    , flags.nbMobile
-                    , flags.nbWorkPhoneNumber
+                    [ values.phone
+                    , values.mobile
+                    , values.workPhoneNumber
                     ]
                     |> List.length
             of
@@ -130,15 +129,15 @@ setupForm flags =
 
                 otherwise ->
                     FormInput.setupNonInteractiveInput
-                        { value = flags.nbPhone }
+                        { value = values.phone }
 
         mobileInput =
             FormInput.setupNonInteractiveInput
-                { value = flags.nbMobile }
+                { value = values.mobile }
 
         workPhoneNumberInput =
             FormInput.setupNonInteractiveInput
-                { value = flags.nbWorkPhoneNumber }
+                { value = values.workPhoneNumber }
 
         notesInput =
             FormInput.setupInteractiveInput
