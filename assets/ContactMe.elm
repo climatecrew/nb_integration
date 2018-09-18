@@ -2,7 +2,6 @@ module ContactMe exposing (Flags, Model, Msg, init, subscriptions, update, view)
 
 import Browser.Dom as Dom
 import ContactMeForm exposing (Form)
-import ContactMeTypes exposing (..)
 import FormInput exposing (FormInput)
 import FormResult exposing (FormResult)
 import Html exposing (Html, button, div, input, label, li, span, text, textarea, ul)
@@ -27,12 +26,40 @@ type alias Model =
     }
 
 
-type alias Msg =
-    ContactMeTypes.Msg
+type Msg
+    = FirstName String
+    | LastName String
+    | Email String
+    | Phone String
+    | Notes String
+    | SubmitForm
+    | SubmitFormResult (Result Http.Error APIResult)
+    | SubmitButtonUnfocused (Result Dom.Error ())
+    | SpinnerMsg Spinner.Msg
 
 
 type alias Flags =
-    ContactMeTypes.Flags
+    { nbPersonID : Maybe Int
+    , nbFirstName : Maybe String
+    , nbLastName : Maybe String
+    , nbEmail : Maybe String
+    , nbPhone : Maybe String
+    , nbMobile : Maybe String
+    , nbWorkPhoneNumber : Maybe String
+    , rootURL : String
+    , slug : String
+    }
+
+
+type APIResult
+    = APIErrors (List Error)
+    | APIContactRequest
+
+
+type alias Error =
+    { title : Maybe String
+    , detail : Maybe String
+    }
 
 
 initialModel : Flags -> Model
