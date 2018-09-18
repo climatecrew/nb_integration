@@ -1,6 +1,6 @@
 module ContactMeForm exposing (Form, FormInputValues, errorResult, formInputValues, formInputsValid, setupForm, submit, successResult, updateEmail, updateFirstName, updateLastName, updateNotes, updatePhone)
 
-import ContactMeTypes exposing (APIResult, Flags, Msg)
+import ContactMeTypes exposing (Flags)
 import FormInput exposing (FormInput)
 import FormResult exposing (FormResult)
 
