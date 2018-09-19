@@ -99,6 +99,13 @@ class Server < Roda
         end
       end
 
+      r.is "test" do
+        r.post do
+          logger.info("test endpoint received payload:\n#{r.body.read}")
+          {}
+        end
+      end
+
       r.is 'contact_requests' do
         slug = r.params['slug']
         if slug.nil?
