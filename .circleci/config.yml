@@ -45,7 +45,7 @@ jobs:
       # Download and cache client dependencies
       - restore_cache:
           keys:
-          - v1-client-dependencies-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "assets/tests/elm-package.json" }}
+          - v1-client-dependencies-{{ checksum "package.json" }}-{{ checksum "elm.json" }}-{{ checksum "assets/tests/elm.json" }}
           # fallback to using the latest cache if no exact match is found
           - v1-client-dependencies-
 
@@ -63,7 +63,8 @@ jobs:
           name: install client dependencies
           command: |
             sysconfcpus -n 2 make client
-            sysconfcpus -n 2 make client-test-packages
+            # temp: remove until elm-test fixed
+            # sysconfcpus -n 2 make client-test-packages
 
       - save_cache:
           paths:
@@ -71,7 +72,7 @@ jobs:
             - ./node_modules
             - ./elm-stuff
             - ./tests/elm-stuff
-          key: v1-client-dependencies-{{ checksum "package.json" }}-{{ checksum "elm-package.json" }}-{{ checksum "assets/tests/elm-package.json" }}
+          key: v1-client-dependencies-{{ checksum "package.json" }}-{{ checksum "elm.json" }}-{{ checksum "assets/tests/elm.json" }}
         
 
       # Database setup
