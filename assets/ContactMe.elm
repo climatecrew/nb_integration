@@ -68,13 +68,16 @@ initialModel flags =
         emptyNotes =
             Just ""
 
-        showNameInput =
+        loggedInUser =
             case flags.nbPersonID of
                 Just _ ->
                     True
 
                 Nothing ->
                     False
+
+        showNameInput =
+            not loggedInUser
 
         initialFormValues =
             ContactMeForm.FormInputValues
