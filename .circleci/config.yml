@@ -43,11 +43,12 @@ jobs:
           key: v1-server-dependencies-{{ checksum "Gemfile.lock" }}
 
       # Download and cache client dependencies
-      - restore_cache:
-          keys:
-          - v1-client-dependencies-{{ checksum "package.json" }}-{{ checksum "elm.json" }}-{{ checksum "assets/tests/elm.json" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-client-dependencies-
+      # temp: sort out with Elm 0.19
+      #- restore_cache:
+      #    keys:
+      #    - v1-client-dependencies-{{ checksum "package.json" }}-{{ checksum "elm.json" }}-{{ checksum "assets/tests/elm.json" }}
+      #    # fallback to using the latest cache if no exact match is found
+      #    - v1-client-dependencies-
 
       - run:
           name: install sysconfcpus to speed up Elm compiler
