@@ -12,7 +12,7 @@ client:
 	yarn
 
 client-test-packages:
-	cd assets/tests && yarn run elm install -y
+	cd assets/tests && yarn run elm make
 
 client-test:
 	yarn test
