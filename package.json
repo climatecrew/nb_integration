@@ -8,14 +8,15 @@
   "license": "MIT",
   "dependencies": {
     "elm": "^0.19.0-bugfix2",
-    "elm-test": "^0.19.0-beta9"
+    "uglify-js": "^3.4.9"
   },
   "scripts": {
     "test": "cd assets && elm-test",
-    "postinstall": "yarn run elm make assets/Main.elm --output public/nb_integration.js",
-    "heroku-postbuild": "gzip -f public/nb_integration.js"
+    "postinstall": "yarn run elm make ${ELM_MAKE_OPTIMIZE_FLAG} assets/Main.elm --output public/nb_integration.js",
+    "heroku-postbuild": "yarn run --silent uglifyjs public/nb_integration.js --compress 'pure_funcs=\"F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9\",pure_getters,keep_fargs=false,unsafe_comps,unsafe' | yarn run --silent uglifyjs --mangle --output=public/nb_integration.js; gzip -f public/nb_integration.js"
   },
   "devDependencies": {
+    "elm-test": "^0.19.0-beta9",
     "markdown-toc": "^1.2.0"
   }
 }
